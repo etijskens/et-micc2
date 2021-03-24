@@ -1,22 +1,22 @@
 
-.. automodule:: et_micc
+.. automodule:: et_micc2
    :members:
 
-.. automodule:: et_micc.project
+.. automodule:: et_micc2.project
    :members:
 
-.. automodule:: et_micc.expand
+.. automodule:: et_micc2.expand
    :members:
 
-.. automodule:: et_micc.logger
+.. automodule:: et_micc2.logger
    :members:
 
-.. automodule:: et_micc.utils
+.. automodule:: et_micc2.utils
    :members:
 
-.. automodule:: et_micc.tomlfile
+.. automodule:: et_micc2.tomlfile
    :members:
    
-.. automodule:: et_micc.static_vars
+.. automodule:: et_micc2.static_vars
    :members:
    

@@ -254,12 +254,12 @@ Finally, we run ``poetry install`` to install the remaining dependencies (we rem
       - Installing walkdir (0.4.1)
       - Installing atomicwrites (1.3.0)
       - Installing attrs (19.3.0)
-      - Installing et-micc (0.10.13)
+      - Installing et-micc2 (0.10.13)
       - Installing pluggy (0.13.1)
       - Installing py (1.8.0)
       - Installing pybind11 (2.4.3)
       - Installing wcwidth (0.1.7)
-      - Installing et-micc-build (0.10.13)
+      - Installing et-micc2-build (0.10.13)
       - Installing pytest (4.6.8)
       - Installing ET-dot (1.0.0)
 
@@ -272,8 +272,8 @@ available:
     # Name                    Version                   Build  Channel
     ...
     et-dot                    1.0.0                     dev_0    <develop>
-    et-micc                   0.10.13                  pypi_0    pypi
-    et-micc-build             0.10.13                  pypi_0    pypi
+    et-micc2                   0.10.13                  pypi_0    pypi
+    et-micc2-build             0.10.13                  pypi_0    pypi
     ...
     intel-openmp              2019.4                      233
     ...
@@ -421,7 +421,7 @@ We do not recommend to use ``poetry install`` to install the project`s dependenc
 Intel distribution for Python, apparently, uses distutils instead of pip for its distributions,
 wich causes problems). Rather, install them manually::
 
-    (/Users/etijskens/software/dev/workspace/ET-dot/.idp) > pip install et-micc-build
+    (/Users/etijskens/software/dev/workspace/ET-dot/.idp) > pip install et-micc2-build
     ...
     (/Users/etijskens/software/dev/workspace/ET-dot/.idp) > pip install pytest
     ...
@@ -497,15 +497,15 @@ The name chosens is arbitrary of course, but it resembles the .venv we had above
 the :py:mod:`venv` Python package. In fact, also the location is arbitrary, but the project
 root directory is a familiar place for this.
 
-Next, we use pip_ to install et-micc-build into :file:`.cenv`::
+Next, we use pip_ to install et-micc2-build into :file:`.cenv`::
 
-    > pip install -t .cenv et-micc-build
-    Collecting et-micc-build==0.10.13
+    > pip install -t .cenv et-micc2-build
+    Collecting et-micc2-build==0.10.13
       Using cached https://files.pythonhosted.org/packages/1f/41/a3c2ca300f735742f7183127afaf302e3c9875ff14dedf1cf14b1850774e/et_micc_build-0.10.13-py3-none-any.whl
     ...
     Successfully installed MarkupSafe-1.1.1 Pygments-2.5.2 alabaster-0.7.12 arrow-0.15.4
     babel-2.7.0 binaryornot-0.4.4 certifi-2019.11.28 chardet-3.0.4 click-7.0 cookiecutter-1.6.0
-    docutils-0.15.2 et-micc-0.10.13 et-micc-build-0.10.13 future-0.18.2 idna-2.8 imagesize-1.1.0
+    docutils-0.15.2 et-micc2-0.10.13 et-micc2-build-0.10.13 future-0.18.2 idna-2.8 imagesize-1.1.0
     jinja2-2.10.3 jinja2-time-0.2.0 numpy-1.17.4 packaging-19.2 pbr-5.4.4 poyo-0.5.0 pybind11-2.4.3
     pyparsing-2.4.5 python-dateutil-2.8.1 pytz-2019.3 requests-2.22.0 semantic-version-2.8.3
     setuptools-42.0.2 six-1.13.0 snowballstemmer-2.0.0 sphinx-2.3.0 sphinx-click-2.3.1
@@ -615,7 +615,7 @@ Run pytest to see if everything is working::
 
 Inspecting the output shows us that we are half way: the f2py module :py:mod:`dotf` was built,
 but the cpp module :py:mod:`dotc` failed to build because the pybind11 include files could not
-be found. Although ``pybind11-2.4.3`` appears in the output of ``pip install -t .cenv et-micc-build``
+be found. Although ``pybind11-2.4.3`` appears in the output of ``pip install -t .cenv et-micc2-build``
 above, it only installs the python components (which we don't need) and not the include files
 (which we do need). This is not to difficult to solve. First clone the pybind11 git repo
 somewhere in ``$VSC_DATA``. We choose to do that in the parent directory of ET-dot::

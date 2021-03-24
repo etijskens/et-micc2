@@ -14,7 +14,7 @@ forth between both environments several times.
 There are important differences in managing your environment on your local machine and on the
 cluster. They are described in detail in :ref:`tutorial-6`.
 
-.. warning:: `Micc <https://github.com/etijskens/et-micc>`_ was designed for supporting HPC
+.. warning:: `Micc <https://github.com/etijskens/et-micc2>`_ was designed for supporting HPC
     developers, and, consequentially, with Linux systems in mind. We provide support for Linux
     (Ubuntu 19.10, CentOS 7.7), and macOS. Due to lack of human resources, it has not been
     tested on Windows, and no support is provided for it. However,
@@ -107,8 +107,8 @@ Setting up your local Development environment - step by step
 
 #.  Install micc_ with pipx::
 
-        > pipx install et-micc
-          installed package et-micc 0.10.8, Python 3.8.0
+        > pipx install et-micc2
+          installed package et-micc2 0.10.8, Python 3.8.0
           These apps are now globally available
             - micc
         done!
@@ -117,13 +117,13 @@ Setting up your local Development environment - step by step
 
     To upgrade micc_ to the newest version run::
 
-        > pipx upgrade et-micc
+        > pipx upgrade et-micc2
 
 #.  To upgrade to a newer version of a tool that you installed with pipx_, use the ``upgrade``
     command::
 
-        > pipx upgrade et-micc
-        et-micc is already at latest version 0.10.8 (location: /Users/etijskens/.local/pipx/venvs/et-micc)
+        > pipx upgrade et-micc2
+        et-micc2 is already at latest version 0.10.8 (location: /Users/etijskens/.local/pipx/venvs/et-micc2)
 
 #.  If you want to develop binary extensions in Fortran or C++, you will need a Fortran compiler or a C++
     compiler, respectively. For C++ binary extensions, also CMake and make must be on your system PATH.
@@ -162,7 +162,7 @@ Setting up your local Development environment - step by step
         default git branch [master]:
 
     The last two entries are generally ok. If you later want to change the entries, you can simply
-    edit the file :file:`~/.et_micc/micc.json`.
+    edit the file :file:`~/.et_micc2/micc.json`.
 
 You should be good to go now.
 
@@ -204,7 +204,7 @@ For details see :ref:`Tutorial-6`
     If you want to create a new project with micc_, you must install it first of course::
 
         > module load Python         # load your favourite Python module
-        > pip install --user et-micc
+        > pip install --user et-micc2
 
     Without the ``--user`` flag pip_ would try to install in the cluster module, where you
     to not have access. The flag instructs pip_ to install in your home directory.
@@ -241,7 +241,7 @@ For details see :ref:`Tutorial-6`
         default git branch [master]:
 
     The last two entries are generally ok. If you later want to change the entries, you can simply
-    edit the file :file:`~/.et_micc/micc.json`.
+    edit the file :file:`~/.et_micc2/micc.json`.
 
 You should be good to go now.
 

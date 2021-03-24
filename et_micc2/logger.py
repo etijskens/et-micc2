@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Module et_micc.logger
+Module et_micc2.logger
 =====================
 
 Helper functions for logging.
@@ -28,11 +28,11 @@ def verbosity_to_loglevel(verbosity):
 # # Use static vare to implement a singleton (the micc_logger)
 # @static_vars(the_logger=None)
 # def get_micc_logger(global_options=None):
-#     """Set up and store a et_micc logger that writes to the console (taking verbosity
-#     into account) and to a log file ``et_micc.log``.
+#     """Set up and store a et_micc2 logger that writes to the console (taking verbosity
+#     into account) and to a log file ``et_micc2.log``.
 #
 #     :param types.SimpleNamespace global_options: namespace object with options
-#         accepted by (almost) all et_micc commands. If None, the static :py:obj:`the_logger`
+#         accepted by (almost) all et_micc2 commands. If None, the static :py:obj:`the_logger`
 #         is returned.
 #     :returns: a Logger object.
 #     """
@@ -44,9 +44,9 @@ def verbosity_to_loglevel(verbosity):
 #
 #     if not get_micc_logger.the_logger is None:
 #         # verify that the current logger is for the current project directory
-#         # (When running pytest, et_micc commands are run in several different
+#         # (When running pytest, et_micc2 commands are run in several different
 #         # project directories created on the fly. the micc_logger must adjust
-#         # to this situation and log to a et_micc.log file in the project directory.
+#         # to this situation and log to a et_micc2.log file in the project directory.
 #         current_logfile = get_micc_logger.the_logger.logfile
 #         current_project_path = global_options.project_path
 #         if not current_logfile.parent == current_project_path:
@@ -55,15 +55,15 @@ def verbosity_to_loglevel(verbosity):
 #     if get_micc_logger.the_logger is None:
 #
 #         if getattr(global_options,'clear_log',False):
-#             logfile = global_options.project_path / 'et_micc.log'
+#             logfile = global_options.project_path / 'et_micc2.log'
 #             if logfile.exists():
 #                 logfile.unlink()
 #             else:
 #                 global_options.clear_log = False
 #
-#         # create a new logger object that will write to et_micc.log
+#         # create a new logger object that will write to et_micc2.log
 #         # in the current project directory
-#         p = global_options.project_path / 'et_micc.log'
+#         p = global_options.project_path / 'et_micc2.log'
 #         get_micc_logger.the_logger = create_logger(p)
 #         get_micc_logger.the_logger.logfile = p
 #         if global_options.verbosity>2:
@@ -83,7 +83,7 @@ def verbosity_to_loglevel(verbosity):
 class IndentingLogger(logging.Logger):
     """Cuastom Logger class for creating indented logs.
     
-    This is the class for the et_micc logger.
+    This is the class for the et_micc2 logger.
     """
     def __init__(self, name, level=logging.NOTSET):
         super().__init__(name, level)
@@ -114,7 +114,7 @@ class IndentingLogger(logging.Logger):
         """Increase the indentation level.
         
         Future log messages will shift to the left. The width of the shift
-        is determined by the last call to :py:meth:`~et_micc.logger.IndentingLogger.indent`
+        is determined by the last call to :py:meth:`~et_micc2.logger.IndentingLogger.indent`
         """
         if self._stack:
             n = self._stack.pop()
@@ -123,7 +123,7 @@ class IndentingLogger(logging.Logger):
 
 
 def create_logger(path_to_log_file,filemode='a'):
-    """Create a logger object for et_micc.
+    """Create a logger object for et_micc2.
     
     It will log to:
     
@@ -167,12 +167,12 @@ def create_logger(path_to_log_file,filemode='a'):
 def log(logfun=None, before='doing', after='done.',bracket=True):
     """Print a message before and after executing the body of the contextmanager.
 
-    :param callable logfun: a function that can print a log message, e.g. :py:meth:`print`, :py:meth:`~et_micc.logger.get_micc_logger.the_logger.info`. 
+    :param callable logfun: a function that can print a log message, e.g. :py:meth:`print`, :py:meth:`~et_micc2.logger.get_micc_logger.the_logger.info`.
     :param str before: print this before body is executed
     :param str after: print this after body is executed
     :param bool bracket: append ' [' to before and prepend '] ' to after.
     
-    This works best with the :py:class:`~et_micc.logger.IndentingLogger`.
+    This works best with the :py:class:`~et_micc2.logger.IndentingLogger`.
     """
     if logfun:
         if bracket:
@@ -195,11 +195,11 @@ def log(logfun=None, before='doing', after='done.',bracket=True):
 @contextmanager
 def logtime(project=None):
     """Log start time, end time and duration of the task in the body of the context manager
-    to the et_micc logger.
+    to the et_micc2 logger.
     
-    This logs on debug level. To see in in the console output you must pass ``-vv`` to et_micc.
+    This logs on debug level. To see in in the console output you must pass ``-vv`` to et_micc2.
     
-    :param SimpleNameSpace global_options: pass verbosity to the et_micc logger.
+    :param SimpleNameSpace global_options: pass verbosity to the et_micc2 logger.
     """
     if project is None:
         logfun = print

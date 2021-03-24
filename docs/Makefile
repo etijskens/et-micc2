@@ -3,8 +3,8 @@
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
-# if et-micc is pipx installed:
-SPHINXBUILD   = $(HOME)/.local/pipx/venvs/et-micc/bin/python -msphinx
+# if et-micc2 is pipx installed:
+SPHINXBUILD   = $(HOME)/.local/pipx/venvs/et-micc2/bin/python -msphinx
 # otherwise
 #SPHINXBUILD   = python -msphinx
 SPHINXPROJ    = micc

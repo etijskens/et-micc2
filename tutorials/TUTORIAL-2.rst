@@ -1,4 +1,4 @@
-.. _micc-build: https://github.com/etijskens/et-micc-build
+.. _micc-build: https://github.com/etijskens/et-micc2-build
 
 .. _tutorial-2:
 
@@ -242,21 +242,21 @@ version of all dependencies and install them.
       • Updating sphinx-rtd-theme (0.5.1 -> 0.4.3)
       • Installing tomlkit (0.5.11)
       • Installing walkdir (0.4.1)
-      • Installing et-micc (1.0.12)
+      • Installing et-micc2 (1.0.12)
       • Installing numpy (1.19.5)
       • Installing pybind11 (2.6.1)
-      • Installing et-micc-build (1.0.12)
+      • Installing et-micc2-build (1.0.12)
 
     Installing the current project: ET-dot (0.0.6)
 
 In fact the only dependency added in :file:`pyproject.toml` was micc-build_,
-but that depends on numpy, pybind11 and et-micc, which in turn have their own
+but that depends on numpy, pybind11 and et-micc2, which in turn have their own
 sub-dependencies, all of which are nicely resolved by poetry_ and installed.
 Although micc-build_ also needs CMake_, it is not added as dependency of micc-build_>
 In view of the widespread use of CMake_, it was considered better have a system-wide
 CMake installation (see section :ref:`development-environment`).
 
-The dependency of :file:`et-micc-build` on :file:`et-micc` makes that ``micc`` is now
+The dependency of :file:`et-micc2-build` on :file:`et-micc2` makes that ``micc`` is now
 also installed in the project's virtual environment. Therefore, when the project's
 virtual environment is activated, the active ``micc`` is the one in the project's
 virtual environment, which might be a more recent version than the system-wide micc::
@@ -267,8 +267,8 @@ virtual environment, which might be a more recent version than the system-wide m
     (.venv) >
 
 If you do not want to use poetry_ to install the dependencies, you can lookup the
-dependencies in :file:`pyproject.toml`, see that there is only ``et-micc-build``,
-and run ``pip install et-micc-build`` in the Python environment you want to use
+dependencies in :file:`pyproject.toml`, see that there is only ``et-micc2-build``,
+and run ``pip install et-micc2-build`` in the Python environment you want to use
 for your project development. (Using a virtual environment is good practise, see
 :ref:`virtual-environments`).
 

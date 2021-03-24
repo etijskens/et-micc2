@@ -4,10 +4,10 @@ Created on 18 Nov 2019
 
 @author: etijskens
 
-Module et_micc.utils
+Module et_micc2.utils
 ====================
 
-Utility functions for et_micc.
+Utility functions for et_micc2.
 """
 import os
 import re
@@ -18,8 +18,8 @@ from contextlib import contextmanager
 
 import semantic_version as sv
 
-from et_micc.tomlfile import TomlFile
-import et_micc.logger
+from et_micc2.tomlfile import TomlFile
+import et_micc2.logger
 
 from pypi_simple import PyPISimple
 
@@ -318,7 +318,7 @@ def execute(cmds,logfun=None,stop_on_error=True,env=None,cwd=None,verbose=True):
     
     :param list cmds: list of OS commands (=list of list of str) or a single command (list of str)
     :param callable logfun: a function to write output, typically
-        ``logging.getLogger('et_micc').debug``.
+        ``logging.getLogger('et_micc2').debug``.
     :param bool stop_on_error: stops the commands in case the exit code is not 0.
     :param cwd: current working directory
     :param verbose: if False, output on stderr is not logged.
@@ -330,7 +330,7 @@ def execute(cmds,logfun=None,stop_on_error=True,env=None,cwd=None,verbose=True):
         cmds = [cmds]
         
     for cmd in cmds:
-        with et_micc.logger.log(logfun, f"> {' '.join(cmd)}"):
+        with et_micc2.logger.log(logfun, f"> {' '.join(cmd)}"):
             try:
                 # python >=3.7
                 completed_process = subprocess.run(cmd, capture_output=True,env=env,cwd=cwd)
@@ -353,7 +353,7 @@ def log_completed_process(completed_process, logfun=None):
 
     :param completed_process: output of subprocess.run
     :param callable logfun: a function to write output, typically
-        ``logging.getLogger('et_micc').debug``.
+        ``logging.getLogger('et_micc2').debug``.
     :returns int: return code of first failing command, or 0 if all
         commanbs succeed.
     """

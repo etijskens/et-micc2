@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Tests for et_micc.utils module."""
+"""Tests for et_micc2.utils module."""
 
 from pathlib import Path 
 
 import semantic_version as sv
 
-import et_micc.utils
+import et_micc2.utils
 from tests.helpers import in_empty_tmp_dir
 
 
@@ -16,42 +16,42 @@ def test_version_range():
     vn = vv.next_patch()
     
     vc = f"=={vs}"
-    bounds = et_micc.utils.version_range(vc)
+    bounds = et_micc2.utils.version_range(vc)
     assert bounds[0] == vv
     assert bounds[1] == sv.Version("1.2.4")
 
     vc = f">={vs}"
-    bounds = et_micc.utils.version_range(vc)
+    bounds = et_micc2.utils.version_range(vc)
     assert bounds[0] == vv
     assert bounds[1] is None
 
     vc = f">{vs}"
-    bounds = et_micc.utils.version_range(vc)
+    bounds = et_micc2.utils.version_range(vc)
     assert bounds[0] == vn
     assert bounds[1] is None
 
     vc = f"<={vs}"
-    bounds = et_micc.utils.version_range(vc)
+    bounds = et_micc2.utils.version_range(vc)
     assert bounds[0] is None
     assert bounds[1] == vn
 
     vc = f"<{vs}"
-    bounds = et_micc.utils.version_range(vc)
+    bounds = et_micc2.utils.version_range(vc)
     assert bounds[0] is None
     assert bounds[1] == vv
     
     vc = f"^{vs}"
     vu = sv.Version("2.0.0")
-    bounds = et_micc.utils.version_range(vc)
+    bounds = et_micc2.utils.version_range(vc)
     assert bounds[0] == vv
     assert bounds[1] == vu
 
 
 def test_convert_caret_specification():
     spec = ">=1.1.2"
-    assert et_micc.utils.convert_caret_specification(spec) == spec
+    assert et_micc2.utils.convert_caret_specification(spec) == spec
     spec = "^1.1.2"
-    spec_new = et_micc.utils.convert_caret_specification(spec)
+    spec_new = et_micc2.utils.convert_caret_specification(spec)
     assert spec_new == ">=1.1.2,<2.0.0"
     assert     sv.SimpleSpec("1.1.2").match(sv.Version("1.1.2"))
     assert not sv.Version("1.1.1") in sv.SimpleSpec(spec_new)
@@ -63,16 +63,16 @@ def test_convert_caret_specification():
 
 
 def test_verify_project_name():
-    assert not et_micc.utils.verify_project_name("1")
-    assert not et_micc.utils.verify_project_name("1ab")
-    assert et_micc.utils.verify_project_name("a")
-    assert et_micc.utils.verify_project_name("a1")
-    assert et_micc.utils.verify_project_name("a123b")
-    assert et_micc.utils.verify_project_name("a_-123b")
-    assert et_micc.utils.verify_project_name("A_-123B")
-    assert not et_micc.utils.verify_project_name("A_-123.B")
-    assert not et_micc.utils.verify_project_name("A._-123.B")
-    assert not et_micc.utils.verify_project_name("A_-123 B")
+    assert not et_micc2.utils.verify_project_name("1")
+    assert not et_micc2.utils.verify_project_name("1ab")
+    assert et_micc2.utils.verify_project_name("a")
+    assert et_micc2.utils.verify_project_name("a1")
+    assert et_micc2.utils.verify_project_name("a123b")
+    assert et_micc2.utils.verify_project_name("a_-123b")
+    assert et_micc2.utils.verify_project_name("A_-123B")
+    assert not et_micc2.utils.verify_project_name("A_-123.B")
+    assert not et_micc2.utils.verify_project_name("A._-123.B")
+    assert not et_micc2.utils.verify_project_name("A_-123 B")
     
 def test_insert_in_file():
     with in_empty_tmp_dir():
@@ -81,7 +81,7 @@ def test_insert_in_file():
             for i in range(10):
                 f.write(str(i) + '\n')
         ilines = ["insert 1","insert 2"]
-        et_micc.utils.insert_in_file(file, ilines, before=True, startswith="5")
+        et_micc2.utils.insert_in_file(file, ilines, before=True, startswith="5")
         with file.open() as f:
             lines = f.readlines()
             for l,line in enumerate(lines):
@@ -96,7 +96,7 @@ def test_insert_in_file():
             for i in range(10):
                 f.write(str(i) + '\n')
         ilines = ["insert 1","insert 2"]
-        et_micc.utils.insert_in_file(file, ilines, before=False, startswith=("5"))
+        et_micc2.utils.insert_in_file(file, ilines, before=False, startswith=("5"))
         with file.open() as f:
             lines = f.readlines()
             for l,line in enumerate(lines):

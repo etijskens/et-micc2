@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "et-micc"
+name = "et-micc2"
 version = "2.0.0"
 description = "A practical Python project skeleton generator."
 authors = ["Engelbert Tijskens <engelbert.tijskens@uantwerpen.be>"]
@@ -7,8 +7,8 @@ license = "MIT"
 
 readme = 'README.rst'
 
-repository = "https://github.com/etijskens/et-micc"
-homepage = "https://github.com/etijskens/et-micc"
+repository = "https://github.com/etijskens/et-micc2"
+homepage = "https://github.com/etijskens/et-micc2"
 
 keywords = ['project management']
 
@@ -26,7 +26,7 @@ pybind11 = "^2.6.1"
 [tool.poetry.dev-dependencies]
 
 [tool.poetry.scripts]
-micc = 'et_micc:cli_micc.main'
+micc2 = 'et_micc2:cli_micc.main'
 
 [build-system]
 requires = ["poetry>=0.12"]

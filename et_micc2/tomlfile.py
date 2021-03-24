@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Module et_micc.tomlfile
-=======================
+Module et_micc2.tomlfile
+========================
 """
 # This is a copy of poetry/utils/toml_file.py
-# It is there to avoid introducing a dependency on poetry in et_micc.
+# It is there to avoid introducing a dependency on poetry in et_micc2.
 from tomlkit.toml_file import TOMLFile as BaseTOMLFile
 from typing import Union
 

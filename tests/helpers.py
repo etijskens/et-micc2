@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Tests for et_micc package.
+Tests for et_micc2 package.
 """
 #===============================================================================
 
@@ -13,7 +13,7 @@ import uuid
 import traceback
 from pathlib import Path
 
-from et_micc.tomlfile import TomlFile
+from et_micc2.tomlfile import TomlFile
 
 def report(result,assert_exit_code=True):
     """

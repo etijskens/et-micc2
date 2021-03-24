@@ -13,7 +13,7 @@ Micc
         :alt: Documentation Status
 
 
-`Micc <https://github.com/etijskens/et-micc>`_ is a Python project manager: it helps 
+`Micc <https://github.com/etijskens/et-micc2>`_ is a Python project manager: it helps
 you organize your Python project from simple single file modules to fully fledged 
 Python packages containing modules, sub-modules, apps and binary extension modules 
 written in Fortran or C++. Micc_ organizes your project in a way that is considered good

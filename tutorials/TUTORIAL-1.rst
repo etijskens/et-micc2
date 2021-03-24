@@ -70,7 +70,7 @@ Run ``micc setup`` to set the preferences::
     Done
 
     If you want to change your preferences, edit the default entries in file
-        /Users/etijskens/.et_micc/micc.json
+        /Users/etijskens/.et_micc2/micc.json
     Note that these changes will only affect NEW projects. Existing projects will be unaffected.
 
 You can always change your settings by running ``micc setup --force``.
@@ -945,7 +945,7 @@ neatly from the :py:obj:`help` strings of options and the doc-strings of the com
 
        [tool.poetry.dependencies]
        python = "^3.7"
-       et-micc-build = "^0.10.10"
+       et-micc2-build = "^0.10.10"
 
        [tool.poetry.dev-dependencies]
        pytest = "^4.4.2"
@@ -987,10 +987,10 @@ project, the log file will only contain the log messages from the last subcomman
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     Micc_ is based on a series of additive Cookiecutter_ templates which generate the
     boilerplate code. If you like, you can tweak these templates in the
-    :file:`site-packages/et_micc/templates` directory of your micc_ installation. When you
+    :file:`site-packages/et_micc2/templates` directory of your micc_ installation. When you
     ``pipx`` installed micc_, that is typically something like:
 
-       :file:`~/.local/pipx/venvs/et-micc/lib/pythonX.Y/site-packages/et_micc`,
+       :file:`~/.local/pipx/venvs/et-micc2/lib/pythonX.Y/site-packages/et_micc2`,
 
     where :file`pythonX.Y` is the python version you installed micc_ with.
 

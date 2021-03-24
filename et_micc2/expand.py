@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Module et_micc.expand
-=====================
+Module et_micc2.expand
+======================
 
 Helper functions for dealing with *Cookiecutter* templates.
 """
@@ -13,7 +13,7 @@ import json
 import click
 from cookiecutter.main import cookiecutter
 
-import et_micc.logger
+import et_micc2.logger
 
 EXIT_OVERWRITE = -3
 
@@ -72,15 +72,15 @@ def get_preferences(micc_file):
     :param Path micc_file: path to a json file.
     """
     if micc_file.samefile('.'):
-        # There is no et_micc file with preferences yet.
-        dotmicc = Path().home() / '.et_micc'
+        # There is no et_micc2 file with preferences yet.
+        dotmicc = Path().home() / '.et_micc2'
         dotmicc.mkdir(exist_ok=True)
-        dotmicc_miccfile = dotmicc / 'micc.json'
+        dotmicc_miccfile = dotmicc / 'micc2.json'
         if dotmicc_miccfile.exists():
             preferences = get_preferences(dotmicc_miccfile)
         else:
             preferences = None
-            # micc_file_template = Path(__file__).parent / 'micc.json'
+            # micc_file_template = Path(__file__).parent / 'micc2.json'
             # shutil.copyfile(str(micc_file_template),str(dotmicc_miccfile))
             # preferences = set_preferences(dotmicc_miccfile)
     else:
@@ -127,7 +127,7 @@ def expand_templates(options):
       wrong, you can inspect the backup files, and correct the errors manually.
       
     :param types.SimpleNamespace options: namespace object with
-        options accepted by et_micc commands. Relevant attributes are 
+        options accepted by et_micc2 commands. Relevant attributes are
         
         * templates: ordered list of (paths to) cookiecutter templates that 
           will be expanded as they appear. The template parameters are propagated 

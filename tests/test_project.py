@@ -5,7 +5,7 @@
 from types import SimpleNamespace
 from pathlib import Path
 
-from et_micc.project import Project
+from et_micc2.project import Project
 
 def test_ctor():
     options = SimpleNamespace(

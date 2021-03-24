@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Tests for et_micc package.
+Tests for et_micc2 package.
 """
 #===============================================================================
 
@@ -14,9 +14,9 @@ from types import SimpleNamespace
 #===============================================================================
 from click.testing import CliRunner
 
-import et_micc.logger
+import et_micc2.logger
 from tests.helpers import in_empty_tmp_dir, report, get_version
-from et_micc import cli_micc
+from et_micc2 import cli_micc
 
 #===============================================================================
 # test scenario blocks
@@ -37,7 +37,7 @@ def run(runner, arguments, input_=None):
 #===============================================================================
 def test_micc_help():
     """
-    Test ``et_micc --help``.
+    Test ``et_micc2 --help``.
     """
     runner = CliRunner()
     result = run(runner,['--help'])
@@ -96,16 +96,16 @@ def test_scenario_2():
 #     with in_empty_tmp_dir():
 #         run(runner, ['-p','foo','-vv', 'create', '--allow-nesting'])
 #         foo = Path('foo')
-#         et_micc.utils.is_project_directory(foo,raise_if=False)
-#         et_micc.utils.is_module_project   (foo,raise_if=False)
-#         et_micc.utils.is_package_project  (foo,raise_if=True)
+#         et_micc2.utils.is_project_directory(foo,raise_if=False)
+#         et_micc2.utils.is_module_project   (foo,raise_if=False)
+#         et_micc2.utils.is_package_project  (foo,raise_if=True)
 #         expected = '0.0.0'
 #         assert get_version(foo / 'pyproject.toml')==expected
 #         assert get_version(foo / 'foo.py')==expected
 #         
 #         run(runner, ['-p','foo','-vv', 'convert-to-package','--overwrite'])
-#         et_micc.utils.is_module_project   (foo,raise_if=True)
-#         et_micc.utils.is_package_project  (foo,raise_if=False)
+#         et_micc2.utils.is_module_project   (foo,raise_if=True)
+#         et_micc2.utils.is_package_project  (foo,raise_if=False)
 # 
 #         run(runner, ['-vv','-p','foo','version'])
 #         assert get_version(foo / 'pyproject.toml')==expected
@@ -151,7 +151,7 @@ def test_scenario_2():
 #         assert Path('foo/foo/cpp_mod4/mod4.cpp').exists()
 #         print("cpp ok")
 #         
-#         extension_suffix = et_micc.utils.get_extension_suffix()
+#         extension_suffix = et_micc2.utils.get_extension_suffix()
 #         run(runner, ['-p','foo','build'])
 #         assert Path('foo/foo/mod3'+extension_suffix).exists()
 #         assert Path('foo/foo/mod4'+extension_suffix).exists()
@@ -173,8 +173,8 @@ def test_scenario_2():
 #     with in_empty_tmp_dir():
 #         run(runner, ['-vv', '-p', 'FOO', 'create', '--allow-nesting'])
 #         assert Path('FOO/foo.py').exists()
-#         with et_micc.utils.in_directory('FOO'):
-#             et_micc.commands.add_dependencies(['numpy'],SimpleNamespace(verbosity=0))
+#         with et_micc2.utils.in_directory('FOO'):
+#             et_micc2.commands.add_dependencies(['numpy'],SimpleNamespace(verbosity=0))
 
 
 # ==============================================================================
@@ -185,6 +185,6 @@ if __name__ == "__main__":
     print(sys.version_info)
     the_test_you_want_to_debug = test_scenario_2
 
-    with et_micc.logging_.log(print,f"__main__ running {the_test_you_want_to_debug}",'-*# finished #*-'):
+    with et_micc2.logging_.log(print,f"__main__ running {the_test_you_want_to_debug}",'-*# finished #*-'):
         the_test_you_want_to_debug()
 # ==============================================================================

@@ -10,8 +10,8 @@ from pathlib import Path
 
 import click
 
-from et_micc.project import Project, micc_version
-import et_micc.logger
+from et_micc2.project import Project, micc_version
+import et_micc2.logger
 
 __template_help = "Ordered list of Cookiecutter templates, or a single Cookiecutter template."
 
@@ -28,7 +28,7 @@ __template_help = "Ordered list of Cookiecutter templates, or a single Cookiecut
     , type=str
 )
 @click.option('--clear-log'
-    , help="If specified clears the project's ``et_micc.log`` file."
+    , help="If specified clears the project's ``et_micc2.log`` file."
     , default=False, is_flag=True
 )
 @click.version_option(version=micc_version())
@@ -38,7 +38,7 @@ def main(ctx, verbosity, project_path, clear_log):
 
     All commands that change the state of the project produce some output that
     is send to the console (taking verbosity into account). It is also sent to
-    a logfile ``et_micc.log`` in the project directory. All output is always appended
+    a logfile ``et_micc2.log`` in the project directory. All output is always appended
     to the logfile. If you think the file has gotten too big, or you are no more
     interested in the history of your project, you can specify the ``--clear-log``
     flag to clear the logfile before any command is executed. In this way the
@@ -243,10 +243,10 @@ def convert_to_package(ctx, overwrite, backup):
     if project.exit_code:
         ctx.exit(project.exit_code)
 
-    with et_micc.logger.logtime(options):
+    with et_micc2.logger.logtime(options):
         project.module_to_package_cmd()
 
-        if project.exit_code == et_micc.expand.EXIT_OVERWRITE:
+        if project.exit_code == et_micc2.expand.EXIT_OVERWRITE:
             options.logger.warning(
                 f"It is normally ok to overwrite 'index.rst' as you are not supposed\n"
                 f"to edit the '.rst' files in '{options.project_path}{os.sep}docs.'\n"
@@ -292,7 +292,7 @@ def info(ctx,name,version):
         print(project.version)
         return
     else:
-        with et_micc.logger.logtime(options):
+        with et_micc2.logger.logtime(options):
             project.info_cmd()
 
     if project.exit_code:
@@ -352,7 +352,7 @@ def version(ctx, major, minor, patch, rule, tag, short, dry_run):
     if project.exit_code:
         ctx.exit(project.exit_code)
 
-    with et_micc.logger.logtime(project):
+    with et_micc2.logger.logtime(project):
         project.version_cmd()
         if project.exit_code == 0 and tag:
             project.tag_cmd()
@@ -467,7 +467,7 @@ def add(ctx
     if project.exit_code:
         ctx.exit(project.exit_code)
 
-    with et_micc.logger.logtime(options):
+    with et_micc2.logger.logtime(options):
         project.add_cmd()
 
     if project.exit_code:
@@ -509,7 +509,7 @@ def mv(ctx, cur_name, new_name, silent, entire_package, entire_project):
     if project.exit_code:
         ctx.exit(project.exit_code)
 
-    with et_micc.logger.logtime(options):
+    with et_micc2.logger.logtime(options):
         project.mv_component()
 
 
@@ -529,19 +529,19 @@ def setup( ctx
     options = ctx.obj
 
     options.force = force
-    micc_file_template = Path(__file__).parent / 'micc.json'
-    setupdir = Path().home() / '.et_micc'
+    micc_file_template = Path(__file__).parent / 'micc2.json'
+    setupdir = Path().home() / '.et_micc2'
     setupdir.mkdir(exist_ok=True)
-    path_to_miccfile = setupdir / 'micc.json'
+    path_to_miccfile = setupdir / 'micc2.json'
     if not path_to_miccfile.exists() or force:
         shutil.copyfile(str(micc_file_template),str(path_to_miccfile))
-        preferences = et_micc.expand.set_preferences(path_to_miccfile)
+        preferences = et_micc2.expand.set_preferences(path_to_miccfile)
         print("\nConfiguring git:")
         cmds = [['git', 'config', '--global', 'user.name' , preferences['full_name']['default'] ]
                ,['git', 'config', '--global', 'user.email', preferences['email'    ]['default'] ]
                ,['git', 'config', '--global', 'credential.helper', 'cache']
                ]
-        et_micc.utils.execute(cmds, print, stop_on_error=False)
+        et_micc2.utils.execute(cmds, print, stop_on_error=False)
 
     else:
         print("Micc has already been setup. Use '--force' or '-f' to overwrite the existing setup.")
@@ -590,7 +590,7 @@ def build( ctx
     if project.exit_code:
         ctx.exit(project.exit_code)
 
-    with et_micc.logger.logtime(options):
+    with et_micc2.logger.logtime(options):
         project.build_cmd()
 
     if project.exit_code:

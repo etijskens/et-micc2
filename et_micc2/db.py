@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Module et_micc.db
-=================
+Module et_micc2.db
+==================
 
 This submodule implements the database that is needed for safe refactoring of
 submodules and CLIs.

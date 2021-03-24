@@ -18,7 +18,7 @@ Why doesn't micc_ have rename and remove commands?
 --------------------------------------------------
 While renaming a submodule or a removing a submodule would be valuable additions, it is very
 complicated to retrieve all references to a submodule in a project correctly. See
-https://github.com/etijskens/et-micc/issues/29 and https://github.com/etijskens/et-micc/issues/32.
+https://github.com/etijskens/et-micc2/issues/29 and https://github.com/etijskens/et-micc2/issues/32.
 
 If refactoring is necessary, we strongly recommend creating a new project and subprojects with
 the correct names and manually copying stuff from the original to the refactored project.
