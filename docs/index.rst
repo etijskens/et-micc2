@@ -1,14 +1,21 @@
-###########################################################
-Welcome to et-micc2's documentation!
-###########################################################
+
+################################
+Welcome to micc's documentation!
+################################
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
 
    readme
    installation
+   usage
+   apps
    api
+   devenv
+   faq
+   tutorials
+   links
    authors
    history
 

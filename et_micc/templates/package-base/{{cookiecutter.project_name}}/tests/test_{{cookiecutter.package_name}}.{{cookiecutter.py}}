@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 
-"""Tests for et_micc2 package."""
+"""Tests for {{ cookiecutter.package_name }} package."""
 
-import et_micc2
+import {{ cookiecutter.package_name }}
 
 
 def test_hello_noargs():
-    """Test for et_micc2.hello()."""
-    s = et_micc2.hello()
+    """Test for {{ cookiecutter.package_name }}.hello()."""
+    s = {{ cookiecutter.package_name }}.hello()
     assert s=="Hello world"
 
 
 def test_hello_me():
-    """Test for et_micc2.hello('me')."""
-    s = et_micc2.hello('me')
+    """Test for {{ cookiecutter.package_name }}.hello('me')."""
+    s = {{ cookiecutter.package_name }}.hello('me')
     assert s=="Hello me"
     
     

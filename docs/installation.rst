@@ -1,51 +1,48 @@
 .. highlight:: shell
 
+.. _micc: https://micc.readthedocs.io
+.. _micc-build: https://micc.readthedocs.io
+
 ************
 Installation
 ************
 
-
-Stable release
-==============
-
-To install et-micc2, run this command in your terminal:
+It is recommended to install micc_ system-wide with `pipx <https://github.com/pipxproject/pipx>`_.
 
 .. code-block:: console
 
-    $ pip install et_micc2
-
-This is the preferred method to install et-micc2, as it will always install the most recent stable release.
-
-If you don't have `pip`_ installed, this `Python installation guide`_ can guide
-you through the process.
-
-.. _pip: https://pip.pypa.io
-.. _Python installation guide: http://docs.python-guide.org/en/latest/starting/installation/
-
-
-From sources
-============
-
-The sources for et-micc2 can be downloaded from the `Github repo`_.
-
-You can either clone the public repository:
+    > pipx install et-micc
+    
+Upgrading to a newer version is done as:
 
 .. code-block:: console
 
-    $ git clone git://github.com/etijskens/et_micc2
+    > pipx upgrade et-micc
 
-Or download the `tarball`_:
-
-.. code-block:: console
-
-    $ curl  -OL https://github.com/etijskens/et_micc2/tarball/master
-
-Once you have a copy of the source, you can install it with:
+To install micc in your current Python environment, run this command in your terminal:
 
 .. code-block:: console
 
-    $ python setup.py install
+    > pip install et-micc
 
+Debugging ``micc`` and ``micc-build``
+-------------------------------------
+To test/debug micc_ or micc-build_ on a specific project, run:
 
-.. _Github repo: https://github.com/etijskens/et_micc2
-.. _tarball: https://github.com/etijskens/et_micc2/tarball/master
+.. code-block:: console
+
+    (.venv)> path/to/et-micc/symlink-micc.sh
+
+As indicated, the projects virtual environmentmust be activated. The current working
+directory is immaterial, though. This command replaces the package folders ``et_micc``
+and ``et_micc_build`` in the projects virtual environment's ``site-packages`` folder
+with symbolic links to the project module directories ``et-micc/et_micc`` and
+``et-micc-build/et_micc_build``, so that any changes in those are immediately visible
+in the project your are working on.
+
+If the project's virtual environment does not contain the package folders, you get a
+warning and the suggestion to first install them. Note, that unless micc-build_ is a
+dependency of your project (because it has binary extensions), micc_ is usually not
+in the ``site-packages`` folder (it is usually installed system-wide).
+
+Productivity tip: put a symbolic link to symlink-micc.sh somewhere on the path.

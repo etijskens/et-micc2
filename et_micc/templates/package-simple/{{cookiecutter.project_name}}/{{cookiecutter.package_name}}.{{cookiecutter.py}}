@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
-
 """
-Package et_micc2
+Package {{ cookiecutter.package_name }}
 =======================================
 
-Top-level package for et_micc2.
+A 'hello world' example.
 """
-
-__version__ = "0.0.0"
+__version__ = "{{ cookiecutter.version }}"
 
 
 def hello(who='world'):
@@ -19,4 +17,4 @@ def hello(who='world'):
     result = "Hello " + who
     return result
 
-# Your code here...
+# eof
