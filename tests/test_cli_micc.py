@@ -95,15 +95,16 @@ def test_scenario_package_structure():
             assert completed_process.returncode == 0
 
             # Add a python sub-module
-            result = micc2(['-v', 'add', 'added_py','--py'] )
-            
-            completed_process = subprocess.run(['pytest', 'tests/test_added_py.py'])
-            assert completed_process.returncode == 0
+            for submodule, flag in zip(['added_py','added_pyp'], ['--py','--package']):
+                result = micc2(['-v', 'add', submodule, flag] )
+
+                completed_process = subprocess.run(['pytest', f'tests/test_{submodule}.py'])
+                assert completed_process.returncode == 0
 
             # Add a binary sub-module
-            for kind in ['cpp','f90']:
-                submodule = f'added_{kind}'
-                result = micc2(['-v', 'add', submodule, f'--{kind}'] )
+            for flag in ['--cpp','--f90']:
+                submodule = f'added_{flag[2:]}'
+                result = micc2(['-v', 'add', submodule, flag])
                 # test micc build
                 result = micc2(['-vv', 'build', '-m', submodule, '--clean'] )
                 extension_suffix = et_micc2.project.get_extension_suffix()
@@ -124,14 +125,14 @@ def test_scenario_package_structure():
 
                 # completed_process = subprocess.run([python, '-c', 'import et_micc2'])
                 # assert completed_process.returncode == 0
-                completed_process = subprocess.run(['python', '-m', 'pytest', f'tests/test_{kind}_{submodule}.py'])
+                completed_process = subprocess.run(['python', '-m', 'pytest', f'tests/test_{flag[2:]}_{submodule}.py'])
                 assert completed_process.returncode == 0
                 assert binary_extension.exists()
 
             for app, flag in zip(['app','app_with_subcommands'], ['--app','--group']):
-                result = micc2(['-v', 'add', app, flag] )
-                
-                completed_process = subprocess.run(['python', '-m', 'pytest', f'tests/test_{kind}_{submodule}.py'])
+                result = micc2(['-v', 'add', app, flag])
+
+                completed_process = subprocess.run(['python', '-m', 'pytest', f'tests/test_cli_{app}.py'])
                 assert completed_process.returncode == 0
 
 
