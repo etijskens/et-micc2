@@ -15,28 +15,8 @@ from pathlib import Path
 
 from et_micc2.tomlfile import TomlFile
 
-def report(result,assert_exit_code=True):
-    """
-    helper to print the ``result`` of CliRunner.invoke
-    """
-    print(result.output)
-
-    if result.exception:
-        if result.stderr_bytes:
-            print(result.stderr)
-        print('exit_code =',result.exit_code)
-        print(result.exception)
-        traceback.print_tb(result.exc_info[2])
-        print(result.exc_info[2])
-        
-    if assert_exit_code:
-        if result.exit_code:
-            raise AssertionError(f"result.exit_code = {result.exit_code}")
-        
-    return result
-
-
 test_workspace = (Path(__file__) / '../../test_workspace').resolve()
+
 
 def clear_test_workspace(folder=None):
     """If dir is None, clear the test workspace by removing it and recreating it.

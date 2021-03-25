@@ -22,16 +22,28 @@ from et_micc2 import cli_micc
 #===============================================================================
 # test scenario blocks
 #===============================================================================
-def micc2(arguments, stdin=None):
+def micc2(arguments, stdin=None, assert_exit_code=True):
     """
     create a project 
     """
     runner = CliRunner()
-    result = runner.invoke( cli_micc.main
-                          , arguments
-                          , input=stdin
-                          )
-    return helpers.report(result)
+    result = runner.invoke( cli_micc.main, arguments, input=stdin)
+    
+    print(result.output)
+
+    if result.exception:
+        if result.stderr_bytes:
+            print(result.stderr)
+        print('exit_code =', result.exit_code)
+        print(result.exception)
+        traceback.print_tb(result.exc_info[2])
+        print(result.exc_info[2])
+
+    if assert_exit_code:
+        if result.exit_code:
+            raise AssertionError(f"result.exit_code = {result.exit_code}")
+
+    return result
 
 
 #===============================================================================
@@ -115,6 +127,12 @@ def test_scenario_package_structure():
                 completed_process = subprocess.run(['python', '-m', 'pytest', f'tests/test_{kind}_{submodule}.py'])
                 assert completed_process.returncode == 0
                 assert binary_extension.exists()
+
+            for app, flag in zip(['app','app_with_subcommands'], ['--app','--group']):
+                result = micc2(['-v', 'add', app, flag] )
+                
+                completed_process = subprocess.run(['python', '-m', 'pytest', f'tests/test_{kind}_{submodule}.py'])
+                assert completed_process.returncode == 0
 
 
 if __name__ == "__main__":
