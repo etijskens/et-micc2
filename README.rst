@@ -1,6 +1,11 @@
-****
-Micc
-****
+*****
+Micc2
+*****
+
+Micc2 is still experimental ...
+
+Micc2 has been split off from Micc to reduce the dependencies of micc projects as
+they may put the file systems of clusters under stress.
 
 .. image:: https://img.shields.io/pypi/v/micc.svg
         :target: https://pypi.python.org/pypi/micc
