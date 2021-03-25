@@ -71,9 +71,14 @@ def test_scenario_module_structure():
         result = micc2(['-vvv', '-p', 'FOO', 'info'])
         results.append(result)
 
-        with et_micc2.utils.in_directory('Foo'):
+        with et_micc2.utils.in_directory('FOO'):
             completed_process = subprocess.run(['pytest', 'tests'])
             assert completed_process.returncode == 0
+
+            # test building documentation
+            with et_micc2.utils.in_directory('docs'):
+                completed_process = subprocess.run(['make', 'html'])
+                assert completed_process.returncode == 0
 
 
 def test_scenario_package_structure():
@@ -90,7 +95,7 @@ def test_scenario_package_structure():
         result = micc2(['-vvv', '-p', 'FOO', 'info'])
         results.append(result)
 
-        with et_micc2.utils.in_directory('Foo'):
+        with et_micc2.utils.in_directory('FOO'):
             completed_process = subprocess.run(['pytest', 'tests'])
             assert completed_process.returncode == 0
 
@@ -135,6 +140,10 @@ def test_scenario_package_structure():
                 completed_process = subprocess.run(['python', '-m', 'pytest', f'tests/test_cli_{app}.py'])
                 assert completed_process.returncode == 0
 
+            # test building documentation
+            with et_micc2.utils.in_directory('docs'):
+                completed_process = subprocess.run(['make', 'html'])
+                assert completed_process.returncode == 0
 
 if __name__ == "__main__":
     print(sys.version_info)
