@@ -362,7 +362,7 @@ class Project:
                         p = self.project_path / self.package_name / '__init__.py'
                         et_micc2.utils.replace_in_file(p, look_for, replace_with)
 
-                self.logger.info(f"({self.project_name})> micc version ({current_semver}) -> ({new_semver})")
+                self.logger.info(f"({self.project_name})> version ({current_semver}) -> ({new_semver})")
             else:
                 click.echo(f"({self.project_name})> micc version {r} --dry-run : "
                            + click.style(f"({current_semver} ", fg='cyan') + "-> "

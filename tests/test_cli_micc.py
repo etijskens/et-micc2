@@ -58,6 +58,7 @@ def test_micc_help():
     assert 'Show this message and exit.' in result.output
 
 
+
 def test_scenario_module_structure():
     """
     """
@@ -79,6 +80,23 @@ def test_scenario_module_structure():
             with et_micc2.utils.in_directory('docs'):
                 completed_process = subprocess.run(['make', 'html'])
                 assert completed_process.returncode == 0
+
+            result = micc2(['version'])
+            assert 'Project (FOO) version (0.0.0)' in result.output
+            result = micc2(['version', '-p'])
+            assert '(FOO)> version (0.0.0) -> (0.0.1)' in result.output
+            result = micc2(['version', '-p'])
+            assert '(FOO)> version (0.0.1) -> (0.0.2)' in result.output
+            result = micc2(['version', '-m'])
+            assert '(FOO)> version (0.0.2) -> (0.1.0)' in result.output
+            result = micc2(['version', '-m'])
+            assert '(FOO)> version (0.1.0) -> (0.2.0)' in result.output
+            result = micc2(['version', '-p'])
+            assert '(FOO)> version (0.2.0) -> (0.2.1)' in result.output
+            result = micc2(['version', '-M'])
+            assert '(FOO)> version (0.2.1) -> (1.0.0)' in result.output
+            result = micc2(['version', '-s'])
+            assert '1.0.0' in result.output
 
 
 def test_scenario_package_structure():
@@ -147,7 +165,7 @@ def test_scenario_package_structure():
 
 if __name__ == "__main__":
     print(sys.version_info)
-    the_test_you_want_to_debug = test_scenario_package_structure
+    the_test_you_want_to_debug = test_scenario_module_structure
 
     print(f"__main__ running {the_test_you_want_to_debug}")
     the_test_you_want_to_debug()
