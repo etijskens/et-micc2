@@ -6,9 +6,10 @@ Tests for et_micc2 package.
 """
 #===============================================================================
 
-import sys
+import sys,os
 from pathlib import Path
 import subprocess
+import importlib
 
 import pytest
 from click.testing import CliRunner
@@ -69,6 +70,7 @@ def test_scenario_package_structure():
     helpers.clear_test_workspace()
     with et_micc2.utils.in_directory(helpers.test_workspace):
         results = []
+        #Create package FOO
         result = micc2(['-vv', '-p', 'FOO', 'create', '--allow-nesting', '--remote=none', '--package'])
         assert Path('FOO/foo/__init__.py').exists()
         results.append(result)
@@ -80,11 +82,39 @@ def test_scenario_package_structure():
             completed_process = subprocess.run(['pytest', 'tests'])
             assert completed_process.returncode == 0
 
+            # Add a python sub-module
             result = micc2(['-v', 'add', 'added_py','--py'] )
-            helpers.report(result)
-
-            completed_process = subprocess.run(['pytest', 'tests'])
+            
+            completed_process = subprocess.run(['pytest', 'tests/test_added_py.py'])
             assert completed_process.returncode == 0
+
+            # Add a binary sub-module
+            for kind in ['cpp','f90']:
+                submodule = f'added_{kind}'
+                result = micc2(['-v', 'add', submodule, f'--{kind}'] )
+                # test micc build
+                result = micc2(['-vv', 'build', '-m', submodule, '--clean'] )
+                extension_suffix = et_micc2.project.get_extension_suffix()
+                binary_extension = Path(f'foo/{submodule}{extension_suffix}')
+                assert binary_extension.exists()
+
+                # test auto build:
+                os.remove(binary_extension)
+                assert not binary_extension.exists()
+
+                completed_process = subprocess.run(['which', 'python'])
+                # This is not the python from the micc2 .venv, but the one from pyenv.
+                # I made this working by putting a symbolic link to the et_micc2 directory in the
+                # site-packages folder of /Users/etijskens/.pyenv/versions/3.8.5/bin/python.
+                # attempts to make it work with this python
+                # python = str(helpers.test_workspace / '../.venv/bin/python')
+                # fail because pybind11 is not found..'
+
+                # completed_process = subprocess.run([python, '-c', 'import et_micc2'])
+                # assert completed_process.returncode == 0
+                completed_process = subprocess.run(['python', '-m', 'pytest', f'tests/test_{kind}_{submodule}.py'])
+                assert completed_process.returncode == 0
+                assert binary_extension.exists()
 
 
 if __name__ == "__main__":
@@ -94,129 +124,3 @@ if __name__ == "__main__":
     print(f"__main__ running {the_test_you_want_to_debug}")
     the_test_you_want_to_debug()
     print('-*# finished #*-')
-        
- 
-# def test_scenario_1b():
-#     """
-#     """
-#     runner = CliRunner()
-# #     with runner.isolated_filesystem():
-#     with in_empty_tmp_dir():
-#         oops = Path('oops')
-#         oops.touch()
-#         with pytest.raises(AssertionError):
-#             run(['-vv', 'create', '--allow-nesting'] )
-#         l = os.listdir()
-#         assert len(l)==1
-#         
-#         
-# def test_scenario_2():
-#     """
-#     """
-#     runner = CliRunner()
-# #     with runner.isolated_filesystem():
-#     with in_empty_tmp_dir():
-#         run(['-p','foo','-vv', 'create', '--allow-nesting'])
-#         foo = Path('foo')
-#         et_micc2.utils.is_project_directory(foo,raise_if=False)
-#         et_micc2.utils.is_module_project   (foo,raise_if=False)
-#         et_micc2.utils.is_package_project  (foo,raise_if=True)
-#         expected = '0.0.0'
-#         assert get_version(foo / 'pyproject.toml')==expected
-#         assert get_version(foo / 'foo.py')==expected
-#         
-#         run(['-p','foo','-vv', 'convert-to-package','--overwrite'])
-#         et_micc2.utils.is_module_project   (foo,raise_if=True)
-#         et_micc2.utils.is_package_project  (foo,raise_if=False)
-# 
-#         run(['-vv','-p','foo','version'])
-#         assert get_version(foo / 'pyproject.toml')==expected
-#         assert get_version(foo / 'foo' / '__init__.py')==expected
-# 
-#         run(['-p','foo','version', 'patch'])
-#         expected = '0.0.1'
-#         assert get_version(foo / 'pyproject.toml')==expected
-#         assert get_version(foo / 'foo' / '__init__.py')==expected
-#         
-#         run(['-p','foo','version', 'minor'])
-#         expected = '0.1.0'
-#         assert get_version(foo / 'pyproject.toml')==expected
-#         assert get_version(foo / 'foo' / '__init__.py')==expected
-# 
-#         run(['-p','foo','version', 'major'])
-#         expected = '1.0.0'
-#         assert get_version(foo / 'pyproject.toml')==expected
-#         assert get_version(foo / 'foo' / '__init__.py')==expected
-# 
-#         run(['-p','foo','version', 'major'])
-#         expected = '2.0.0'
-#         assert get_version(foo / 'pyproject.toml')==expected
-#         assert get_version(foo / 'foo' / '__init__.py')==expected
-#         
-#         result = run(['-p','foo','version', '-s'])
-#         assert expected in result.stdout
-#         
-#         run(['-p','foo','-vv', 'add', '--app', 'my_app'])
-#         assert Path('foo/foo/cli_my_app.py').exists()
-#         
-#         run(['-p','foo','-vv', 'add', 'mod1', '--py'])
-#         assert Path('foo/foo/mod1.py').exists()
-#         
-#         run(['-p','foo','-vv', 'add', 'mod2', '--py', '--package'])
-#         assert Path('foo/foo/mod2/__init__.py').exists()
-# 
-#         run(['-p','foo','-vv', 'add', 'mod3', '--f2py'])
-#         assert Path('foo/foo/f2py_mod3/mod3.f90').exists()
-#         print("f2py ok")
-# 
-#         run(['-p','foo','-vv', 'add', 'mod4', '--cpp'])
-#         assert Path('foo/foo/cpp_mod4/mod4.cpp').exists()
-#         print("cpp ok")
-#         
-#         extension_suffix = et_micc2.utils.get_extension_suffix()
-#         run(['-p','foo','build'])
-#         assert Path('foo/foo/mod3'+extension_suffix).exists()
-#         assert Path('foo/foo/mod4'+extension_suffix).exists()
-#         
-#         run(['-p','foo','docs','--html','-l'])
-#         assert Path('foo/docs/_build/html/index.html').exists()
-#         assert Path('foo/docs/_build/latex/foo.pdf').exists()
-#         print('make docs ok')
-#         
-#         run(['-p','foo','-vv','info'])
-# 
-# 
-# def _test_add_dependency():
-#     """
-#     the outcome of this depends on whether we are online or not
-#     this is mainly for debugging
-#     """
-#     runner = CliRunner()
-#     with in_empty_tmp_dir():
-#         run(['-vv', '-p', 'FOO', 'create', '--allow-nesting'])
-#         assert Path('FOO/foo.py').exists()
-#         with et_micc2.utils.in_directory('FOO'):
-#             et_micc2.commands.add_dependencies(['numpy'],SimpleNamespace(verbosity=0))
-
-
-# ==============================================================================
-# The code below is for debugging a particular test in eclipse/pydev.
-# (normally all tests are run with pytest)
-# ==============================================================================
-# def test_scenario_2():
-#     """
-#     """
-#     runner = CliRunner()
-#     with in_empty_tmp_dir():
-#         run(['-vv', '-p', 'FOO', 'create', '-p', '--allow-nesting'])
-#         assert Path('FOO/foo/__init__.py').exists()
-#         run(['-vvv', '-p', 'FOO', 'info'])
-#         run(['-v', '-p', 'FOO', 'version'])
-#         run(['-v', '-p', 'FOO', 'version','--short'])
-#         run(['-vv', '-p', 'FOO', 'version','-M'])
-#         run(['-v', '-p', 'FOO', 'version','--short'])
-#         run(['-vv', '-p', 'FOO', 'version','-m'])
-#         run(['-v', '-p', 'FOO', 'version','--short'])
-#         run(['-vv', '-p', 'FOO', 'version','-p'])
-#         run(['-v', '-p', 'FOO', 'version','--short'])
-# ==============================================================================

@@ -1325,7 +1325,7 @@ def auto_build_binary_extension(package_path, module_to_build):
     exit_code = build_binary_extension(options)
 
     msg = ("[ERROR]\n"
-           "    Binary extension module 'bar{get_extension_suffix}' could not be build.\n"
+          F"    Binary extension module '{options.module_name}{get_extension_suffix()}' could not be build.\n"
            "    Any attempt to use it will raise exceptions.\n"
            ) if exit_code else ""
     return msg
