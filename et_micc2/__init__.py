@@ -2,7 +2,7 @@
 
 """
 Package et-micc2
-===============
+================
 
 Top-level package for :py:mod:`et-micc2`.
 """

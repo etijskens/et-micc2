@@ -22,14 +22,11 @@ import semantic_version
 import et_micc2.utils
 import et_micc2.expand
 import et_micc2.logger
-from et_micc2 import __version__
-# from et_micc2.db import Database
 import subprocess
-CURRENT_ET_MICC_BUILD_VERSION = __version__
 
 
 def micc_version():
-    return __version__
+    return et_micc2.__version__
 
 
 class Project:

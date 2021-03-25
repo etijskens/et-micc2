@@ -17,9 +17,10 @@ from et_micc2.tomlfile import TomlFile
 
 def report(result,assert_exit_code=True):
     """
-    helper to show the ``result`` of CliRunner.invoke
+    helper to print the ``result`` of CliRunner.invoke
     """
     print(result.output)
+
     if result.exception:
         if result.stderr_bytes:
             print(result.stderr)
@@ -33,6 +34,20 @@ def report(result,assert_exit_code=True):
             raise AssertionError(f"result.exit_code = {result.exit_code}")
         
     return result
+
+
+test_workspace = (Path(__file__) / '../../test_workspace').resolve()
+
+def clear_test_workspace(folder=None):
+    """If dir is None, clear the test workspace by removing it and recreating it.
+    Otherwise, only remove directory folder
+    """
+    if folder is None:
+        shutil.rmtree(test_workspace)
+        test_workspace.mkdir()
+    else:
+        tws_folder = test_workspace / folder
+        shutil.rmtree(tws_folder)
 
 
 @contextlib.contextmanager

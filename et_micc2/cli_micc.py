@@ -1,8 +1,21 @@
 # -*- coding: utf-8 -*-
 
 """
-Application micc
+Application micc2
 """
+
+
+def sys_path_helper():
+    """Make sure that et_micc2 can be imported in case this file is executed as::
+
+            (.venv)> python et_micc2/cli_micc.py <args>
+    """
+    try:
+        import et_micc2
+    except ModuleNotFoundError:
+        p = Path(__file__) / '..' / '..'
+        sys.path.insert(0, str(p.resolve()))
+
 
 import os, sys, shutil
 from types import SimpleNamespace
@@ -10,8 +23,10 @@ from pathlib import Path
 
 import click
 
+sys_path_helper()
 from et_micc2.project import Project, micc_version
 import et_micc2.logger
+
 
 __template_help = "Ordered list of Cookiecutter templates, or a single Cookiecutter template."
 
@@ -34,7 +49,7 @@ __template_help = "Ordered list of Cookiecutter templates, or a single Cookiecut
 @click.version_option(version=micc_version())
 @click.pass_context
 def main(ctx, verbosity, project_path, clear_log):
-    """Micc command line interface.
+    """Micc2 command line interface.
 
     All commands that change the state of the project produce some output that
     is send to the console (taking verbosity into account). It is also sent to
@@ -47,7 +62,7 @@ def main(ctx, verbosity, project_path, clear_log):
     See below for (sub)commands.
     """
     if verbosity > 1:
-        print("Current micc command is using Python", sys.version.replace('\n', ' '), end='\n\n')
+        print(f"micc2 ({et_micc2.__version__}) using Python", sys.version.replace('\n', ' '), end='\n\n')
 
     if clear_log:
         os.remove(project_path / 'micc.log')
