@@ -7,7 +7,6 @@ Tests for C++ module {{ cookiecutter.project_name }}.{{ cookiecutter.module_name
 
 import os
 import sys
-import importlib
 
 import numpy as np
 
