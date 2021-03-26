@@ -26,7 +26,9 @@ import click
 sys_path_helper()
 from et_micc2.project import Project, micc_version
 import et_micc2.logger
-from et_micc2.check_environment import check_cmd
+
+if '3.8' < sys.version:
+    from et_micc2.check_environment import check_cmd
 
 __template_help = "Ordered list of Cookiecutter templates, or a single Cookiecutter template."
 
@@ -595,8 +597,10 @@ def check( ctx
     * gh
     * compilers
     """
-    check_cmd(ctx.obj)
-    
+    if '3.8' < sys.version:
+        check_cmd(ctx.obj)
+    else:
+        print("`micc2 check` requires python 3.8 or later.")
 
 @main.command()
 @click.option('-m', '--module'
