@@ -91,7 +91,7 @@ class Project:
 
     def error(self, msg):
         """Print an error message :py:obj:`msg` and set the project's :py:obj:`exit_code`."""
-        click.secho("[ERROR]\n" + msg, fg='bright_red')
+        click.secho("[ERROR]\n" + msg, fg='bright_red') 
         self.exit_code = 1
 
     def warning(self, msg):
@@ -362,7 +362,7 @@ class Project:
                         p = self.project_path / self.package_name / '__init__.py'
                         et_micc2.utils.replace_in_file(p, look_for, replace_with)
 
-                self.logger.info(f"({self.project_name})> version ({current_semver}) -> ({new_semver})")
+                self.logger.info(f"({self.project_name})> micc version ({current_semver}) -> ({new_semver})")
             else:
                 click.echo(f"({self.project_name})> micc version {r} --dry-run : "
                            + click.style(f"({current_semver} ", fg='cyan') + "-> "

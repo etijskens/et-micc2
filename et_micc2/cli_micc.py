@@ -26,7 +26,7 @@ import click
 sys_path_helper()
 from et_micc2.project import Project, micc_version
 import et_micc2.logger
-
+from et_micc2.check_environment import check_cmd
 
 __template_help = "Ordered list of Cookiecutter templates, or a single Cookiecutter template."
 
@@ -567,6 +567,36 @@ def setup( ctx
           "Done"
     )
 
+
+@main.command()
+# @click.option('--force', '-f', is_flag=True
+#     , help="Overwrite existing setup."
+#     , default=False
+# )
+@click.pass_context
+def check( ctx
+         ):
+    """Check wether the current environment has all the neccessary tools available.
+
+    Python packages:
+
+    * Numpy
+    * Pybind11
+    * sphinx
+    * sphinx-rtd-theme
+    * sphinx-click
+
+    Tools:
+
+    * CMake
+    * make
+    * poetry
+    * git
+    * gh
+    * compilers
+    """
+    check_cmd(ctx.obj)
+    
 
 @main.command()
 @click.option('-m', '--module'
