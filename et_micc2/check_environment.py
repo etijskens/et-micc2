@@ -14,7 +14,7 @@ import importlib
 from importlib.metadata import version
 import click
 
-def check_tool(tool,local):
+def check_tool(tool,local,not_required_message=None):
     """
     :param str tool: name of executable, e.g. 'cmake'
     """
@@ -22,6 +22,8 @@ def check_tool(tool,local):
     which_string = completed_which.stdout.strip().replace('\n', ' ')
     if completed_which.returncode !=0:
         click.secho(f'    {tool} is not available.', fg='bright_red')
+        if not_required_message:
+            print(f'      {not_required_message}') 
         return False
     else:
         completed_version = subprocess.run([tool, '--version'], capture_output=True, text=True)
@@ -33,14 +35,12 @@ def check_tool(tool,local):
             return True
         else: # VSC cluster
             
-            if completed_which.stdout.startswith('/usr/bin/'):
-                
-                click.secho(f'   {tool} is available from the system:However, it is recommended to use a cluster module version.\n'
-                            f'     {which_string}'
-                            f'     {version_string}'
+            if completed_which.stdout.startswith('/usr/bin/'):                
+                click.secho(f'   {tool} is available from the system. However, it is recommended to use a cluster module version.'
                            , fg='bright_red'
                            )
-                print()
+                print(      f'     {which_string}\n'
+                            f'     {version_string}\n')
                 return False
             else:
                 click.secho(f'    {tool} is available:', fg='green')
@@ -70,8 +70,9 @@ def check_cmd(options):
                          'use `module load` to load a appropriate Python distribution.', fg='bright_red')
 
     # format strings
-    pip_install         = '    To install it, run `pip install {module_name}` in your environment.'
-    pip_install_cluster = '    To install it, run `PYTHONUSERBASE=$VSC_DATA/.local/ python -m pip install --user {module_name}`'
+    pip_install         = '    To install it, run `python -m pip install {module_name}` in your virtual environment, or\n'\
+                          '    `pip install python -m pip install --user {module_name}`'
+    pip_install_cluster = '    To install it, run `python -m pip install --user {module_name}`'
     load_module = '    Load a cluster module containing {module_name}.'
 
     can_build_doc = True
@@ -98,17 +99,14 @@ def check_cmd(options):
             m = importlib.import_module(module_name)
             version = importlib.metadata.version(module_name)
             if version < version_needed:
-                click.secho(f'{module_name}: FOUND {version}, but expecting {version_needed}', fg='bright_red')
+                click.secho(f'\n{module_name}: FOUND {version}, but expecting {version_needed}', fg='bright_red')
             else:
-                print(f'{module_name}: {version} is OK (>={version_needed}).')
+                print(f'\n{module_name}: {version} is OK (>={version_needed}).')
                 if options.verbosity > 1:
                     print(f'    {m}')
         except ModuleNotFoundError:
-            if module_name.startswith('sphinx'):
-                fg = 'black'
-            else:
-                fg = 'bright_red'
-            click.secho(f'{module_name}: NOT FOUND, need {modules[module_name]}', fg=fg)
+            fg = 'bright_red'
+            click.secho(f'\n{module_name}: NOT FOUND, need {modules[module_name]} or later', fg=fg)
             s = None
             if module_name=='numpy':
                 print(f'    {module_name} is needed for building binary extensions from Fortran.')
@@ -149,9 +147,8 @@ def check_cmd(options):
           '-----')
     # poetry
     print('\n- poetry:')
-    can_poetry = check_tool('poetry', local)
-    if not local:
-        print('    Poetry is not recommended on the cluster.')
+    not_required_message = 'The use of Poetry is discouraged on the cluster.' if not local else None
+    can_poetry = check_tool('poetry', local, not_required_message=not_required_message)
         
     # git
     print('\n- VCS:')
