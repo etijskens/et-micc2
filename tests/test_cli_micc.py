@@ -76,10 +76,11 @@ def test_scenario_module_structure():
             completed_process = subprocess.run(['pytest', 'tests'])
             assert completed_process.returncode == 0
 
-            # test building documentation
-            with et_micc2.utils.in_directory('docs'):
-                completed_process = subprocess.run(['make', 'html'])
-                assert completed_process.returncode == 0
+            if not getattr(os.environ,'VSC_HOME','')
+                # test building documentation
+                with et_micc2.utils.in_directory('docs'):
+                    completed_process = subprocess.run(['make', 'html'])
+                    assert completed_process.returncode == 0
 
             result = micc2(['version'])
             assert 'Project (FOO) version (0.0.0)' in result.output
@@ -158,10 +159,11 @@ def test_scenario_package_structure():
                 completed_process = subprocess.run(['python', '-m', 'pytest', f'tests/test_cli_{app}.py'])
                 assert completed_process.returncode == 0
 
-            # test building documentation
-            with et_micc2.utils.in_directory('docs'):
-                completed_process = subprocess.run(['make', 'html'])
-                assert completed_process.returncode == 0
+            if not getattr(os.environ,'VSC_HOME','')
+                # test building documentation
+                with et_micc2.utils.in_directory('docs'):
+                    completed_process = subprocess.run(['make', 'html'])
+                    assert completed_process.returncode == 0
 
 if __name__ == "__main__":
     print(sys.version_info)

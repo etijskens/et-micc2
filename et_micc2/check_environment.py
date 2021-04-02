@@ -12,43 +12,51 @@ import os
 import subprocess
 import importlib
 from importlib.metadata import version
+import click
 
 def check_tool(tool,local):
+    """
+    :param str tool: name of executable, e.g. 'cmake'
+    """
     completed_which = subprocess.run(['which', tool], capture_output=True, text=True)
     if completed_which.returncode !=0:
-        print(f'    {tool} is not available.')
+        click.secho(f'    {tool} is not available.', fg='bright_red')
         return False
     else:
         completed_version = subprocess.run([tool, '--version'], capture_output=True, text=True)
         version_string = completed_version.stdout.strip().replace('\n',' ')
         if local:
-            print(f'    {tool} is available: {version_string}')
+            click.secho(f'    {tool} is available:', fg='green')
+            print(version_string)
             return True
         else: # VSC cluster
-            if not completed_which.output.startswith('/Apps/'):
+            if not completed_which.stdout.startswith('/apps/'):
                 which_string = completed_which.stdout.strip().replace('\n', ' ')
-                print( '   {tool} is available from the system:\n'
-                      f'       {which_string}'
-                      f'       {version_string}'
-                       '   However, it is recommended to use a cluster module version.')
+                click.secho(f'   {tool} is available from the system:However, it is recommended to use a cluster module version.\n'
+                            f'       {which_string}'
+                            f'       {version_string}'
+                           , fg='bright_red'
+                           )
+                print()
                 return False
             else:
-                print(f'    {tool} is available; {completed_version.stdout.strip()}')
+                click.secho(f'    {tool} is available:', fg='green')
+                print(version_string)
                 return True
 
 def check_cmd(options):
     """
     """
     
-    where = os.environ['VSC_INSTITUTE_CLUSTER'] if getattr(os.environ, 'VSC_HOME', '') else 'local'
+    where = os.environ['VSC_INSTITUTE_CLUSTER'] if 'VSC_HOME' in os.environ else 'local'
     local = where=='local'
-
+    
     if not local:
         # check that we are not using the system Python:
-        completed_which = subprocess.run(['which', 'python'])
-        if not '/Apps/' in completed_which.output:
-            click.secho('The system python ({completed_which.output.strip()}) is not suitable for development.\n'
-                        'use `module load` to load a appropriate Python distribution.', fg='bright_red')
+        completed_which = subprocess.run(['which', 'python'],text=True,capture_output=True)
+        if not '/apps/' in completed_which.stdout:
+            click.secho(f'The system python ({completed_which.stdout.strip()}) is not suitable for development.\n'
+                         'use `module load` to load a appropriate Python distribution.', fg='bright_red')
 
     # format strings
     pip_install         = '    To install it, run `pip install {module_name}` in your environment.'
@@ -73,7 +81,8 @@ def check_cmd(options):
               ,'click'              : '7.0'
               ,'pytest'             : '5.0'
               }
-    print('Checking Python packages:')
+    print('Python packages')
+    print('---------------')
     for module_name, version_needed in modules.items():
         try:
             m = importlib.import_module(module_name)
@@ -85,7 +94,7 @@ def check_cmd(options):
                 if options.verbosity > 1:
                     print(f'    {m}')
         except ModuleNotFoundError:
-            click.secho(f'{m}: NOT FOUND, need {modules[module_name]}', fg='bright_red')
+            click.secho(f'{module_name}: NOT FOUND, need {modules[module_name]}', fg='bright_red')
             s = None
             if module_name=='numpy':
                 print(f'    {module_name} is needed for building binary extensions from Fortran.')
@@ -122,16 +131,20 @@ def check_cmd(options):
             if s:
                 print(s.format(module_name=module_name))
 
-    print('\nChecking tools:')
+    print('\n'
+          'Tools\n'
+          '-----')
+    # poetry
+    print('\n- poetry:')
+    can_poetry = check_tool('poetry', local)
+        
     # git
-    print('- VCS:')
-    if check_tool('git', local):
-        can_git = True
-    if check_tool('gh', local):
-        can_gh = True
+    print('\n- VCS:')
+    can_git = check_tool('git', local)
+    can_gh = check_tool('gh', local)
 
     # CMake
-    print('- CMake:')
+    print('\n- CMake:')
     if not check_tool('cmake', local):
         can_build_f90 = False
         can_build_cpp = False
@@ -145,11 +158,11 @@ def check_cmd(options):
     check_tool('ifort', local)
 
     print('\nYour environment is ready to:')
-    print('  - use poetry (e.g. `poetry publish --build`:', 'YES' if can_poetry    else 'NO')
-    print('  - use pytest for automating tests          :', 'YES' if can_pytest    else 'NO')
-    print('  - build binary extension from C++          :', 'if C++ compiler available' if can_build_cpp else 'NO')
-    print('  - build binary extension from Fortran      :', 'if Fortran and C compiler available' if can_build_f90 else 'NO')
-    print('  - build command line interfaces with click :', 'YES' if can_build_cli else 'NO')
-    print('  - generate documentation with sphinx       :', 'YES' if can_build_doc else 'NO')
-    print('  - git                                      :', 'YES' if can_git else 'NO')
-    print('  - create remote repositories at github.com :', 'YES' if can_gh else 'NO')
+    print('  - use poetry (e.g. `poetry publish --build`):', 'YES' if can_poetry    else 'NO')
+    print('  - use pytest for automating tests           :', 'YES' if can_pytest    else 'NO')
+    print('  - build binary extension from C++           :', 'if C++ compiler available' if can_build_cpp else 'NO')
+    print('  - build binary extension from Fortran       :', 'if Fortran and C compiler available' if can_build_f90 else 'NO')
+    print('  - build command line interfaces with click  :', 'YES' if can_build_cli else 'NO')
+    print('  - generate documentation with sphinx        :', 'YES' if can_build_doc else 'NO')
+    print('  - git                                       :', 'YES' if can_git else 'NO')
+    print('  - create remote repositories at github.com  :', 'YES' if can_gh else 'NO')
