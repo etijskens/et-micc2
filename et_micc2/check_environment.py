@@ -48,6 +48,7 @@ def check_tool(tool,local,not_required_message=None):
                 print(f'      {which_string}')
                 return True
 
+
 def check_cmd(options):
     """
     """
