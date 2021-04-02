@@ -19,29 +19,33 @@ def check_tool(tool,local):
     :param str tool: name of executable, e.g. 'cmake'
     """
     completed_which = subprocess.run(['which', tool], capture_output=True, text=True)
+    which_string = completed_which.stdout.strip().replace('\n', ' ')
     if completed_which.returncode !=0:
         click.secho(f'    {tool} is not available.', fg='bright_red')
         return False
     else:
         completed_version = subprocess.run([tool, '--version'], capture_output=True, text=True)
-        version_string = completed_version.stdout.strip().replace('\n',' ')
+        version_string = completed_version.stdout.strip().replace('\n','\n        ')
         if local:
             click.secho(f'    {tool} is available:', fg='green')
-            print(version_string)
+            print(f'      {version_string}')
+            print(f'      {which_string}')
             return True
         else: # VSC cluster
-            if not completed_which.stdout.startswith('/apps/'):
-                which_string = completed_which.stdout.strip().replace('\n', ' ')
+            
+            if completed_which.stdout.startswith('/usr/bin/'):
+                
                 click.secho(f'   {tool} is available from the system:However, it is recommended to use a cluster module version.\n'
-                            f'       {which_string}'
-                            f'       {version_string}'
+                            f'     {which_string}'
+                            f'     {version_string}'
                            , fg='bright_red'
                            )
                 print()
                 return False
             else:
                 click.secho(f'    {tool} is available:', fg='green')
-                print(version_string)
+                print(f'      {version_string}')
+                print(f'      {which_string}')
                 return True
 
 def check_cmd(options):
@@ -51,11 +55,16 @@ def check_cmd(options):
     where = os.environ['VSC_INSTITUTE_CLUSTER'] if 'VSC_HOME' in os.environ else 'local'
     local = where=='local'
     
+    
+    print('Python\n'
+          '------')
+    completed_which = subprocess.run(['which', 'python'],text=True,capture_output=True)
+    which_string = completed_which.stdout.replace('\n', '\n      ')
+    print(f'python={which_string}')
     if not local:
         # check that we are not using the system Python:
-        completed_which = subprocess.run(['which', 'python'],text=True,capture_output=True)
-        if not '/apps/' in completed_which.stdout:
-            click.secho(f'The system python ({completed_which.stdout.strip()}) is not suitable for development.\n'
+        if '/usr/bin/' in which_string:
+            click.secho(f'The system python is not suitable for development.\n'
                          'use `module load` to load a appropriate Python distribution.', fg='bright_red')
 
     # format strings
@@ -94,7 +103,11 @@ def check_cmd(options):
                 if options.verbosity > 1:
                     print(f'    {m}')
         except ModuleNotFoundError:
-            click.secho(f'{module_name}: NOT FOUND, need {modules[module_name]}', fg='bright_red')
+            if module_name.startswith('sphinx'):
+                fg = 'black'
+            else:
+                fg = 'bright_red'
+            click.secho(f'{module_name}: NOT FOUND, need {modules[module_name]}', fg=fg)
             s = None
             if module_name=='numpy':
                 print(f'    {module_name} is needed for building binary extensions from Fortran.')
@@ -111,8 +124,7 @@ def check_cmd(options):
                     print(f'    Sphinx is only needed to build documentation.')
                     s = pip_install
                 else:
-                    print('    You must use your local machine for building documentation.\n'
-                          '    The cluster is not suited for this.')
+                    print('    It is discouraged to build documentation on the cluster. Please consider building documentation on a desktop.')
                 can_build_doc = False
 
             elif 'click' in module_name:
@@ -137,6 +149,8 @@ def check_cmd(options):
     # poetry
     print('\n- poetry:')
     can_poetry = check_tool('poetry', local)
+    if not local:
+        print('    Poetry is not recommended on the cluster.')
         
     # git
     print('\n- VCS:')
