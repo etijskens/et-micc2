@@ -12,7 +12,7 @@ import contextlib
 import uuid
 import traceback
 from pathlib import Path
-
+import subprocess
 from et_micc2.tomlfile import TomlFile
 
 test_workspace = (Path(__file__) / '../../test_workspace').resolve()
@@ -23,11 +23,13 @@ def clear_test_workspace(folder=None):
     Otherwise, only remove directory folder
     """
     if folder is None:
-        shutil.rmtree(test_workspace)
+        #shutil.rmtree(test_workspace, ignore_errors=True)
+        subprocess.run(['rm', '-rf', str(test_workspace)])
         test_workspace.mkdir()
     else:
         tws_folder = test_workspace / folder
-        shutil.rmtree(tws_folder)
+        shutil.rmtree(tws_folder, ignore_errors=True)
+        shutil.rmtree(tws_folder, ignore_errors=True)
 
 
 @contextlib.contextmanager

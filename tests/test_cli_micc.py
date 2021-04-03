@@ -5,8 +5,11 @@
 Tests for et_micc2 package.
 """
 #===============================================================================
-
-import sys,os
+import sys
+sys.path.insert(0,'.')
+sys.path.insert(0,'..')
+import traceback
+import os
 from pathlib import Path
 import subprocess
 import importlib
@@ -76,7 +79,9 @@ def test_scenario_module_structure():
             completed_process = subprocess.run(['pytest', 'tests'])
             assert completed_process.returncode == 0
 
-            if not getattr(os.environ,'VSC_HOME','')
+            if 'VSC_HOME' in os.environ:
+                print('Not testing build documentation')
+            else:
                 # test building documentation
                 with et_micc2.utils.in_directory('docs'):
                     completed_process = subprocess.run(['make', 'html'])
@@ -98,12 +103,12 @@ def test_scenario_module_structure():
             assert '(FOO)> version (0.2.1) -> (1.0.0)' in result.output
             result = micc2(['version', '-s'])
             assert '1.0.0' in result.output
-
+    helpers.clear_test_workspace()
 
 def test_scenario_package_structure():
     """
     """
-    helpers.clear_test_workspace()
+    helpers.clear_test_workspace('FOO')
     with et_micc2.utils.in_directory(helpers.test_workspace):
         results = []
         #Create package FOO
@@ -159,15 +164,19 @@ def test_scenario_package_structure():
                 completed_process = subprocess.run(['python', '-m', 'pytest', f'tests/test_cli_{app}.py'])
                 assert completed_process.returncode == 0
 
-            if not getattr(os.environ,'VSC_HOME','')
+            if 'VSC_HOME' in os.environ:
+                print('Not testing build documentation')
+            else:
                 # test building documentation
                 with et_micc2.utils.in_directory('docs'):
                     completed_process = subprocess.run(['make', 'html'])
                     assert completed_process.returncode == 0
+    helpers.clear_test_workspace()
+
 
 if __name__ == "__main__":
     print(sys.version_info)
-    the_test_you_want_to_debug = test_scenario_module_structure
+    the_test_you_want_to_debug = test_scenario_package_structure
 
     print(f"__main__ running {the_test_you_want_to_debug}")
     the_test_you_want_to_debug()

@@ -31,6 +31,7 @@ def resolve_template(template):
         template = Path(__file__).parent / 'templates' / template
 
     if not template.exists():
+        print(template.resolve())
         raise AssertionError(f"Inexisting template {template}")
     
     return template
