@@ -103,7 +103,8 @@ def test_scenario_module_structure():
             assert '(FOO)> version (0.2.1) -> (1.0.0)' in result.output
             result = micc2(['version', '-s'])
             assert '1.0.0' in result.output
-    helpers.clear_test_workspace()
+    # helpers.clear_test_workspace()
+
 
 def test_scenario_package_structure():
     """
@@ -171,7 +172,7 @@ def test_scenario_package_structure():
                 with et_micc2.utils.in_directory('docs'):
                     completed_process = subprocess.run(['make', 'html'])
                     assert completed_process.returncode == 0
-    helpers.clear_test_workspace()
+    # helpers.clear_test_workspace()
 
 
 if __name__ == "__main__":

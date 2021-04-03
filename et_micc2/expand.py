@@ -27,11 +27,14 @@ def resolve_template(template):
         # reative path
         template = Path.cwd() / template
     else:
-        # just the template name 
+        # just the template name
+        print(os.path.abspath(os.path.dirname(__file__)))
+        print(Path(__file__).resolve())
         template = Path(__file__).parent / 'templates' / template
+        print(template)
+        print(template.resolve())
 
     if not template.exists():
-        print(template.resolve())
         raise AssertionError(f"Inexisting template {template}")
     
     return template

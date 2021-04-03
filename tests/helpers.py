@@ -23,13 +23,12 @@ def clear_test_workspace(folder=None):
     Otherwise, only remove directory folder
     """
     if folder is None:
-        #shutil.rmtree(test_workspace, ignore_errors=True)
         subprocess.run(['rm', '-rf', str(test_workspace)])
+        # shutil.rmtree fails on leibniz with IntelPython3 module (3.7.7)
         test_workspace.mkdir()
     else:
         tws_folder = test_workspace / folder
-        shutil.rmtree(tws_folder, ignore_errors=True)
-        shutil.rmtree(tws_folder, ignore_errors=True)
+        subprocess.run(['rm', '-rf', str(tws_folder)])
 
 
 @contextlib.contextmanager
