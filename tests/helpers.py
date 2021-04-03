@@ -13,6 +13,7 @@ import uuid
 import traceback
 from pathlib import Path
 import subprocess
+import time
 from et_micc2.tomlfile import TomlFile
 
 test_workspace = (Path(__file__) / '../../test_workspace').resolve()
@@ -24,12 +25,13 @@ def clear_test_workspace(folder=None):
     """
     if folder is None:
         subprocess.run(['rm', '-rf', str(test_workspace)])
+        time.sleep(1000)
         # shutil.rmtree fails on leibniz with IntelPython3 module (3.7.7)
         test_workspace.mkdir()
     else:
         tws_folder = test_workspace / folder
         subprocess.run(['rm', '-rf', str(tws_folder)])
-
+    a
 
 @contextlib.contextmanager
 def in_empty_tmp_dir(cleanup=True):
