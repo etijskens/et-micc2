@@ -28,11 +28,9 @@ def resolve_template(template):
         template = Path.cwd() / template
     else:
         # just the template name
-        print(os.path.abspath(os.path.dirname(__file__)))
-        print(Path(__file__).resolve())
         template = Path(__file__).parent / 'templates' / template
-        print(template)
-        print(template.resolve())
+        template = template.resolve().replace('/et_micc2/test_workspace', '') # this is a hack
+        # on the cluster this does not resolve correctly when running the tests, hence the hack
 
     if not template.exists():
         raise AssertionError(f"Inexisting template {template}")
