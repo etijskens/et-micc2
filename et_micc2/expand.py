@@ -29,7 +29,9 @@ def resolve_template(template):
     else:
         # just the template name
         template = Path(__file__).parent / 'templates' / template
-        template = template.resolve().replace('/et_micc2/test_workspace', '') # this is a hack
+        # this is a hack
+        template = str(template).resolve().replace('/et_micc2/test_workspace', '')
+        template = Path(template)
         # on the cluster this does not resolve correctly when running the tests, hence the hack
 
     if not template.exists():
