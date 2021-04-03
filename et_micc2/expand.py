@@ -30,7 +30,7 @@ def resolve_template(template):
         # just the template name
         template = Path(__file__).parent / 'templates' / template
         # this is a hack
-        template = str(template.resolve()).replace('/et_micc2/test_workspace', '')
+        template = str(template.resolve()).replace('/test_workspace', '')
         template = Path(template)
         # on the cluster this does not resolve correctly when running the tests, hence the hack
 
