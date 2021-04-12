@@ -7,7 +7,7 @@ Module et_micc2.project
 An OO interface to *micc* projects.
 
 """
-import os, sys
+import os, sys, site
 import sysconfig
 import shutil
 import json
@@ -23,6 +23,9 @@ import et_micc2.utils
 import et_micc2.expand
 import et_micc2.logger
 import subprocess
+
+
+__FILE__ = Path(__file__).resolve() 
 
 
 def micc_version():
@@ -1269,8 +1272,25 @@ def build_binary_extension(options):
 
 
 def path_to_cmake_tools():
-    """Return the path to the folder with the CMake tools."""
-    p = (Path(__file__) / '..' / '..' / 'pybind11' / 'share' / 'cmake' / 'pybind11').resolve()
+    """Return the path to the folder with the CMake tools.
+    
+    """
+    found = ''
+    #look in global site-packages:
+    site_packages = site.getsitepackages()
+    site_packages.append(site.getusersitepackages())
+    print(site_packages)
+    for d in site_packages:
+        pd = Path(d) / 'pybind11'
+        if pd.exists():
+            found = pd
+            break
+    
+    if not found:
+        raise ModuleNotFoundError('pybind11 not found in {site_packages}')
+        
+    p = pd / 'share' / 'cmake' / 'pybind11'
+    print(f'path_to_cmake_tools={p}')
     return str(p)
 
 

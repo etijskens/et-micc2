@@ -62,6 +62,48 @@ def test_micc_help():
 
 
 
+def test_clear_test_workspace():
+    """ 
+    """
+    helpers.clear_test_workspace()
+    p = Path('test_workspace')
+    assert p.exists()
+    print(1)
+    
+    pFOO = p / 'FOO'
+    pFOO.mkdir()
+    assert pFOO.exists()
+    helpers.clear_test_workspace()
+    assert not pFOO.exists()
+    assert p.exists()
+    print(2)
+
+    pFOO.mkdir()
+    pbar = pFOO / 'bar.txt'
+    with pbar.open('w') as f:
+        f.write("some text\n")
+    assert pbar.exists()
+    helpers.clear_test_workspace()
+    assert not pbar.exists()
+    assert not pFOO.exists()
+    assert p.exists()
+    print(3)
+
+    pFOO.mkdir()
+    pKeep = p / 'Keep'
+    pKeep.mkdir()
+    assert pKeep.exists()
+    with pbar.open('w') as f:
+        f.write("some text\n")
+    assert pbar.exists()
+    helpers.clear_test_workspace('FOO')
+    assert not pbar.exists()
+    assert not pFOO.exists()
+    assert pKeep.exists()
+    print(4)
+
+
+
 def test_scenario_module_structure():
     """
     """
@@ -109,18 +151,18 @@ def test_scenario_module_structure():
 def test_scenario_package_structure():
     """
     """
-    helpers.clear_test_workspace('FOO')
+    # helpers.clear_test_workspace()
     with et_micc2.utils.in_directory(helpers.test_workspace):
         results = []
         #Create package FOO
-        result = micc2(['-vv', '-p', 'FOO', 'create', '--allow-nesting', '--remote=none', '--package'])
-        assert Path('FOO/foo/__init__.py').exists()
+        result = micc2(['-vv', '-p', 'BAR', 'create', '--allow-nesting', '--remote=none', '--package'])
+        assert Path('BAR/bar/__init__.py').exists()
         results.append(result)
 
-        result = micc2(['-vvv', '-p', 'FOO', 'info'])
+        result = micc2(['-vvv', '-p', 'BAR', 'info'])
         results.append(result)
 
-        with et_micc2.utils.in_directory('FOO'):
+        with et_micc2.utils.in_directory('BAR'):
             completed_process = subprocess.run(['pytest', 'tests'])
             assert completed_process.returncode == 0
 
@@ -138,7 +180,7 @@ def test_scenario_package_structure():
                 # test micc build
                 result = micc2(['-vv', 'build', '-m', submodule, '--clean'] )
                 extension_suffix = et_micc2.project.get_extension_suffix()
-                binary_extension = Path(f'foo/{submodule}{extension_suffix}')
+                binary_extension = Path(f'bar/{submodule}{extension_suffix}')
                 assert binary_extension.exists()
 
                 # test auto build:

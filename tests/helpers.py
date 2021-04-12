@@ -23,15 +23,21 @@ def clear_test_workspace(folder=None):
     """If dir is None, clear the test workspace by removing it and recreating it.
     Otherwise, only remove directory folder
     """
-    if folder is None:
-        subprocess.run(['rm', '-rf', str(test_workspace)])
-        time.sleep(1000)
-        # shutil.rmtree fails on leibniz with IntelPython3 module (3.7.7)
-        test_workspace.mkdir()
-    else:
-        tws_folder = test_workspace / folder
-        subprocess.run(['rm', '-rf', str(tws_folder)])
-    a
+    p0 = Path('test_workspace')
+    ok = False
+    while not ok:
+        try:
+            if not folder is None:
+                p = p0 / folder
+                shutil.rmtree(p)
+            else:
+                shutil.rmtree(p0)
+        except OSError:
+            print('retrying')
+        else: 
+            ok = True 
+    p0.mkdir(exist_ok=True)
+        
 
 @contextlib.contextmanager
 def in_empty_tmp_dir(cleanup=True):

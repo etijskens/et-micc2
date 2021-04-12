@@ -36,8 +36,7 @@
     else()
       message(FATAL_ERROR "python executable not found.")
     endif()
-    set(pybind11_DIR "${_site_packages}/pybind11/share/cmake/pybind11")
-    message("pybind11_DIR : ${pybind11_DIR}")
+    message("pybind11_DIR : ${pybind11_DIR}") # set in command line!
   # now this will do fine:
     find_package(pybind11 CONFIG REQUIRED)
 #>> end boilerplate code

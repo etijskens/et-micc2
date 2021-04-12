@@ -16,7 +16,7 @@ from cookiecutter.main import cookiecutter
 import et_micc2.logger
 
 EXIT_OVERWRITE = -3
-
+__FILE__ = Path(__file__).resolve() 
 
 def resolve_template(template):
     """Compose the absolute path of a template."""
@@ -28,13 +28,10 @@ def resolve_template(template):
         template = Path.cwd() / template
     else:
         # just the template name
-        template = Path(__file__).parent / 'templates' / template
-        # this is a hack
-        template = str(template.resolve()).replace('/test_workspace', '')
-        template = Path(template)
-        # on the cluster this does not resolve correctly when running the tests, hence the hack
-
+        template = Path(__FILE__).parent / 'templates' / template
+      
     if not template.exists():
+        print(f'template=={template}')
         raise AssertionError(f"Inexisting template {template}")
     
     return template

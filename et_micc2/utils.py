@@ -11,6 +11,7 @@ Utility functions for et_micc2.
 """
 import os
 import re
+import time
 import subprocess
 import copy
 from pathlib import Path
@@ -311,6 +312,7 @@ def in_directory(path):
     os.chdir(str(path)) # the str method takes care of when path is a Path object
     yield os.getcwd()
     os.chdir(previous_dir)
+    time.sleep(1)
 
 
 def execute(cmds,logfun=None,stop_on_error=True,env=None,cwd=None,verbose=True):
