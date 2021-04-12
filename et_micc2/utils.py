@@ -151,7 +151,7 @@ def verify_project_name(project_name):
     
     :returns: bool
     """
-    p = re.compile("\A[a-zA-Z][a-zA-Z0-9_-]*\Z")
+    p = re.compile(r"\A[a-zA-Z][a-zA-Z0-9_-]*\Z")
     return bool( p.match(project_name) )
     
     
