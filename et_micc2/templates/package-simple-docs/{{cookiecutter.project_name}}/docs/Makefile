@@ -32,10 +32,6 @@ ifdef VSC_HOME
 	$(warning "VSC_HOME is set: $(VSC_HOME).")
 	$(error "The cluster ($(VSC_INSTITUTE_CLUSTER)) is not suitable for building documentation. Use a desktop machine instead")
 endif
-	@pip show click            >/dev/null && echo "Already installed: click"            || pip install click
-	@pip show sphinx-click     >/dev/null && echo "Already installed: sphinx-click"     || pip install sphinx-click
-	@pip show sphinx           >/dev/null && echo "Already installed: sphinx"           || pip install sphinx
-	@pip show sphinx-rtd-theme >/dev/null && echo "Already installed: sphinx-rtd-theme" || pip install sphinx-rtd-theme
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
