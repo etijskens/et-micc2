@@ -1,15 +1,31 @@
 .. _pip: https://pypi.org/project/pip/
-
-
-Principles
-----------
-
 This document aims at setting up a practical development environment for Python projects,
 allowing the integration of binary extension modules based on C++ or Fortran.
+
+Constraints
+-----------
+In micc versions prior to 2.0 a virtual Python environment was created for every micc
+project. These virtual environments contained all possible dependencies of micc and
+micc-build and consumed a lot of disk space. When working on HPC clusters this exerted a lot
+pressure on their file systems. Starting from micc v2.0 a leaner approach was followed.
+The tools needed by micc2_ are now install once
+
+
+..  note::
+
+    Micc2_ comes with a ``check`` command that checks your environment for missing components
+    and tells you which functionality you will not be able to use because of missing components.
+    A missing component is not necessarily a problem. E.g. if you are not interesting in
+    building documentation on your system, then you can do without sphinx_, sphinx_click_, and
+    sphinx_rtd_theme.
+
 Developing on a local machine, a desktop or a laptop, is often somewhat more practical than
 developing on the cluster. Typically, I start developing on my own machine until things are
 working well, and then I port the code to the cluster for further testing. I switch back and
-forth between both environments several times.
+forth between both environments several times. This is facilitated with git_ using a remote
+repository at https://github.com .
+
+
 
 There are important differences in managing your environment on your local machine and on the
 cluster. They are described in detail in :ref:`tutorial-6`.

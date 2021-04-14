@@ -7,7 +7,7 @@ Module et_micc2.project
 An OO interface to *micc* projects.
 
 """
-import os, sys, site
+import os, sys, site, subprocess
 import sysconfig
 import shutil
 import json
@@ -22,14 +22,62 @@ import semantic_version
 import et_micc2.utils
 import et_micc2.expand
 import et_micc2.logger
-import subprocess
 
 
-__FILE__ = Path(__file__).resolve() 
+__FILE__ = Path(__file__).resolve()
 
 
 def micc_version():
     return et_micc2.__version__
+
+
+def on_vsc_cluster():
+    """test if we are running on one of the VSC clusters"""
+    try:
+        os.environ['VSC_HOME']
+        os.environ['VSC_INSTITUTE_CLUSTER']
+    except:
+        return False
+    else:
+        return True
+
+
+def is_os_tool(path_to_exe):
+    """test if path_to_exe was installed as part of the OS."""
+    return path_to_exe.startswith('/usr/bin')
+
+
+class ToolInfo:
+    def __init__(self, exe, version=False, accept_cluster_os_tools=False):
+        """Check if tool exe is available.
+
+        :param bool version: request version info
+        :param bool accept_cluster_os_tools: accept cluster operating system tools
+
+        :return: SimpleNamespace(which,version), where which is the location of the tool or an empty
+            string if it is not found or not accepted, and version is the version string (if requested)
+            as returned be 'exe --version'.
+        """
+        self.exe = exe
+        completed_which = subprocess.run(['which', exe], capture_output=True, text=True)
+        self.which = completed_which.stdout.strip().replace('\n', ' ')
+
+        if self.which:
+            if on_vsc_cluster() and not accept_cluster_os_tools and is_os_tool(self.which):
+                self.which = ''
+
+    def version(self):
+        """Return the version string of the tool, or an empty string if the tool is not available."""
+        if self.which:
+            completed_version = subprocess.run([tool, '--version'], capture_output=True, text=True)
+            self.version = completed_version.stdout.strip().replace('\n\n','\n')#.replace('\n','\n        ')
+        else:
+            self.version = ''
+        return self.version
+
+    def is_available(self):
+        """Return True if the tool is available, False otherwise."""
+        return bool(self.which)
 
 
 class Project:
@@ -88,6 +136,33 @@ class Project:
             self.version = self.pyproject_toml['tool']['poetry']['version']
 
 
+    def may_continue(self, default=False, stop_message=None):
+        """Ask the user if he wants to continue or stop a command.
+
+        If the answer is to stop, sets self.exit_code to -1, and prints the stop_message.
+
+        :param bool default: The answer if the user just presses enter.
+        :return: True if the user wants to stop, False otherwise.
+        """
+        if default == True:
+            question = 'Continue? [Yes]/No'
+        else:
+            question = 'Continue? [No]/Yes'
+        answer = input(question)
+
+        if not answer:
+            answer = default
+        else:
+            answer = answer.lower()
+            answer = True if answer.startswith('y') else False
+
+        if not answer:
+            if stop_message:
+                print(stop_message)
+            self.exit_code = -1
+
+        return answer
+
     @property
     def project_path(self):
         return self.options.project_path
@@ -104,6 +179,35 @@ class Project:
     def create(self):
         """Create a new project skeleton."""
 
+        # Check for tools needed:
+        # always need git:
+        git = ToolInfo('git')
+        if not git.is_available():
+            s = '(or not suitable) ' if on_vsc_cluster() else ''
+            self.warning(f'The git command is not available {s}in your environment.'
+                          'If you continue this project will not have a local repository.'
+                        )
+            if not self.may_continue(stop_message='Project not created.'):
+                return
+
+        if self.options.remote:
+            # Check that we have github username
+            github_username = template_parameters['github_username']
+            if not github_username:
+                self.error('Micc2 configuration does not have a github username. Creation of remote repo is not possible.\n'
+                           'Project is not created.'
+                          )
+                return
+            # Check availability of gh command:
+            gh = ToolInfo('gh')
+            if not gh.is_available() and self.options.remote:
+                self.warning('The gh command is not available in your environment.'
+                             'If you continue this project a remote repository will not be created.'
+                            )
+                if not self.may_continue(stop_message='Project not created.'):
+                    return
+
+        # Proceed creating the project
         self.project_path.mkdir(parents=True, exist_ok=True)
 
         if not self.options.allow_nesting:
@@ -168,9 +272,10 @@ class Project:
 
         self.options.verbosity = max(1, self.options.verbosity)
         self.get_logger()
+
         with et_micc2.logger.logtime(self):
             with et_micc2.logger.log(self.logger.info
-                    , f"Creating project ({self.project_name}):"
+                                    , f"Creating project ({self.project_name}):"
                                     ):
                 self.logger.info(f"Python {structure} ({self.package_name}): structure = {source_file}")
                 template_parameters = {'project_name': self.project_name
@@ -199,8 +304,7 @@ class Project:
                                ]
                         returncode = et_micc2.utils.execute(cmds, self.logger.debug, stop_on_error=True)
                 if not returncode:
-                    github_username = template_parameters['github_username']
-                    if github_username and not self.options.remote is None:
+                    if self.options.remote:
                         with et_micc2.logger.log(self.logger.info, f"Creating remote git repository at https://github.com/{github_username}/{self.project_name}"):
                             with et_micc2.utils.in_directory(self.project_path):
                                 pat_file = Path.home() / '.pat.txt'
@@ -221,14 +325,15 @@ class Project:
                     else:
                         self.logger.warning("Creation of remote GitHub repository not requested.")
 
-                self.logger.warning(
-                    "Run 'poetry install' in the project directory to create a virtual "
-                    "environment and install its dependencies."
-                )
+                # self.logger.warning(
+                #     "Run 'poetry install' in the project directory to create a virtual "
+                #     "environment and install its dependencies."
+                # )
+
         if self.options.publish:
             self.logger.info(f"The name '{self.package_name}' is still available on PyPI.")
-            self.logger.warning("To claim the name, it is best to publish your project now\n"
-                                "by running 'poetry publish'."
+            self.logger.warning("To claim the name, it is best to publish your project right away\n"
+                                "by running 'poetry publish --build'."
             )
 
 
