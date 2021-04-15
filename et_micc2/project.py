@@ -49,7 +49,7 @@ def is_os_tool(path_to_exe):
 
 class ToolInfo:
     def __init__(self, exe, version=False, accept_cluster_os_tools=False):
-        """Check if tool exe is available.
+        """Check if tool 'exe' is available.
 
         :param bool version: request version info
         :param bool accept_cluster_os_tools: accept cluster operating system tools
@@ -176,11 +176,26 @@ class Project:
         """Print an warning message :py:obj:`msg` and set the project's :py:obj:`exit_code`."""
         click.secho("[WARNING]\n" + msg, fg='green')
 
+
+    def require_git(self):
+        git = ToolInfo('git')
+        if not git.is_available():
+            s = '(or not suitable) ' if on_vsc_cluster() else ''
+            self.warning(f'The git command is not available {s}in your environment.'
+                          'If you continue this project will not have a local repository.'
+                        )
+            if not self.may_continue(stop_message='Project not created.'):
+                return False
+        return True
+
+
     def create(self):
         """Create a new project skeleton."""
 
         # Check for tools needed:
-        # always need git:
+        # . git is required for creating a local repo
+        # . gh is required for creating a remote repo
+
         git = ToolInfo('git')
         if not git.is_available():
             s = '(or not suitable) ' if on_vsc_cluster() else ''
@@ -339,6 +354,9 @@ class Project:
 
     def module_to_package_cmd(self):
         """Convert a module project (:file:`module.py`) to a package project (:file:`package/__init__.py`)."""
+
+        # This command does not require any external tools.
+
         if self.structure == 'package':
             self.warning(f"Project ({self.project_name}) is already a package ({self.package}).")
             return
@@ -369,6 +387,9 @@ class Project:
 
     def info_cmd(self):
         """Output info on the project."""
+
+        # This command does not require any external tools.
+
         if self.options.verbosity >= 0:
             self.options.verbosity = 10
 
@@ -429,6 +450,9 @@ class Project:
         in :file:`<package_name>.py`, :file:`<package_name>/__init__.py`, or in
         :file:`<package_name>/__version__.py`.
         """
+
+        # This command does not require any external tools.
+
         self.options.verbosity = max(1, self.options.verbosity)
 
         if not self.options.rule:
@@ -480,6 +504,16 @@ class Project:
 
     def tag_cmd(self):
         """Create and push a version tag ``v<Major>.<minor>.<patch>`` for the current version."""
+
+        # Git is required
+
+        git = ToolInfo('git')
+        if not git.is_available():
+            s = '(or not suitable) ' if on_vsc_cluster() else ''
+            self.error(f'The tag command requires git, which is not available {s}in your environment.\n'
+                        'Exiting.')
+            return
+
         tag = f"v{self.version}"
 
         with et_micc2.utils.in_directory(self.project_path):
@@ -601,17 +635,54 @@ class Project:
                     self.options.templates = 'module-py'
                 self.add_python_module(db_entry)
 
-            elif self.options.f90:
-                # prepare for adding a Fortran sub-module:
-                if not self.options.templates:
-                    self.options.templates = 'module-f90'
-                self.add_f90_module(db_entry)
+            else: # add a binary extension module
+                # Check availability of cmake
+                cmake = ToolInfo('cmake')
+                if not cmake.is_available():
+                    s = '(or not suitable) ' if on_vsc_cluster() else ''
+                    self.warning(f'Building binary extensions requires cmake, which is not available {s}in your environment.')
+                    if not self.may_continue(stop_message='Exiting.'):
+                        return
 
-            elif self.options.cpp:
-                # prepare for adding a C++ sub-module:
-                if not self.options.templates:
-                    self.options.templates = 'module-cpp'
-                self.add_cpp_module(db_entry)
+                if self.options.f90:
+                    # Check availabilite of f2py
+                    f2py = ToolInfo('f2py')
+                    if not f2py.is_available():
+                        s = 'loading a module with numpy pre-installed' if on_vsc_cluster() else 'installing numpy in your Python environment using pip'
+                        self.warning( 'Building Fortran binary extensions requires f2py, which is not available in your environment.\n'
+                                     f'f2py is made available by {s}.\n'
+                                      '(You also need a Fortran compiler and a C compiler).'
+                                     )
+                        if not self.may_continue(stop_message='Exiting.'):
+                            return
+
+                    # prepare for adding a Fortran sub-module:
+                    if not self.options.templates:
+                        self.options.templates = 'module-f90'
+                    self.add_f90_module(db_entry)
+
+                if self.options.cpp:
+                    # check availability of pybind11
+                    try:
+                        import pybind11
+                    except ModuleNotFoundError:
+                        self.warning('Building C++ binary extensions requires pybind11, which is not available in your environment.\n'
+                                     'If you are using a virtual environment, install it as .\n'
+                                     '    (.venv) > pip install pybind11\n'
+                                     'otherwise,\n'
+                                     '    > pip install pybind11 --user\n'
+                                     '(You also need a C++ compiler).'
+                                     )
+                    else:
+                        if pybind11.__version__<'2.6.2':
+                            self.warning(f'Building C++ binary extensions requires pybind11, which is available in your environment (v{pybind11.__version__}).\n'
+                                          'However, you may experience problems because it is older than v2.6.2.\n'
+                                          'Upgrading is recommended.'
+                                         )
+                    # prepare for adding a C++ sub-module:
+                    if not self.options.templates:
+                        self.options.templates = 'module-cpp'
+                    self.add_cpp_module(db_entry)
 
         self.deserialize_db()
         self.serialize_db(db_entry)
