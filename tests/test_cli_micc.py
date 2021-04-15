@@ -20,7 +20,8 @@ from tests import helpers
 #===============================================================================
 
 import et_micc2.logger
-from et_micc2 import cli_micc
+from et_micc2 import cli_micc, project
+
 
 #===============================================================================
 # test scenario blocks
@@ -59,7 +60,6 @@ def test_micc_help():
     result = micc2(['--help'])
     assert '--help' in result.output
     assert 'Show this message and exit.' in result.output
-
 
 
 def test_clear_test_workspace():
@@ -154,7 +154,7 @@ def test_scenario_package_structure():
     # helpers.clear_test_workspace()
     with et_micc2.utils.in_directory(helpers.test_workspace):
         results = []
-        #Create package FOO
+        #Create package BAR
         result = micc2(['-vv', '-p', 'BAR', 'create', '--allow-nesting', '--remote=none', '--package'])
         assert Path('BAR/bar/__init__.py').exists()
         results.append(result)
@@ -217,9 +217,132 @@ def test_scenario_package_structure():
     # helpers.clear_test_workspace()
 
 
+def test_git_missing():
+    """"""
+    helpers.clear_test_workspace()
+
+    project.ToolInfo.mock = ['git']
+
+    with et_micc2.utils.in_directory(helpers.test_workspace):
+        results = []
+        #Create package NOGIT
+        result = micc2( ['-vv', '-p', 'NOGIT', 'create', '--allow-nesting', '--remote=none', '--package']
+                      , stdin='\n', assert_exit_code=False
+                      )
+        assert result.exit_code == -1
+        assert not Path('NOGIT/nogit/__init__.py').exists()
+        results.append(result)
+
+    project.ToolInfo.mock = []
+
+
+def test_gh_missing():
+    """"""
+    project.ToolInfo.mock = ['gh']
+
+    with et_micc2.utils.in_directory(helpers.test_workspace):
+        results = []
+        #Create package NOGH
+        result = micc2( ['-vv', '-p', 'NOGH', 'create', '--allow-nesting', '--package']
+                      , stdin='\n', assert_exit_code=False
+                      )
+        assert result.exit_code == -1
+        assert not Path('NOGH/nogh/__init__.py').exists()
+        results.append(result)
+
+    project.ToolInfo.mock = []
+
+
+def test_cmake_missing():
+    """"""
+    helpers.clear_test_workspace()
+
+    project.ToolInfo.mock = ['cmake']
+
+    with et_micc2.utils.in_directory(helpers.test_workspace):
+        #Create package NOCMAKE
+        result = micc2( ['-vv', '-p', 'NOCMAKE', 'create', '--remote=none', '--allow-nesting', '--package']
+                      , stdin='\n', assert_exit_code=False
+                      )
+        assert result.exit_code == 0
+        assert Path('NOCMAKE/nocmake/__init__.py').exists()
+
+        with et_micc2.utils.in_directory('NOCMAKE'):
+            # Add a binary sub-module
+            for flag in ['--cpp', '--f90']:
+                submodule = f'added_{flag[2:]}'
+                result = micc2(['-v', 'add', submodule, flag])
+                assert result.exit_code == 0
+                # # test micc build
+                # result = micc2(['-vv', 'build', '-m', submodule, '--clean'])
+                # extension_suffix = et_micc2.project.get_extension_suffix()
+                # binary_extension = Path(f'bar/{submodule}{extension_suffix}')
+                # assert binary_extension.exists()
+
+    project.ToolInfo.mock = []
+
+def test_pybind11_f2py_missing():
+    """"""
+    helpers.clear_test_workspace()
+
+    project.ToolInfo.mock = ['f2py']
+    project.ModuleInfo.mock = ['pybind11']
+
+    with et_micc2.utils.in_directory(helpers.test_workspace):
+        #Create package nopybind11_nof2py
+        result = micc2( ['-vv', '-p', 'nopybind11_nof2py', 'create', '--remote=none', '--allow-nesting', '--package']
+                      , stdin='\n', assert_exit_code=False
+                      )
+        assert result.exit_code == 0
+        assert Path('nopybind11_nof2py/nopybind11_nof2py/__init__.py').exists()
+
+        with et_micc2.utils.in_directory('nopybind11_nof2py'):
+            # Add a binary sub-module
+            for flag in ['--cpp', '--f90']:
+                submodule = f'added_{flag[2:]}'
+                result = micc2(['-v', 'add', submodule, flag])
+                assert result.exit_code == 0
+                # # test micc build
+                # result = micc2(['-vv', 'build', '-m', submodule, '--clean'])
+                # extension_suffix = et_micc2.project.get_extension_suffix()
+                # binary_extension = Path(f'bar/{submodule}{extension_suffix}')
+                # assert binary_extension.exists()
+
+    project.ToolInfo.mock = []
+    project.ModuleInfo.mock = []
+
+
+def test_build_pybind11_missing():
+    """"""
+    helpers.clear_test_workspace()
+
+    project.ModuleInfo.mock = ['pybind11']
+
+    with et_micc2.utils.in_directory(helpers.test_workspace):
+        #Create package nopybind11
+        result = micc2( ['-vv', '-p', 'nopybind11', 'create', '--remote=none', '--allow-nesting', '--package']
+                      , stdin='\n', assert_exit_code=False
+                      )
+        assert result.exit_code == 0
+        assert Path('nopybind11/nopybind11/__init__.py').exists()
+
+        with et_micc2.utils.in_directory('nopybind11'):
+            # Add a binary sub-module
+            for flag in ['--cpp']:
+                submodule = f'added_{flag[2:]}'
+                result = micc2(['-v', 'add', submodule, flag])
+                assert result.exit_code == 0
+                # test micc build
+                result = micc2(['-vv', 'build', '-m', submodule, '--clean'], assert_exit_code=False)
+                assert result.exit_code !=0
+
+    project.ToolInfo.mock = []
+    project.ModuleInfo.mock = []
+
+
 if __name__ == "__main__":
     print(sys.version_info)
-    the_test_you_want_to_debug = test_scenario_package_structure
+    the_test_you_want_to_debug = test_build_pybind11_missing
 
     print(f"__main__ running {the_test_you_want_to_debug}")
     the_test_you_want_to_debug()

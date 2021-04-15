@@ -15,6 +15,7 @@ from pathlib import Path
 from operator import xor
 import requests
 from types import SimpleNamespace
+from importlib import import_module
 
 import click
 import semantic_version
@@ -46,25 +47,62 @@ def is_os_tool(path_to_exe):
     """test if path_to_exe was installed as part of the OS."""
     return path_to_exe.startswith('/usr/bin')
 
+class ModuleInfo:
+    mock = [] # list of module names to pretend missing. This is just for testing purposes.
+
+    def __init__(self, module_name):
+        if module_name in ModuleInfo.mock:
+            print(f'Mock: pretending moduile `{module_name}` is missing.')
+            self.which = ''
+        else:
+            try:
+                self.module = import_module(module_name)
+            except ModuleNotFoundError:
+                self.which = ''
+            else:
+                self.which = self.module.__file__
+
+    def is_available(self):
+        """Return True if the tool is available, False otherwise."""
+        return bool(self.which)
+
+    def version(self):
+        """Return the version string of the tool, or an empty string if the tool is not available."""
+        return self.module.__version__ if self.which else ''
+
+
+__pybind11_required_version__ = '2.6.2'
+
 
 class ToolInfo:
-    def __init__(self, exe, version=False, accept_cluster_os_tools=False):
+    mock = [] # list of executable names to pretend missing. This is just fortesting purposes.
+
+    def __init__(self, exe, accept_cluster_os_tools=False):
         """Check if tool 'exe' is available.
 
-        :param bool version: request version info
+        :param str exe: name of an executable
         :param bool accept_cluster_os_tools: accept cluster operating system tools
+
 
         :return: SimpleNamespace(which,version), where which is the location of the tool or an empty
             string if it is not found or not accepted, and version is the version string (if requested)
             as returned be 'exe --version'.
         """
         self.exe = exe
-        completed_which = subprocess.run(['which', exe], capture_output=True, text=True)
-        self.which = completed_which.stdout.strip().replace('\n', ' ')
+        if exe in ToolInfo.mock:
+            print(f'Mock: pretending tool `{exe}` is missing.')
+            self.which = ''
+        else:
+            completed_which = subprocess.run(['which', exe], capture_output=True, text=True)
+            self.which = completed_which.stdout.strip().replace('\n', ' ')
 
         if self.which:
             if on_vsc_cluster() and not accept_cluster_os_tools and is_os_tool(self.which):
                 self.which = ''
+
+    def is_available(self):
+        """Return True if the tool is available, False otherwise."""
+        return bool(self.which)
 
     def version(self):
         """Return the version string of the tool, or an empty string if the tool is not available."""
@@ -74,10 +112,6 @@ class ToolInfo:
         else:
             self.version = ''
         return self.version
-
-    def is_available(self):
-        """Return True if the tool is available, False otherwise."""
-        return bool(self.which)
 
 
 class Project:
@@ -172,6 +206,7 @@ class Project:
         click.secho("[ERROR]\n" + msg, fg='bright_red') 
         self.exit_code = 1
 
+
     def warning(self, msg):
         """Print an warning message :py:obj:`msg` and set the project's :py:obj:`exit_code`."""
         click.secho("[WARNING]\n" + msg, fg='green')
@@ -208,27 +243,18 @@ class Project:
         # . gh is required for creating a remote repo
         if not self.require_git():
             return
-        git = ToolInfo('git')
-        if not git.is_available():
-            s = '(or not suitable) ' if on_vsc_cluster() else ''
-            self.warning(f'The git command is not available {s}in your environment.'
-                          'If you continue this project will not have a local repository.'
-                        )
-            if not self.may_continue(stop_message='Project not created.'):
-                return
 
         if self.options.remote:
             # Check that we have github username
-            github_username = template_parameters['github_username']
+            github_username = et_micc2.expand.get_preferences(Path.home() / '.et_micc2/micc2.json')['github_username']
             if not github_username:
                 self.error('Micc2 configuration does not have a github username. Creation of remote repo is not possible.\n'
                            'Project is not created.'
                           )
                 return
             # Check availability of gh command:
-            gh = ToolInfo('gh')
-            if not gh.is_available() and self.options.remote:
-                self.warning('The gh command is not available in your environment.'
+            if not ToolInfo('gh').is_available() and self.options.remote:
+                self.warning('The gh command is not available in your environment.\n'
                              'If you continue this project a remote repository will not be created.'
                             )
                 if not self.may_continue(stop_message='Project not created.'):
@@ -305,9 +331,9 @@ class Project:
                                     , f"Creating project ({self.project_name}):"
                                     ):
                 self.logger.info(f"Python {structure} ({self.package_name}): structure = {source_file}")
-                template_parameters = {'project_name': self.project_name
-                    , 'package_name': self.package_name
-                                       }
+                template_parameters = { 'project_name': self.project_name
+                                      , 'package_name': self.package_name
+                                      }
                 template_parameters.update(self.options.template_parameters)
                 self.options.template_parameters = template_parameters
                 self.options.overwrite = False
@@ -655,9 +681,18 @@ class Project:
                 if self.options.f90:
                     # Warn if f2py is not available
                     if not ToolInfo('f2py').is_available():
-                        self.warning( 'Building Fortran binary extensions requires f2py, which is currently not available in your environment.\n'
-                                      '(You will also need a Fortran compiler and a C compiler).'
-                                     )
+                        msg = 'Building Fortran binary extensions requires f2py, which is currently not available in your environment.\n'
+                        if on_vsc_cluster():
+                            msg += 'To enable f2py:\n'\
+                                   '    load a cluster module that has numpy pre-installed.\n'
+                        else:
+                            msg += 'To enable f2py, install numpy:\n' \
+                                   '    If you are using a virtual environment:\n' \
+                                   '            (.venv) > pip install numpy\n' \
+                                   '    otherwise:\n' \
+                                   '            > pip install numpy --user\n'
+                        msg += '(You also need a Fortran compiler and a C compiler).'
+                        self.warning(msg)
 
                     # prepare for adding a Fortran sub-module:
                     if not self.options.templates:
@@ -666,9 +701,8 @@ class Project:
 
                 if self.options.cpp:
                     # Warn if pybind11 is not available or too old
-                    try:
-                        import pybind11
-                    except ModuleNotFoundError:
+                    pybind11 = ModuleInfo('pybind11')
+                    if not pybind11.is_available():
                         self.warning('Building C++ binary extensions requires pybind11, which is not available in your environment.\n'
                                      'If you are using a virtual environment, install it as .\n'
                                      '    (.venv) > pip install pybind11\n'
@@ -677,10 +711,9 @@ class Project:
                                      '(You also need a C++ compiler).'
                                      )
                     else:
-                        pybind11_required_version = '2.6.2'
-                        if pybind11.__version__<pybind11_required_version:
-                            self.warning(f'Building C++ binary extensions requires pybind11, which is available in your environment (v{pybind11.__version__}).\n'
-                                         f'However, you may experience problems because it is older than v{pybind11_required_version}.\n'
+                        if pybind11.version() < __pybind11_required_version__:
+                            self.warning(f'Building C++ binary extensions requires pybind11, which is available in your environment (v{pybind11.version()}).\n'
+                                         f'However, you may experience problems because it is older than v{__pybind11_required_version__}.\n'
                                           'Upgrading is recommended.'
                                          )
                     # prepare for adding a C++ sub-module:
@@ -997,9 +1030,8 @@ class Project:
                         return
                 elif module_kind == 'cpp':
                     # exit if pybind11 is not available, and warn if too old...
-                    try:
-                        import pybind11
-                    except ModuleNotFoundError:
+                    pybind11 = ModuleInfo('pybind11')
+                    if not pybind11.is_available():
                         self.error('Building C++ binary extensions requires pybind11, which is not available in your current environment.\n'
                                    'If you are using a virtual environment, install it as .\n'
                                    '    (.venv) > pip install pybind11\n'
@@ -1008,10 +1040,9 @@ class Project:
                                   )
                         return
                     else:
-                        pybind11_required_version = '2.6.2'
-                        if pybind11.__version__<pybind11_required_version:
-                            self.warning(f'Building C++ binary extensions requires pybind11, which is available in your current environment (v{pybind11.__version__}).\n'
-                                         f'However, you may experience problems because it is older than v{pybind11_required_version}.\n'
+                        if pybind11.version() < __pybind11_required_version__:
+                            self.warning(f'Building C++ binary extensions requires pybind11, which is available in your current environment (v{pybind11.version()}).\n'
+                                         f'However, you may experience problems because it is older than v{__pybind11_required_version__}.\n'
                                           'Upgrading is recommended.'
                                          )
 
