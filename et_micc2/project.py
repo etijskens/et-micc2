@@ -178,14 +178,25 @@ class Project:
 
 
     def require_git(self):
+        """Check the availability of git.
+
+        If not available, the user has the option to exit.
+        """
         git = ToolInfo('git')
         if not git.is_available():
-            s = '(or not suitable) ' if on_vsc_cluster() else ''
-            self.warning(f'The git command is not available {s}in your environment.'
-                          'If you continue this project will not have a local repository.'
-                        )
+            if on_vsc_cluster():
+                self.warning('Your current environment has no suitable git command.\n'
+                             'Load a cluster module that has git.\n'
+                             'If you continue, this project will NOT have a local git repository.'
+                            )
+            else:
+                self.warning('Your current environment has no git command.\n'
+                             'To install git: https://git-scm.com/downloads.\n'
+                             'If you continue, this project will NOT have a local git repository.'
+                            )
+
             if not self.may_continue(stop_message='Project not created.'):
-                return False
+                return False # self.exit_code is set by may_continue
         return True
 
 
@@ -195,7 +206,8 @@ class Project:
         # Check for tools needed:
         # . git is required for creating a local repo
         # . gh is required for creating a remote repo
-
+        if not self.require_git():
+            return
         git = ToolInfo('git')
         if not git.is_available():
             s = '(or not suitable) ' if on_vsc_cluster() else ''
@@ -636,25 +648,16 @@ class Project:
                 self.add_python_module(db_entry)
 
             else: # add a binary extension module
-                # Check availability of cmake
-                cmake = ToolInfo('cmake')
-                if not cmake.is_available():
-                    s = '(or not suitable) ' if on_vsc_cluster() else ''
-                    self.warning(f'Building binary extensions requires cmake, which is not available {s}in your environment.')
-                    if not self.may_continue(stop_message='Exiting.'):
-                        return
+                # Warn if cmake is not available
+                if not ToolInfo('cmake').is_available():
+                    self.warning('Building binary extensions requires cmake, which is currently not available in your environment.')
 
                 if self.options.f90:
-                    # Check availabilite of f2py
-                    f2py = ToolInfo('f2py')
-                    if not f2py.is_available():
-                        s = 'loading a module with numpy pre-installed' if on_vsc_cluster() else 'installing numpy in your Python environment using pip'
-                        self.warning( 'Building Fortran binary extensions requires f2py, which is not available in your environment.\n'
-                                     f'f2py is made available by {s}.\n'
-                                      '(You also need a Fortran compiler and a C compiler).'
+                    # Warn if f2py is not available
+                    if not ToolInfo('f2py').is_available():
+                        self.warning( 'Building Fortran binary extensions requires f2py, which is currently not available in your environment.\n'
+                                      '(You will also need a Fortran compiler and a C compiler).'
                                      )
-                        if not self.may_continue(stop_message='Exiting.'):
-                            return
 
                     # prepare for adding a Fortran sub-module:
                     if not self.options.templates:
@@ -662,7 +665,7 @@ class Project:
                     self.add_f90_module(db_entry)
 
                 if self.options.cpp:
-                    # check availability of pybind11
+                    # Warn if pybind11 is not available or too old
                     try:
                         import pybind11
                     except ModuleNotFoundError:
@@ -674,9 +677,10 @@ class Project:
                                      '(You also need a C++ compiler).'
                                      )
                     else:
-                        if pybind11.__version__<'2.6.2':
+                        pybind11_required_version = '2.6.2'
+                        if pybind11.__version__<pybind11_required_version:
                             self.warning(f'Building C++ binary extensions requires pybind11, which is available in your environment (v{pybind11.__version__}).\n'
-                                          'However, you may experience problems because it is older than v2.6.2.\n'
+                                         f'However, you may experience problems because it is older than v{pybind11_required_version}.\n'
                                           'Upgrading is recommended.'
                                          )
                     # prepare for adding a C++ sub-module:
@@ -850,7 +854,6 @@ class Project:
             self.logger.info(f"- module documentation in {rst_file} (restructuredText format).")
 
             with et_micc2.utils.in_directory(project_path):
-                # self.add_dependencies({'et-micc2-build': f"^{CURRENT_ET_MICC_BUILD_VERSION}"})
                 # docs
                 filename = "API.rst"
                 text = f"\n.. include:: ../{package_name}/f90_{module_name}/{module_name}.rst\n"
@@ -931,7 +934,6 @@ class Project:
             self.logger.info(f"- module documentation in {rst_file} (restructuredText format).")
 
             with et_micc2.utils.in_directory(project_path):
-                # self.add_dependencies({'et-micc2-build': f"^{CURRENT_ET_MICC_BUILD_VERSION}"})
                 # docs
                 with open("API.rst", "a") as f:
                     filename = "API.rst"
@@ -945,6 +947,16 @@ class Project:
 
     def build_cmd(self):
         """Build a binary extension."""
+
+        # Exit if cmake is not available:
+        if not ToolInfo('cmake').is_available():
+            msg = 'The build command requires cmake, which is not available in your current environment.\n'
+            if on_vsc_cluster():
+                msg += 'Load a cluster module that enables cmake.'
+            else:
+                msg += 'Make sure cmake is installed and on your PATH.'
+            self.error(msg)
+            return
 
         project_path = self.options.project_path
         if getattr(self, 'module', False):
@@ -969,6 +981,40 @@ class Project:
                     continue
 
                 module_kind, module_name = d.split('_', 1)
+                if module_kind == 'f90':
+                    # Exit if f2py is not available
+                    if not ToolInfo('f2py').is_available():
+                        msg = 'Building a Fortran binary extension requires f2py, which is not available in your current environment.\n'\
+                              '(F2py is part of the numpy Python package).'
+                        if on_vsc_cluster():
+                            msg += 'Load a cluster module that has the numpy package pre-installed.'
+                        else:
+                            msg += 'If you are using a virtual environment, install numpy as:\n' \
+                                   '    (.venv) > pip install numpy\n' \
+                                   'otherwise,\n' \
+                                   '    > pip install numpy --user\n'
+                        self.error(msg)
+                        return
+                elif module_kind == 'cpp':
+                    # exit if pybind11 is not available, and warn if too old...
+                    try:
+                        import pybind11
+                    except ModuleNotFoundError:
+                        self.error('Building C++ binary extensions requires pybind11, which is not available in your current environment.\n'
+                                   'If you are using a virtual environment, install it as .\n'
+                                   '    (.venv) > pip install pybind11\n'
+                                   'otherwise,\n'
+                                   '    > pip install pybind11 --user\n'
+                                  )
+                        return
+                    else:
+                        pybind11_required_version = '2.6.2'
+                        if pybind11.__version__<pybind11_required_version:
+                            self.warning(f'Building C++ binary extensions requires pybind11, which is available in your current environment (v{pybind11.__version__}).\n'
+                                         f'However, you may experience problems because it is older than v{pybind11_required_version}.\n'
+                                          'Upgrading is recommended.'
+                                         )
+
                 binary_extension = package_path / (module_name + extension_suffix)
                 self.options.module_srcdir_path = package_path / d
                 self.options.module_kind = module_kind
@@ -1080,9 +1126,21 @@ class Project:
                 # an entirely new dependency
                 tool_poetry_dependencies[pkg] = version_constraint
                 modified = True
+
         if modified:
             self.pyproject_toml.save()
-            self.logger.warning("Dependencies added. Run `poetry install` to install missing dependencies in the project's virtual environment.")
+            # Tell the user how to add the new dependencies
+            msg = 'Dependencies added:\n' \
+                  'If you are using a virtual environment created with poetry, run:' \
+                  '    `poetry install` or `poetry update` to install missing dependencies.\n' \
+                  'If you are using a virtual environment not created with poetry, run:'
+            for dep,version in deps.items():
+                msg += f'    (.venv) > pip install {dep}'
+            msg += 'Otherwise, run:'
+            for dep,version in deps.items():
+                msg += f'    > pip install {dep} --user'
+            self.logger.warning(msg)
+
 
     def module_to_package(self, module_py):
         """Move file :file:`module.py` to :file:`module/__init__.py`.

@@ -29,7 +29,8 @@ def test_inexisting_tool():
         print('The ghh command is not available in your environment.\n'
                      'If you continue this project a remote repository will not be created.'
                      )
-        answer = input('Continue? [Yes]/No')
+        # answer = input('Continue? [Yes]/No')
+        answer = 'no'
         if answer.lower().startswith('n'):
             print('Project not created.')
         else:
