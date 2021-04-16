@@ -45,7 +45,7 @@ def micc2(arguments, stdin=None, assert_exit_code=True):
 
     if assert_exit_code:
         if result.exit_code:
-            raise AssertionError(f"result.exit_code = {result.exit_code}")
+            raise AssertionError(f"result.exit_code == {result.exit_code}")
 
     return result
 
@@ -224,14 +224,12 @@ def test_git_missing():
     project.ToolInfo.mock = ['git']
 
     with et_micc2.utils.in_directory(helpers.test_workspace):
-        results = []
         #Create package NOGIT
         result = micc2( ['-vv', '-p', 'NOGIT', 'create', '--allow-nesting', '--remote=none', '--package']
                       , stdin='\n', assert_exit_code=False
                       )
-        assert result.exit_code == -1
+        assert result.exit_code == project.__exit_missing_component__
         assert not Path('NOGIT/nogit/__init__.py').exists()
-        results.append(result)
 
     project.ToolInfo.mock = []
 
@@ -246,7 +244,7 @@ def test_gh_missing():
         result = micc2( ['-vv', '-p', 'NOGH', 'create', '--allow-nesting', '--package']
                       , stdin='\n', assert_exit_code=False
                       )
-        assert result.exit_code == -1
+        assert result.exit_code == project.__exit_missing_component__
         assert not Path('NOGH/nogh/__init__.py').exists()
         results.append(result)
 
@@ -273,11 +271,6 @@ def test_cmake_missing():
                 submodule = f'added_{flag[2:]}'
                 result = micc2(['-v', 'add', submodule, flag])
                 assert result.exit_code == 0
-                # # test micc build
-                # result = micc2(['-vv', 'build', '-m', submodule, '--clean'])
-                # extension_suffix = et_micc2.project.get_extension_suffix()
-                # binary_extension = Path(f'bar/{submodule}{extension_suffix}')
-                # assert binary_extension.exists()
 
     project.ToolInfo.mock = []
 
@@ -286,7 +279,7 @@ def test_pybind11_f2py_missing():
     helpers.clear_test_workspace()
 
     project.ToolInfo.mock = ['f2py']
-    project.ModuleInfo.mock = ['pybind11']
+    project.PkgInfo.mock = ['pybind11']
 
     with et_micc2.utils.in_directory(helpers.test_workspace):
         #Create package nopybind11_nof2py
@@ -302,21 +295,16 @@ def test_pybind11_f2py_missing():
                 submodule = f'added_{flag[2:]}'
                 result = micc2(['-v', 'add', submodule, flag])
                 assert result.exit_code == 0
-                # # test micc build
-                # result = micc2(['-vv', 'build', '-m', submodule, '--clean'])
-                # extension_suffix = et_micc2.project.get_extension_suffix()
-                # binary_extension = Path(f'bar/{submodule}{extension_suffix}')
-                # assert binary_extension.exists()
 
     project.ToolInfo.mock = []
-    project.ModuleInfo.mock = []
+    project.PkgInfo.mock = []
 
 
 def test_build_pybind11_missing():
     """"""
     helpers.clear_test_workspace()
 
-    project.ModuleInfo.mock = ['pybind11']
+    project.PkgInfo.mock = ['pybind11']
 
     with et_micc2.utils.in_directory(helpers.test_workspace):
         #Create package nopybind11
@@ -334,10 +322,24 @@ def test_build_pybind11_missing():
                 assert result.exit_code == 0
                 # test micc build
                 result = micc2(['-vv', 'build', '-m', submodule, '--clean'], assert_exit_code=False)
-                assert result.exit_code !=0
+                assert result.exit_code == project.__exit_missing_component__
 
     project.ToolInfo.mock = []
-    project.ModuleInfo.mock = []
+    project.PkgInfo.mock = []
+
+
+def test_doc_cmd():
+    helpers.clear_test_workspace()
+
+    with et_micc2.utils.in_directory(helpers.test_workspace):
+        #Create package nopybind11
+        result = micc2( ['-vv', '-p', 'DOC', 'create', '--remote=none', '--allow-nesting', '--package']
+                      , stdin='\n', assert_exit_code=False
+                      )
+        assert result.exit_code == 0
+        assert Path('DOC/docs').exists()
+        result = micc2( ['-vv', '-p', 'DOC', 'doc'])
+        assert (Path('DOC/docs') / '_build/html/index.html').exists()
 
 
 if __name__ == "__main__":

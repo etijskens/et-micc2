@@ -24,18 +24,12 @@ def clear_test_workspace(folder=None):
     Otherwise, only remove directory folder
     """
     p0 = Path('test_workspace')
-    ok = False
-    while not ok:
-        try:
-            if not folder is None:
-                p = p0 / folder
-                shutil.rmtree(p)
-            else:
-                shutil.rmtree(p0)
-        except OSError:
-            print('retrying')
-        else: 
-            ok = True 
+    if not folder is None:
+        p = p0 / folder
+        shutil.rmtree(p)
+    else:
+        shutil.rmtree(p0)
+
     p0.mkdir(exist_ok=True)
         
 

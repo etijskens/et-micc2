@@ -171,7 +171,6 @@ def create(ctx
             options.project_path = Path(name).resolve()
             options.default_project_path = False
 
-    options.create = True
     options.micc_file = micc_file
     options.package = package
     options.publish = publish
@@ -225,8 +224,10 @@ def create(ctx
          'python_version': python,
         }
     )
-    project = Project(options)
-    if project.exit_code:
+    try:
+        project = Project(options)
+        project.create_cmd()
+    except RuntimeError:
         ctx.exit(project.exit_code)
 
 
@@ -255,14 +256,12 @@ def convert_to_package(ctx, overwrite, backup):
     options = ctx.obj
     options.overwrite = overwrite
     options.backup = backup
-
-    project = Project(options)
-    if project.exit_code:
-        ctx.exit(project.exit_code)
-
-    with et_micc2.logger.logtime(options):
-        project.module_to_package_cmd()
-
+    
+    try:
+        project = Project(options)
+        with et_micc2.logger.logtime(options):
+            project.module_to_package_cmd()
+    except RuntimeError:
         if project.exit_code == et_micc2.expand.EXIT_OVERWRITE:
             options.logger.warning(
                 f"It is normally ok to overwrite 'index.rst' as you are not supposed\n"
@@ -270,8 +269,6 @@ def convert_to_package(ctx, overwrite, backup):
                 f"If in doubt: rerun the command with the '--backup' flag,\n"
                 f"  otherwise: rerun the command with the '--overwrite' flag,\n"
             )
-
-    if project.exit_code:
         ctx.exit(project.exit_code)
 
 
@@ -298,8 +295,9 @@ def info(ctx,name,version):
     """
     options = ctx.obj
 
-    project = Project(options)
-    if project.exit_code:
+    try:
+        project = Project(options)
+    except RuntimeError:
         ctx.exit(project.exit_code)
 
     if name:
@@ -309,11 +307,11 @@ def info(ctx,name,version):
         print(project.version)
         return
     else:
-        with et_micc2.logger.logtime(options):
-            project.info_cmd()
-
-    if project.exit_code:
-        ctx.exit(project.exit_code)
+        with et_micc2.logger.logtime(project):
+            try:
+                project.info_cmd()
+            except RuntimeError:
+                ctx.exit(project.exit_code)
 
 
 @main.command()
@@ -365,17 +363,19 @@ def version(ctx, major, minor, patch, rule, tag, short, dry_run):
     options.short = short
     options.dry_run = dry_run
 
-    project = Project(options)
-    if project.exit_code:
+    try:
+        project = Project(options)
+    except RuntimeError:
         ctx.exit(project.exit_code)
 
     with et_micc2.logger.logtime(project):
-        project.version_cmd()
-        if project.exit_code == 0 and tag:
-            project.tag_cmd()
-
-    if project.exit_code:
-        ctx.exit(project.exit_code)
+        try:
+            project.version_cmd()
+        except RuntimeError:    
+            ctx.exit(project.exit_code)
+        else:
+            if tag:
+                project.tag_cmd()
 
 
 @main.command()
@@ -384,16 +384,10 @@ def tag(ctx):
     """Create a git tag for the current version and push it to the remote repo."""
     options = ctx.obj
 
-    project = Project(options)
-    if project.exit_code:
-        ctx.exit(project.exit_code)
-
-    if project.exit_code:
-        ctx.exit(project.exit_code)
-
-    project.tag_cmd()
-
-    if project.exit_code:
+    try:
+        project = Project(options)
+        project.tag_cmd()
+    except RuntimeError:
         ctx.exit(project.exit_code)
 
 
@@ -480,14 +474,11 @@ def add(ctx
     options.overwrite = overwrite
     options.backup = backup
 
-    project = Project(options)
-    if project.exit_code:
-        ctx.exit(project.exit_code)
-
-    with et_micc2.logger.logtime(options):
-        project.add_cmd()
-
-    if project.exit_code:
+    try:
+        project = Project(options)
+        with et_micc2.logger.logtime(project):
+            project.add_cmd()
+    except RuntimeError:
         ctx.exit(project.exit_code)
 
 
@@ -522,12 +513,12 @@ def mv(ctx, cur_name, new_name, silent, entire_package, entire_project):
         options.entire_package, options.entire_project =  entire_package, entire_project
     # else these flags are ignored.
 
-    project = Project(options)
-    if project.exit_code:
+    try:
+        project = Project(options)
+        with et_micc2.logger.logtime(options):
+            project.mv_component()
+    except RuntimeError:
         ctx.exit(project.exit_code)
-
-    with et_micc2.logger.logtime(options):
-        project.mv_component()
 
 
 @main.command()
@@ -635,15 +626,62 @@ def build( ctx
                                            , cleanup         = cleanup
                                            , cmake           = {'CMAKE_BUILD_TYPE': build_type}
                                            )
-    project = Project(options)
-    if project.exit_code:
+    try:
+        project = Project(options)
+        with et_micc2.logger.logtime(options):
+            project.build_cmd()
+    except RuntimeError:
         ctx.exit(project.exit_code)
 
-    with et_micc2.logger.logtime(options):
-        project.build_cmd()
 
-    if project.exit_code:
+@main.command()
+# @click.option('--force', '-f', is_flag=True
+#     , help="Overwrite existing setup."
+#     , default=False
+# )
+@click.pass_context
+def check( ctx
+         ):
+    """Check wether the current environment has all the neccessary tools available.
+
+    Python packages:
+
+    * Numpy
+    * Pybind11
+    * sphinx
+    * sphinx-rtd-theme
+    * sphinx-click
+
+    Tools:
+
+    * CMake
+    * make
+    * poetry
+    * git
+    * gh
+    * compilers
+    """
+    if '3.8' < sys.version:
+        check_cmd(ctx.obj)
+    else:
+        print("`micc2 check` requires python 3.8 or later.")
+
+
+@main.command()
+@click.pass_context
+@click.argument('what', type=str, default='html')
+def doc(ctx, what):
+    """Build documentation."""
+    options = ctx.obj
+    options.what = what  
+    try:
+        project = Project(options)
+        with et_micc2.logger.logtime(options):
+            project.doc_cmd()
+    except RuntimeError:
         ctx.exit(project.exit_code)
+
+
 
 if __name__ == "__main__":
     sys.exit(main())  # pragma: no cover

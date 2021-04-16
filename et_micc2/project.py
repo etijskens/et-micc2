@@ -23,6 +23,7 @@ import semantic_version
 import et_micc2.utils
 import et_micc2.expand
 import et_micc2.logger
+import pkg_resources
 
 
 __FILE__ = Path(__file__).resolve()
@@ -47,20 +48,20 @@ def is_os_tool(path_to_exe):
     """test if path_to_exe was installed as part of the OS."""
     return path_to_exe.startswith('/usr/bin')
 
-class ModuleInfo:
+class PkgInfo:
     mock = [] # list of module names to pretend missing. This is just for testing purposes.
 
-    def __init__(self, module_name):
-        if module_name in ModuleInfo.mock:
-            print(f'Mock: pretending moduile `{module_name}` is missing.')
+    def __init__(self, pkg_name):
+        if pkg_name in PkgInfo.mock:
+            print(f'Mock: pretending moduile `{pkg_name}` is missing.')
             self.which = ''
         else:
             try:
-                self.module = import_module(module_name)
-            except ModuleNotFoundError:
+                self.pkg_dist_info = pkg_resources.get_distribution(pkg_name)
+            except pkg_resources.DistributionNotFound:
                 self.which = ''
             else:
-                self.which = self.module.__file__
+                self.which = self.pkg_dist_info.location
 
     def is_available(self):
         """Return True if the tool is available, False otherwise."""
@@ -68,7 +69,7 @@ class ModuleInfo:
 
     def version(self):
         """Return the version string of the tool, or an empty string if the tool is not available."""
-        return self.module.__version__ if self.which else ''
+        return self.pkg_dist_info.version if self.which else ''
 
 
 __pybind11_required_version__ = '2.6.2'
@@ -113,6 +114,7 @@ class ToolInfo:
             self.version = ''
         return self.version
 
+__exit_missing_component__ = -1
 
 class Project:
     """
@@ -143,7 +145,6 @@ class Project:
                                "Run 'micc setup' to create it.\n"
                                "If you do not have a github account yet, you might want to create one first at:\n"
                                "    https://github.com/join")
-                    return
                 else:
                     default_parameters.update( et_micc2.expand.get_template_parameters(preferences) )
 
@@ -153,24 +154,13 @@ class Project:
             # Store all the parameters in options.template_parameters.
             options.template_parameters = default_parameters
 
-        if getattr(options, 'create', False):
-            # Request to create a project
-            if project_path.exists() and os.listdir(str(project_path)):
-                self.error(f"Cannot create project in ({project_path}):\n"
-                           f"  Directory must be empty."
-                           )
-            else:
-                # ok create the project
-                self.create()
-        else:
-            if not et_micc2.utils.is_project_directory(project_path, self):
-                self.error(f"Not a project directory ({project_path}):")
 
+        if et_micc2.utils.is_project_directory(project_path, self):
+            # If the project already exists, we can get ourselves a logger;
             self.get_logger()
-            self.version = self.pyproject_toml['tool']['poetry']['version']
 
 
-    def may_continue(self, default=False, stop_message=None):
+    def ask_user_to_continue_or_not(self, default=False, stop_message='Exiting.'):
         """Ask the user if he wants to continue or stop a command.
 
         If the answer is to stop, sets self.exit_code to -1, and prints the stop_message.
@@ -191,20 +181,25 @@ class Project:
             answer = True if answer.startswith('y') else False
 
         if not answer:
-            if stop_message:
-                print(stop_message)
-            self.exit_code = -1
+            self.error(stop_message, exit_code=__exit_missing_component__)
 
-        return answer
 
     @property
     def project_path(self):
         return self.options.project_path
 
-    def error(self, msg):
-        """Print an error message :py:obj:`msg` and set the project's :py:obj:`exit_code`."""
+    def error(self, msg, exit_code=1, raise_runtimeerror=True):
+        """Print an error message,  set this project's exit_code, and optionally raise a
+        RuntimeError.
+        
+        :param str msg: the error message
+        :param int exit_code: the exit_code to set
+        :param bool raise_runtimeerror: raise RuntimeError if True
+        """
         click.secho("[ERROR]\n" + msg, fg='bright_red') 
-        self.exit_code = 1
+        self.exit_code = exit_code
+        if raise_runtimeerror:
+            raise RuntimeError
 
 
     def warning(self, msg):
@@ -212,13 +207,18 @@ class Project:
         click.secho("[WARNING]\n" + msg, fg='green')
 
 
-    def require_git(self):
-        """Check the availability of git.
+    def create_cmd(self):
+        """Create a new project skeleton."""
 
-        If not available, the user has the option to exit.
-        """
-        git = ToolInfo('git')
-        if not git.is_available():
+        # Check for tools needed:
+        # . git is required for creating a local repo
+        # . gh is required for creating a remote repo
+        
+        if self.options.project_path.exists() and os.listdir(str(self.options.project_path)):
+            self.error(f"Cannot create project in ({project_path}):\n"
+                       f"  Directory must be empty.")
+
+        if not ToolInfo('git').is_available():
             if on_vsc_cluster():
                 self.warning('Your current environment has no suitable git command.\n'
                              'Load a cluster module that has git.\n'
@@ -230,19 +230,7 @@ class Project:
                              'If you continue, this project will NOT have a local git repository.'
                             )
 
-            if not self.may_continue(stop_message='Project not created.'):
-                return False # self.exit_code is set by may_continue
-        return True
-
-
-    def create(self):
-        """Create a new project skeleton."""
-
-        # Check for tools needed:
-        # . git is required for creating a local repo
-        # . gh is required for creating a remote repo
-        if not self.require_git():
-            return
+            self.ask_user_to_continue_or_not(stop_message='Project not created.')
 
         if self.options.remote:
             # Check that we have github username
@@ -251,14 +239,12 @@ class Project:
                 self.error('Micc2 configuration does not have a github username. Creation of remote repo is not possible.\n'
                            'Project is not created.'
                           )
-                return
             # Check availability of gh command:
             if not ToolInfo('gh').is_available() and self.options.remote:
                 self.warning('The gh command is not available in your environment.\n'
                              'If you continue this project a remote repository will not be created.'
                             )
-                if not self.may_continue(stop_message='Project not created.'):
-                    return
+                self.ask_user_to_continue_or_not(stop_message='Project not created.')
 
         # Proceed creating the project
         self.project_path.mkdir(parents=True, exist_ok=True)
@@ -271,7 +257,6 @@ class Project:
                     self.error(f"Cannot create project in ({self.project_path}):\n"
                                f"  Specify '--allow-nesting' to create a et_micc2 project inside another et_micc2 project ({p})."
                                )
-                    return
                 p = p.parent
 
         project_name = self.project_path.name
@@ -282,7 +267,6 @@ class Project:
                            f"  The project name must start with char, and contain only chars, digits, hyphens and underscores.\n"
                            f"  Alternatively, provide an explicit module name with the --module-name=<name>."
                            )
-                return
             else:
                 self.package_name = et_micc2.utils.pep8_module_name(project_name)
         else:
@@ -317,13 +301,14 @@ class Project:
                                f"    The availability of name '{self.package_name}' on PyPI could not be verified. \n"
                                f"    The project is not created."
                                )
-                return
 
         structure, source_file = ('package', f'({relative_project_path}{os.sep}{self.package_name}{os.sep}__init__.py)') \
                                  if self.options.package else \
                                  ('module', f'({relative_project_path}{os.sep}{self.package_name}.py)')
 
         self.options.verbosity = max(1, self.options.verbosity)
+
+        # The project directory is created, so we can get ourselves a logger:
         self.get_logger()
 
         with et_micc2.logger.logtime(self):
@@ -390,8 +375,21 @@ class Project:
             )
 
 
+    @property
+    def version(self):
+        """Return the project's version (str)."""
+        return self.pyproject_toml['tool']['poetry']['version']
+
+
+    def require_project_created(self):
+        """Raise a runtime error if this project does not have a project directory."""
+        if self.logger is None:
+            self.error(f'Not a project directory: {self.options.project_path}')
+
+
     def module_to_package_cmd(self):
         """Convert a module project (:file:`module.py`) to a package project (:file:`package/__init__.py`)."""
+        self.require_project_created()
 
         # This command does not require any external tools.
 
@@ -425,6 +423,7 @@ class Project:
 
     def info_cmd(self):
         """Output info on the project."""
+        self.require_project_created()
 
         # This command does not require any external tools.
 
@@ -488,6 +487,7 @@ class Project:
         in :file:`<package_name>.py`, :file:`<package_name>/__init__.py`, or in
         :file:`<package_name>/__version__.py`.
         """
+        self.require_project_created()
 
         # This command does not require any external tools.
 
@@ -538,10 +538,10 @@ class Project:
                            + click.style(f"({current_semver} ", fg='cyan') + "-> "
                            + click.style(f"({new_semver})", fg='cyan')
                            )
-            self.version = str(new_semver)  # even if dry run!
 
     def tag_cmd(self):
         """Create and push a version tag ``v<Major>.<minor>.<patch>`` for the current version."""
+        self.require_project_created()
 
         # Git is required
 
@@ -550,7 +550,6 @@ class Project:
             s = '(or not suitable) ' if on_vsc_cluster() else ''
             self.error(f'The tag command requires git, which is not available {s}in your environment.\n'
                         'Exiting.')
-            return
 
         tag = f"v{self.version}"
 
@@ -590,11 +589,12 @@ class Project:
         * :py:meth:`add_f90_module`,
         * :py:meth:`add_cpp_module`
         """
+        self.require_project_created()
+
         if self.structure == 'module':
             self.error(f"Cannot add to a module project ({self.project_name}).\n"
                        f"  Use `micc convert-to-package' on this project to convert it to a package project."
                        )
-            return
 
         # set implied flags:
         if self.options.group:
@@ -619,7 +619,6 @@ class Project:
                        f"  --f90 ({int(self.options.f90)})\n"
                        f"  --cpp ({int(self.options.cpp)})\n"
                        )
-            return
 
         db_entry = {'options': self.options}
 
@@ -628,15 +627,12 @@ class Project:
             app_name = self.options.add_name
             if self.app_exists(app_name):
                 self.error(f"Project {self.project_name} has already an app named {app_name}.")
-                return
 
             if not et_micc2.utils.verify_project_name(app_name):
-                self.error(
-                    f"Not a valid app name ({app_name}_. Valid names:\n"
-                    f"  * start with a letter [a-zA-Z]\n"
-                    f"  * contain only [a-zA-Z], digits, hyphens, and underscores\n"
-                )
-                return
+                self.error(f"Not a valid app name ({app_name}_. Valid names:\n"
+                           f"  * start with a letter [a-zA-Z]\n"
+                           f"  * contain only [a-zA-Z], digits, hyphens, and underscores\n"
+                          )
 
             if self.options.group:
                 if not self.options.templates:
@@ -654,17 +650,14 @@ class Project:
             # Verify that the name is not already used:
             if self.module_exists(module_name):
                 self.error(f"Project {self.project_name} has already a module named {module_name}.")
-                return
 
             # Verify that the name is valid:
             if (not et_micc2.utils.verify_project_name(module_name)
                     or module_name != et_micc2.utils.pep8_module_name(module_name)):
-                self.error(
-                    f"Not a valid module name ({module_name}). Valid names:\n"
-                    f"  * start with a letter [a-zA-Z]\n"
-                    f"  * contain only [a-zA-Z], digits, and underscores\n"
-                )
-                return
+                self.error(f"Not a valid module name ({module_name}). Valid names:\n"
+                           f"  * start with a letter [a-zA-Z]\n"
+                           f"  * contain only [a-zA-Z], digits, and underscores\n"
+                          )
 
             if self.options.py:
                 # prepare for adding a Python sub-module:
@@ -701,7 +694,7 @@ class Project:
 
                 if self.options.cpp:
                     # Warn if pybind11 is not available or too old
-                    pybind11 = ModuleInfo('pybind11')
+                    pybind11 = PkgInfo('pybind11')
                     if not pybind11.is_available():
                         self.warning('Building C++ binary extensions requires pybind11, which is not available in your environment.\n'
                                      'If you are using a virtual environment, install it as .\n'
@@ -809,7 +802,6 @@ class Project:
 
         if not module_name == et_micc2.utils.pep8_module_name(module_name):
             self.error(f"Not a valid module_name: {module_name}")
-            return
 
         source_file = f"{module_name}{os.sep}__init__.py" if self.options.package else f"{module_name}.py"
         with et_micc2.logger.log(self.logger.info,
@@ -980,6 +972,7 @@ class Project:
 
     def build_cmd(self):
         """Build a binary extension."""
+        self.require_project_created()
 
         # Exit if cmake is not available:
         if not ToolInfo('cmake').is_available():
@@ -989,7 +982,6 @@ class Project:
             else:
                 msg += 'Make sure cmake is installed and on your PATH.'
             self.error(msg)
-            return
 
         project_path = self.options.project_path
         if getattr(self, 'module', False):
@@ -1027,18 +1019,18 @@ class Project:
                                    'otherwise,\n' \
                                    '    > pip install numpy --user\n'
                         self.error(msg)
-                        return
+
                 elif module_kind == 'cpp':
                     # exit if pybind11 is not available, and warn if too old...
-                    pybind11 = ModuleInfo('pybind11')
+                    pybind11 = PkgInfo('pybind11')
                     if not pybind11.is_available():
                         self.error('Building C++ binary extensions requires pybind11, which is not available in your current environment.\n'
                                    'If you are using a virtual environment, install it as .\n'
                                    '    (.venv) > pip install pybind11\n'
                                    'otherwise,\n'
                                    '    > pip install pybind11 --user\n'
+                                  , exit_code=__exit_missing_component__
                                   )
-                        return
                     else:
                         if pybind11.version() < __pybind11_required_version__:
                             self.warning(f'Building C++ binary extensions requires pybind11, which is available in your current environment (v{pybind11.version()}).\n'
@@ -1472,6 +1464,31 @@ class Project:
             with open(new_path,'w') as f:
                 f.write(new_contents)
 
+    
+    def doc_cmd(self):
+        """Build documentation."""
+        self.require_project_created()
+
+        if on_vsc_cluster():
+            self.error("The cluster is not suited for building documentation. Use a desktop machine instead.")
+
+        # Check needed tools
+        if not ToolInfo('make').is_available():
+            self.error("The make command is missing in your current environment. You must install it to build documentation.")
+        if not PkgInfo('sphinx').is_available():
+            self.error("The sphinx package is missing in your current environment.\n"
+                       "You must install it to build documentation.")
+        if not PkgInfo('sphinx_rtd_theme').is_available():
+            self.error("The sphinx_rtd_theme package is missing in your current environment.\n"
+                       "You must install it to build documentation.")
+        if not PkgInfo('sphinx_click').is_available():
+            self.error("The sphinx_click package is missing in your current environment.\n"
+                       "You must install it to build documentation.")
+
+        p_docs = Path(self.options.project_path) / 'docs'
+        cmd =['make', self.options.what]
+        et_micc2.utils.execute(cmd, cwd=p_docs, logfun=self.logger.debug)
+        
 
 def get_extension_suffix():
     """Return the extension suffix, e.g. :file:`.cpython-37m-darwin.so`."""
