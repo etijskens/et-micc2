@@ -2,12 +2,17 @@
 # -*- coding: utf-8 -*-
 """Tests for et_micc2.utils module."""
 
-from pathlib import Path 
+import sys
+sys.path.insert(0,'.')
+sys.path.insert(0,'..')
+import traceback
+
+from pathlib import Path
 
 import semantic_version as sv
 
 import et_micc2.utils
-from tests.helpers import in_empty_tmp_dir
+from tests import helpers
 
 
 def test_version_range():
@@ -105,12 +110,32 @@ def test_insert_in_file():
                     assert line.startswith(ilines[0])
                 if l==7:
                     assert line.startswith(ilines[1])
+
+
+def test_in_directory():
+
+    helpers.clear_test_workspace()
+    p0 = Path.cwd()
+
+    pFoo = helpers.test_workspace / 'Foo'
+    pFoo.mkdir()
+    try:
+        with et_micc2.utils.in_directory(pFoo):
+            assert Path.cwd() == pFoo
+            print(f'cwd = {pFoo}')
+            raise RuntimeError
+    except:
+        print(f'except: cwd = {Path.cwd()}')
+        assert Path.cwd() == p0
+    helpers.clear_test_workspace()
+
+
 # ==============================================================================
 # The code below is for debugging a particular test in eclipse/pydev.
 # (normally all tests are run with pytest)
 # ==============================================================================
 if __name__ == "__main__":
-    the_test_you_want_to_debug = test_version_range
+    the_test_you_want_to_debug = test_in_directory
 
     print(f"__main__ running {the_test_you_want_to_debug}")
     the_test_you_want_to_debug()

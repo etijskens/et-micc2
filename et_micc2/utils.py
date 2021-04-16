@@ -310,9 +310,11 @@ def in_directory(path):
     """
     previous_dir = os.getcwd()
     os.chdir(str(path)) # the str method takes care of when path is a Path object
-    yield os.getcwd()
-    os.chdir(previous_dir)
-    time.sleep(1)
+    try:
+        yield os.getcwd()
+    finally:
+        os.chdir(previous_dir)
+
 
 
 def execute(cmds,logfun=None,stop_on_error=True,env=None,cwd=None,verbose=True):
