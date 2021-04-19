@@ -15,6 +15,7 @@ from pathlib import Path
 import subprocess
 import time
 from et_micc2.tomlfile import TomlFile
+import et_micc2.logger
 
 test_workspace = (Path(__file__) / '../../test_workspace').resolve()
 
@@ -23,6 +24,9 @@ def clear_test_workspace(folder=None):
     """If dir is None, clear the test workspace by removing it and recreating it.
     Otherwise, only remove directory folder
     """
+    et_micc2.logger.logging.shutdown()
+    # see https://stackoverflow.com/questions/58943374/shutil-rmtree-error-when-trying-to-remove-nfs-mounted-directory 
+    
     p0 = Path('test_workspace')
     if not folder is None:
         p = p0 / folder
