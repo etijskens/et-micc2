@@ -26,9 +26,11 @@ def clear_test_workspace(folder=None):
     p0 = Path('test_workspace')
     if not folder is None:
         p = p0 / folder
-        shutil.rmtree(p)
+        if p.exists():
+            shutil.rmtree(p)
     else:
-        shutil.rmtree(p0)
+        if p0.exists():
+            shutil.rmtree(p0)
 
     p0.mkdir(exist_ok=True)
         

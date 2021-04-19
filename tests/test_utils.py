@@ -80,7 +80,7 @@ def test_verify_project_name():
     assert not et_micc2.utils.verify_project_name("A_-123 B")
     
 def test_insert_in_file():
-    with in_empty_tmp_dir():
+    with helpers.in_empty_tmp_dir():
         file = Path('test.txt')
         with file.open(mode='w') as f:
             for i in range(10):
