@@ -12,6 +12,7 @@ For Beginners
 * `Learn Python by building 5 games <https://www.youtube.com/watch?v=XGf2GcyHPhc>`_
 * `How do I start learning Python? <https://automationpanda.com/2020/02/18/how-do-i-start-learning-python/>`_
 * `Learn Python Programming <https://www.programiz.com/python-programming>`_
+* `Python cheat sheet <https://websitesetup.org/wp-content/uploads/2020/04/Python-Cheat-Sheet.pdf>`_
 
 Python as a language
 --------------------

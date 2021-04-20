@@ -343,6 +343,7 @@ class Project:
                         returncode = et_micc2.utils.execute(cmds, self.logger.debug, stop_on_error=True)
                 if not returncode:
                     if self.options.remote:
+                        # todo this context manager does not print correctly
                         with et_micc2.logger.log(self.logger.info, f"Creating remote git repository at https://github.com/{github_username}/{self.project_name}"):
                             with et_micc2.utils.in_directory(self.project_path):
                                 pat_file = Path.home() / '.pat.txt'
