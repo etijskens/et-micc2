@@ -25,7 +25,7 @@ import click
 sys_path_helper()
 from et_micc2.project import Project, micc_version
 import et_micc2.logger
-import et_micc2.et_config
+import et_micc2.config
 
 if '3.8' < sys.version:
     from et_micc2.check_environment import check_cmd
@@ -134,10 +134,10 @@ def main( ctx, verbosity, project_path, clear_log
                       f'         Ignoring `{key}={value}`.')
 
     try:
-        preferences = et_micc2.et_config.Config(file_loc=ctx.obj.project_path / __cfg_filename__)
+        preferences = et_micc2.config.Config(file_loc=ctx.obj.project_path / __cfg_filename__)
     except FileNotFoundError:
         try:
-            preferences = et_micc2.et_config.Config(file_loc=__cfg_dir__ / __cfg_filename__)
+            preferences = et_micc2.config.Config(file_loc=__cfg_dir__ / __cfg_filename__)
         except FileNotFoundError:
             preferences = None
     
@@ -225,7 +225,7 @@ def setup(ctx
             selected[name] = options.overwrite_preferences[name]
         else:
             try:
-                selected[name] = et_micc2.et_config.get_param(name, description)
+                selected[name] = et_micc2.config.get_param(name, description)
             except KeyboardInterrupt:
                 print('Interupted - Preferences are not saved.')
                 ctx.exit(1)
@@ -238,7 +238,7 @@ def setup(ctx
     selected["py"] = "py"
 
     # Transfer the selected preferences to a Config object and save it to disk. 
-    options.preferences = et_micc2.et_config.Config(**selected)
+    options.preferences = et_micc2.config.Config(**selected)
     save_to = __cfg_dir__ / __cfg_filename__
     print(f'These preferences are saved to {save_to}:\n{options.preferences}')
     answer = input("Continue? yes/no")

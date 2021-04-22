@@ -20,7 +20,7 @@ from importlib import import_module
 import click
 import semantic_version
 
-import et_micc2.et_config
+import et_micc2.config
 import et_micc2.utils
 import et_micc2.expand
 import et_micc2.logger
@@ -301,7 +301,7 @@ class Project:
                 self.logger.info(f"Python {structure} ({self.package_name}): structure = {source_file}")
                 
                 # project_name must come before github_repo because the value of github_repo depends on project_name
-                template_parameters = et_micc2.et_config.Config( project_name=self.project_name
+                template_parameters = et_micc2.config.Config( project_name=self.project_name
                                                                , package_name=self.package_name )
                 template_parameters.update(self.options.template_parameters.data)
                 self.options.template_parameters = template_parameters
