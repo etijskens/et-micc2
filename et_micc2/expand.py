@@ -151,8 +151,7 @@ def expand_templates(options):
         template = resolve_template(template)             
         # write a cookiecutter.json file in the cookiecutter template directory
         cookiecutter_json = template / 'cookiecutter.json'
-        with open(cookiecutter_json,'w') as f:
-            json.dump(options.template_parameters, f, indent=2)
+        options.template_parameters.save(cookiecutter_json)
         
         # run cookiecutter in an empty temporary directory to check if there are any
         # existing project files that would be overwritten.
@@ -217,7 +216,7 @@ def expand_templates(options):
                         micc_logger.warning(f"     overwriting {src}")
                 
     # Now we can safely overwrite pre-existing files.
-    micc_logger.debug(f"Expanding templates using these parameters:\n{json.dumps(options.template_parameters,indent=2)}")
+    micc_logger.debug(f"Expanding templates using these parameters:\n{options.template_parameters}")
     for template in templates:
         template = resolve_template(template)
         micc_logger.debug(f"Expanding template {template}.")

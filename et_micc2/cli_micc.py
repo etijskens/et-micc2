@@ -4,7 +4,6 @@
 Application micc2
 """
 
-
 def sys_path_helper():
     """Make sure that et_micc2 can be imported in case this file is executed as::
 
@@ -26,6 +25,7 @@ import click
 sys_path_helper()
 from et_micc2.project import Project, micc_version
 import et_micc2.logger
+import et_micc2.et_config
 
 if '3.8' < sys.version:
     from et_micc2.check_environment import check_cmd
@@ -33,6 +33,16 @@ if '3.8' < sys.version:
 __template_help = "Ordered list of Cookiecutter templates, or a single Cookiecutter template."
 
 
+def underscore2space(text):
+    return text.replace('_', ' ')
+
+__subcmds_supporting_overwrite_preferences__ = ('setup', 'create')
+__cfg_filename__ = 'micc2.cfg'
+__cfg_dir__ = Path.home() / '.micc2'
+
+####################################################################################################
+# main
+####################################################################################################
 @click.group()
 @click.option('-v', '--verbosity', count=True
     , help="The verbosity of the program output."
@@ -48,9 +58,42 @@ __template_help = "Ordered list of Cookiecutter templates, or a single Cookiecut
     , help="If specified clears the project's ``et_micc2.log`` file."
     , default=False, is_flag=True
 )
+# optionally overwrite preferences (supporting sub-commands only):
+@click.option('--full-name'
+    , help=f"Overwrite preference `full_name`, use underscores for spaces. (supporting sub-commands only {__subcmds_supporting_overwrite_preferences__})"
+    , default=''
+)
+@click.option('--email'
+    , help=f"Overwrite preference `email`. (supporting sub-commands only {__subcmds_supporting_overwrite_preferences__})"
+    , default=''
+)
+@click.option('--github-username'
+    , help=f"Overwrite preference `github_username`. (supporting sub-commands only {__subcmds_supporting_overwrite_preferences__})"
+    , default=''
+)
+@click.option('--sphinx-html-theme'
+    , help=f"Overwrite preference `sphinx_html_theme`. (supporting sub-commands only {__subcmds_supporting_overwrite_preferences__})"
+    , default=''
+)
+@click.option('--software-license'
+    , help=f"Overwrite preference `software_license`. (supporting sub-commands only {__subcmds_supporting_overwrite_preferences__})"
+    , default=''
+)
+@click.option('--git-default-branch'
+    , help=f"Overwrite preference `git_default_branch`. (supporting sub-commands only {__subcmds_supporting_overwrite_preferences__})"
+    , default=''
+)
+@click.option('--minimal_python_version'
+    , help=f"Overwrite preference `minimal_python_version`. (supporting sub-commands only {__subcmds_supporting_overwrite_preferences__})"
+    , default=''
+)
+# end of preferences overwrite options
+# Don't put any options below, otherwise they will be treated as overwrite preferences.
 @click.version_option(version=micc_version())
 @click.pass_context
-def main(ctx, verbosity, project_path, clear_log):
+def main( ctx, verbosity, project_path, clear_log
+        , **overwrite_preferences
+        ):
     """Micc2 command line interface.
 
     All commands that change the state of the project produce some output that
@@ -74,13 +117,143 @@ def main(ctx, verbosity, project_path, clear_log):
         project_path=Path(project_path).resolve(),
         default_project_path=(project_path=='.'),
         clear_log=clear_log,
-        template_parameters={},
+        __cfg_filename__=__cfg_filename__,
+        __cfg_dir__=__cfg_dir__
     )
-    print("====================================================")
-    print("WARNING: This is micc2 - it is still experimental...")
-    print("====================================================")
+
+    overwrite_preferences_set = {}
+    if ctx.invoked_subcommand in __subcmds_supporting_overwrite_preferences__:
+        # Remove overwrite_preferences which have not been explicitly set:
+        for key,value in overwrite_preferences.items():
+            if value:
+                overwrite_preferences_set[key] = value
+    else:
+        for key, value in overwrite_preferences.items():
+            if value:
+                print(f'Warning: overwriting preferences is supported only for subcommands `setup` and `create`.\n'
+                      f'         Ignoring `{key}={value}`.')
+
+    try:
+        preferences = et_micc2.et_config.Config(file_loc=ctx.obj.project_path / __cfg_filename__)
+    except FileNotFoundError:
+        try:
+            preferences = et_micc2.et_config.Config(file_loc=__cfg_dir__ / __cfg_filename__)
+        except FileNotFoundError:
+            preferences = None
+    
+    if preferences is None:
+        # no preferences file found
+        if ctx.invoked_subcommand == 'setup':
+            # we're about to create one.
+            pass
+        else:
+            # other commands cannot be executed without a preferences file:
+            print(f"ERROR: No configuration file found in \n"
+                  f"       - {ctx.obj.project_path / 'micc2.cfg'}\n"
+                  f"       - {Path.home() / '.et-micc2/.et-micc2.cfg'}\n"
+                  f"Run `micc setup` first.")
+            ctx.exit(1)
+
+    # pass on the preferences and their overwrites to the subcommands (The overwrite_preferences
+    # are empty if the invoked subcommands do not support it
+    ctx.obj.preferences = preferences
+    ctx.obj.overwrite_preferences = overwrite_preferences_set
 
 
+####################################################################################################
+# setup
+####################################################################################################
+@main.command()
+@click.option('--force', '-f', is_flag=True
+    , help="Overwrite existing setup."
+    , default=False
+              )
+@click.pass_context
+def setup(ctx
+          , force
+          ):
+    """Setup your micc preferences.
+
+    This command must be run once before you can use micc to manage your projects.
+    """
+    options = ctx.obj
+
+    if not options.preferences is None:
+        if force:
+            click.secho(f"Overwriting earlier setup: \n    {options.preferences['file_loc']}", fg='bright_red')
+            click.secho("Enter a suffix for the configuration directory if you want to make a backup.")
+            while 1:
+                suffix = input(':> ')
+
+                if suffix:  # make backup
+                    p_cfg_dir = Path(options.preferences['file_loc']).parent
+                    p_cfg_dir_renamed = p_cfg_dir.parent / (p_cfg_dir.name + suffix)
+                    if p_cfg_dir_renamed.exists():
+                        click.secho(f'Error: suffix `{suffix}` is already in use, choose anoher.', fg='bright_red')
+                    else:
+                        p_cfg_dir.rename(p_cfg_dir_renamed)
+                        break
+            # forget the previous preferences.
+            options.preferences = None
+        else:
+            print(f"Micc2 has already been set up:\n"
+                  f"    {options.preferences['file_loc']}\n"
+                  f"Use '--force' or '-f' to overwrite the existing preferences file.")
+            ctx.exit(1)
+
+    preferences_setup = { "full_name"        : { "text": "your full name"
+                                               , "postprocess": underscore2space
+                                               }
+                        , "email"            : {"text": "your e-mail address"
+                                               }
+                        , "github_username"  : {"default": ""
+                                               , "text": "your github username (leave empty if you do not have one,\n"
+                                                         "  or create one first at https://github.com/join)"
+                                               }
+                        , "sphinx_html_theme": {"default": "sphinx_rtd_theme",
+                                                "text": "Html theme for sphinx documentation"
+                                               }
+                        , "software_license" : {"choices": ['GNU General Public License v3', 'MIT license'
+                                                           , 'BSD license', 'ISC license'
+                                                           , 'Apache Software License 2.0', 'Not open source'],
+                                                "text": "software license"
+                                               }
+                        }
+    selected = {}
+    for name, description in preferences_setup.items():
+        if name in options.overwrite_preferences:
+            selected[name] = options.overwrite_preferences[name]
+        else:
+            try:
+                selected[name] = et_micc2.et_config.get_param(name, description)
+            except KeyboardInterrupt:
+                print('Interupted - Preferences are not saved.')
+                ctx.exit(1)
+
+    # set some preferences for which the default is almost always ok
+    selected['version'] = '0.0.0'  # default initial version number of a new projec
+    selected["github_repo"] = "{{cookiecutter.project_name}}"  # default github repo name for a project
+    selected["git_default_branch"] = "main"  # default git branch
+    selected["minimal_python_version"] = "3.7"  # default minimal Python version"
+    selected["py"] = "py"
+
+    # Transfer the selected preferences to a Config object and save it to disk. 
+    options.preferences = et_micc2.et_config.Config(**selected)
+    save_to = __cfg_dir__ / __cfg_filename__
+    print(f'These preferences are saved to {save_to}:\n{options.preferences}')
+    answer = input("Continue? yes/no")
+    if not answer.lower().startswith('n'):
+        options.preferences.save(save_to, mkdir=True)
+        print(f'Preferences saved to {save_to}.')
+        ctx.exit(0)
+    else:
+        print('Interrupted. Preferences not saved.')
+        ctx.exit(1)
+
+
+####################################################################################################
+# create
+####################################################################################################
 @main.command()
 @click.option('--publish'
     , help="If specified, verifies that the package name is available on PyPI.\n"
@@ -93,22 +266,9 @@ def main(ctx, verbosity, project_path, clear_log):
            "* module  structure = ``<module_name>.py`` \n"
     , default=False, is_flag=True
 )
-@click.option('--micc-file'
-    , help="The file containing the descriptions of the template parameters used"
-           "in the *Cookiecutter* templates. "
-    , default='', type=Path
-)
-@click.option('--python'
-    , help="minimal python version for your project."
-    , default='3.7'
-)
 @click.option('-d', '--description'
     , help="Short description of your project."
     , default='<Enter a one-sentence description of this project here.>'
-)
-@click.option('-l', '--lic'
-    , help="License identifier."
-    , default='MIT'
 )
 @click.option('-T', '--template', help=__template_help, default=[])
 @click.option('-n', '--allow-nesting'
@@ -129,10 +289,7 @@ def create(ctx
            , name
            , package
            , module_name
-           , micc_file
            , description
-           , python
-           , lic
            , template
            , allow_nesting
            , publish
@@ -171,8 +328,7 @@ def create(ctx
             options.project_path = Path(name).resolve()
             options.default_project_path = False
 
-    options.micc_file = micc_file
-    options.package = package
+    options.package_structure = package
     options.publish = publish
     options.module_name = module_name
     if not remote in ['public','private', 'none']:
@@ -185,45 +341,26 @@ def create(ctx
 
     options.remote = None if remote=='none' else remote
 
-    if not template:  # default, empty list
-        if options.package:
+    if not template:  # default is empty list
+        if options.package_structure:
             template = [ 'package-base'
                        , 'package-general'
                        , 'package-simple-docs'
                        , 'package-general-docs'
                        ]
-        else:
+        else: # module structure
             template = [ 'package-base'
                        , 'package-simple'
                        , 'package-simple-docs'
                        ]
         options.templates = template
-    # else:
-    #     # ignore structure
-    #     options.structure = 'user-defined'
 
     options.allow_nesting = allow_nesting
 
-    licenses = ['MIT license'
-        , 'BSD license'
-        , 'ISC license'
-        , 'Apache Software License 2.0'
-        , 'GNU General Public License v3'
-        , 'Not open source'
-                ]
-    for l in licenses:
-        if l.startswith(lic):
-            license_ = l
-            break
-    else:
-        license_ = licenses[0]
+    options.preferences.update(options.overwrite_preferences)
 
-    options.template_parameters.update(
-        {'project_short_description': description,
-         'open_source_license': license_,
-         'python_version': python,
-        }
-    )
+    options.template_parameters = {'project_short_description': underscore2space(description)}
+
     try:
         project = Project(options)
         project.create_cmd()
@@ -231,6 +368,9 @@ def create(ctx
         ctx.exit(project.exit_code)
 
 
+####################################################################################################
+# convert_to_package
+####################################################################################################
 @main.command()
 @click.option('--overwrite', is_flag=True
     , help="Overwrite pre-existing files (without backup)."
@@ -271,7 +411,9 @@ def convert_to_package(ctx, overwrite, backup):
             )
         ctx.exit(project.exit_code)
 
-
+####################################################################################################
+# info
+####################################################################################################
 @main.command()
 @click.option('--name', is_flag=True
     , help="print the project name."
@@ -314,6 +456,9 @@ def info(ctx,name,version):
                 ctx.exit(project.exit_code)
 
 
+####################################################################################################
+# version
+####################################################################################################
 @main.command()
 @click.option('-M', '--major'
     , help='Increment the major version number component and set minor and patch components to 0.'
@@ -378,6 +523,9 @@ def version(ctx, major, minor, patch, rule, tag, short, dry_run):
                 project.tag_cmd()
 
 
+####################################################################################################
+# tag
+####################################################################################################
 @main.command()
 @click.pass_context
 def tag(ctx):
@@ -391,6 +539,9 @@ def tag(ctx):
         ctx.exit(project.exit_code)
 
 
+####################################################################################################
+# add
+####################################################################################################
 @main.command()
 @click.option('--app'
     , default=False, is_flag=True
@@ -473,7 +624,7 @@ def add(ctx
     options.templates = templates
     options.overwrite = overwrite
     options.backup = backup
-
+    options.template_parameters = options.preferences.data
     try:
         project = Project(options)
         with et_micc2.logger.logtime(project):
@@ -482,6 +633,9 @@ def add(ctx
         ctx.exit(project.exit_code)
 
 
+####################################################################################################
+# mv
+####################################################################################################
 @main.command()
 @click.option('--silent', is_flag=True
     , help="Do not ask for confirmation on deleting a component."
@@ -521,78 +675,9 @@ def mv(ctx, cur_name, new_name, silent, entire_package, entire_project):
         ctx.exit(project.exit_code)
 
 
-@main.command()
-@click.option('--force', '-f', is_flag=True
-    , help="Overwrite existing setup."
-    , default=False
-)
-@click.pass_context
-def setup( ctx
-         , force
-         ):
-    """Setup your micc preferences.
-
-    This command must be run once before you can use micc to manage your projects.
-    """
-    options = ctx.obj
-
-    options.force = force
-    micc_file_template = Path(__file__).parent / 'micc2.json'
-    setupdir = Path().home() / '.et_micc2'
-    setupdir.mkdir(exist_ok=True)
-    path_to_miccfile = setupdir / 'micc2.json'
-    if not path_to_miccfile.exists() or force:
-        shutil.copyfile(str(micc_file_template),str(path_to_miccfile))
-        preferences = et_micc2.expand.set_preferences(path_to_miccfile)
-        print("\nConfiguring git:")
-        cmds = [['git', 'config', '--global', 'user.name' , preferences['full_name']['default'] ]
-               ,['git', 'config', '--global', 'user.email', preferences['email'    ]['default'] ]
-               ,['git', 'config', '--global', 'credential.helper', 'cache']
-               ]
-        et_micc2.utils.execute(cmds, print, stop_on_error=False)
-
-    else:
-        print("Micc has already been setup. Use '--force' or '-f' to overwrite the existing setup.")
-    print("\nIf you want to change your preferences, edit the default entries in file \n"
-         f"    {path_to_miccfile}\n"
-          "Note that these changes will only affect NEW projects. Existing projects will be unaffected.\n"
-          "Micc is now configured and ready to be used.\n\n"
-          "Done"
-    )
-
-
-@main.command()
-# @click.option('--force', '-f', is_flag=True
-#     , help="Overwrite existing setup."
-#     , default=False
-# )
-@click.pass_context
-def check( ctx
-         ):
-    """Check wether the current environment has all the neccessary tools available.
-
-    Python packages:
-
-    * Numpy
-    * Pybind11
-    * sphinx
-    * sphinx-rtd-theme
-    * sphinx-click
-
-    Tools:
-
-    * CMake
-    * make
-    * poetry
-    * git
-    * gh
-    * compilers
-    """
-    if '3.8' < sys.version:
-        check_cmd(ctx.obj)
-    else:
-        print("`micc2 check` requires python 3.8 or later.")
-
+####################################################################################################
+# build
+####################################################################################################
 @main.command()
 @click.option('-m', '--module'
     , help="Build only this module. The module kind prefix (``cpp_`` "
@@ -634,6 +719,9 @@ def build( ctx
         ctx.exit(project.exit_code)
 
 
+####################################################################################################
+# check
+####################################################################################################
 @main.command()
 # @click.option('--force', '-f', is_flag=True
 #     , help="Overwrite existing setup."
@@ -667,6 +755,9 @@ def check( ctx
         print("`micc2 check` requires python 3.8 or later.")
 
 
+####################################################################################################
+# doc
+####################################################################################################
 @main.command()
 @click.pass_context
 @click.argument('what', type=str, default='html')

@@ -20,6 +20,7 @@ from importlib import import_module
 import click
 import semantic_version
 
+import et_micc2.et_config
 import et_micc2.utils
 import et_micc2.expand
 import et_micc2.logger
@@ -132,28 +133,9 @@ class Project:
         if hasattr(options, 'template_parameters'):
             # only needed for expanding templates.
             # Pick up the default parameters
-            default_parameters = {}
-            template_parameters_json = project_path / 'micc2.json'
-            if template_parameters_json.exists():
-                default_parameters.update(
-                    et_micc2.expand.get_template_parameters(template_parameters_json)
-                )
-            else:
-                preferences = et_micc2.expand.get_preferences(Path('.'))
-                if preferences is None:
-                    self.error("Micc has not been set up yet: the preferences file '~/.et_micc2/micc2.json' was not found).\n"
-                               "Run 'micc setup' to create it.\n"
-                               "If you do not have a github account yet, you might want to create one first at:\n"
-                               "    https://github.com/join")
-                else:
-                    default_parameters.update( et_micc2.expand.get_template_parameters(preferences) )
-
-            # Add options.template_parameters to the default parameters
-            # (options.template_parameters takes precedence, so they must be added last)
-            default_parameters.update(options.template_parameters)
-            # Store all the parameters in options.template_parameters.
-            options.template_parameters = default_parameters
-
+            parameters = self.options.preferences
+            parameters.update(options.template_parameters)
+            options.template_parameters = parameters
 
         if et_micc2.utils.is_project_directory(project_path, self):
             # If the project already exists, we can get ourselves a logger;
@@ -215,7 +197,7 @@ class Project:
         # . gh is required for creating a remote repo
         
         if self.options.project_path.exists() and os.listdir(str(self.options.project_path)):
-            self.error(f"Cannot create project in ({project_path}):\n"
+            self.error(f"Cannot create project in ({self.options.project_path}):\n"
                        f"  Directory must be empty.")
 
         if not ToolInfo('git').is_available():
@@ -234,7 +216,7 @@ class Project:
 
         if self.options.remote:
             # Check that we have github username
-            github_username = et_micc2.expand.get_preferences(Path.home() / '.et_micc2/micc2.json')['github_username']
+            github_username = self.options.template_parameters['github_username']
             if not github_username:
                 self.error('Micc2 configuration does not have a github username. Creation of remote repo is not possible.\n'
                            'Project is not created.'
@@ -246,8 +228,6 @@ class Project:
                             )
                 self.ask_user_to_continue_or_not(stop_message='Project not created.')
 
-        # Proceed creating the project
-        self.project_path.mkdir(parents=True, exist_ok=True)
 
         if not self.options.allow_nesting:
             # Prevent the creation of a project inside another project
@@ -258,6 +238,9 @@ class Project:
                                f"  Specify '--allow-nesting' to create a et_micc2 project inside another et_micc2 project ({p})."
                                )
                 p = p.parent
+
+        # Proceed creating the project
+        self.project_path.mkdir(parents=True, exist_ok=True)
 
         project_name = self.project_path.name
         self.project_name = project_name
@@ -303,8 +286,8 @@ class Project:
                                )
 
         structure, source_file = ('package', f'({relative_project_path}{os.sep}{self.package_name}{os.sep}__init__.py)') \
-                                 if self.options.package else \
-                                 ('module', f'({relative_project_path}{os.sep}{self.package_name}.py)')
+                                 if self.options.package_structure else \
+                                 ('module' , f'({relative_project_path}{os.sep}{self.package_name}.py)')
 
         self.options.verbosity = max(1, self.options.verbosity)
 
@@ -316,22 +299,21 @@ class Project:
                                     , f"Creating project ({self.project_name}):"
                                     ):
                 self.logger.info(f"Python {structure} ({self.package_name}): structure = {source_file}")
-                template_parameters = { 'project_name': self.project_name
-                                      , 'package_name': self.package_name
-                                      }
-                template_parameters.update(self.options.template_parameters)
+                
+                # project_name must come before github_repo because the value of github_repo depends on project_name
+                template_parameters = et_micc2.et_config.Config( project_name=self.project_name
+                                                               , package_name=self.package_name )
+                template_parameters.update(self.options.template_parameters.data)
                 self.options.template_parameters = template_parameters
+                
                 self.options.overwrite = False
-
                 self.exit_code = et_micc2.expand.expand_templates(self.options)
                 if self.exit_code:
                     self.logger.critical(f"Exiting ({self.exit_code}) ...")
                     return
 
-                my_micc_file = self.project_path / 'micc2.json'
-                with my_micc_file.open('w') as f:
-                    json.dump(template_parameters, f)
-                    self.logger.debug(f" . Wrote project template parameters to {my_micc_file}.")
+                proj_cfg = self.project_path / 'micc2.cfg'
+                self.options.template_parameters.save(proj_cfg)
 
                 with et_micc2.logger.log(self.logger.info, "Creating local git repository"):
                     with et_micc2.utils.in_directory(self.project_path):
@@ -346,7 +328,7 @@ class Project:
                         # todo this context manager does not print correctly
                         with et_micc2.logger.log(self.logger.info, f"Creating remote git repository at https://github.com/{github_username}/{self.project_name}"):
                             with et_micc2.utils.in_directory(self.project_path):
-                                pat_file = Path.home() / '.pat.txt'
+                                pat_file = self.options.__cfg_dir__ / f'{self.options.template_parameters["github_username"]}.pat'
                                 if pat_file.exists():
                                     with open(pat_file) as f:
                                         completed_process = \
@@ -354,7 +336,7 @@ class Project:
                                         et_micc2.utils.log_completed_process(completed_process,self.logger.debug)
 
                                         cmds = [ ['gh', 'repo', 'create', self.project_name, f'--{self.options.remote}', '-y']
-                                               , ['git', 'push', '-u', 'origin', 'master']
+                                               , ['git', 'push', '-u', 'origin', self.options.template_parameters['git_default_branch']]
                                                ]
                                         et_micc2.utils.execute(cmds, self.logger.debug, stop_on_error=True)
                                 else:

@@ -13,6 +13,7 @@ def test_ctor():
         template_parameters={},
         verbosity=3,
         clear_log=False,
+        preferences = {}
     )
     proj = Project(options)
     print(proj.pyproject_toml['tool']['poetry']['dependencies'])
@@ -42,7 +43,7 @@ def test_inexisting_tool():
 # (normally all tests are run with pytest)
 # ==============================================================================
 if __name__ == "__main__":
-    the_test_you_want_to_debug = test_inexisting_tool
+    the_test_you_want_to_debug = test_ctor
 
     the_test_you_want_to_debug()
     print('-*# finished #*-')

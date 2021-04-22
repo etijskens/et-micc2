@@ -17,7 +17,8 @@ import time
 from et_micc2.tomlfile import TomlFile
 import et_micc2.logger
 
-test_workspace = (Path(__file__) / '../../test_workspace').resolve()
+test_workspace = (Path(__file__).parent / 'test_workspace').resolve()
+print(test_workspace)
 
 
 def clear_test_workspace(folder=None):
@@ -28,7 +29,7 @@ def clear_test_workspace(folder=None):
         # see https://stackoverflow.com/questions/58943374/shutil-rmtree-error-when-trying-to-remove-nfs-mounted-directory
         et_micc2.logger.logging.shutdown()
 
-    p0 = Path('test_workspace')
+    p0 = test_workspace
     if not folder is None:
         p = p0 / folder
         if p.exists():

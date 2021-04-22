@@ -15,7 +15,7 @@
         "github_repo": "{{ cookiecutter.project_name }}",
         "default_branch": "master",
         "sphinx_html_theme": "sphinx_rtd_theme",
-        "open_source_license": "MIT license",
+        "software_license": "MIT license",
         "project_short_description": "A Python project manager",
         "py": "py",
         "module_name": "check_environment"

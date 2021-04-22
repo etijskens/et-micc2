@@ -380,6 +380,7 @@ git and other VCS
 * `Getting The Most Out Of Git <https://www.smashingmagazine.com/2021/02/getting-the-most-out-of-git/?utm_source=tldrnewsletter>`_
 * `Git is my buddy: Effective Git as a solo developer <https://mikkel.ca/blog/git-is-my-buddy-effective-solo-developer/?utm_source=tldrnewsletter>`_
 * `A practical guide to using the git stash command <https://opensource.com/article/21/4/git-stash?utm_medium=Email&utm_campaign=weekly&sc_cid=7013a000002w0CEAAY>`_
+* `gitlab <https://learn.gitlab.com/>`_
 
 Development environment, developement workflow
 ----------------------------------------------

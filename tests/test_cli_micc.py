@@ -67,7 +67,7 @@ def test_clear_test_workspace():
     """ 
     """
     helpers.clear_test_workspace()
-    p = Path('test_workspace')
+    p = helpers.test_workspace
     assert p.exists()
     print(1)
     
@@ -152,7 +152,7 @@ def test_scenario_module_structure():
 def test_scenario_package_structure():
     """
     """
-    # helpers.clear_test_workspace()
+    helpers.clear_test_workspace()
     with et_micc2.utils.in_directory(helpers.test_workspace):
         results = []
         #Create package BAR
@@ -353,7 +353,7 @@ def test_doc_cmd():
 
 if __name__ == "__main__":
     print(sys.version_info)
-    the_test_you_want_to_debug = test_doc_cmd
+    the_test_you_want_to_debug = test_clear_test_workspace
 
     print(f"__main__ running {the_test_you_want_to_debug}")
     the_test_you_want_to_debug()
