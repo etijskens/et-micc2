@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Module et_micc2.logger
-=====================
+======================
 
 Helper functions for logging.
 """

@@ -5,11 +5,11 @@ Created on 18 Nov 2019
 @author: etijskens
 
 Module et_micc2.utils
-====================
+=====================
 
 Utility functions for et_micc2.
 """
-import os
+import os, sys
 import re
 import time
 import subprocess
@@ -335,16 +335,7 @@ def execute(cmds,logfun=None,stop_on_error=True,env=None,cwd=None,verbose=True):
         
     for cmd in cmds:
         with et_micc2.logger.log(logfun, f"> {' '.join(cmd)}"):
-            try:
-                # python >=3.7
-                completed_process = subprocess.run(cmd, capture_output=True,env=env,cwd=cwd)
-            except:
-                # python <3.7, e.g 3.6.9:
-                #   capture_output parameter does not exist.
-                completed_process = subprocess.run(cmd, env=env, cwd=cwd,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                )
+            completed_process = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, cwd=cwd)
             returncode = log_completed_process(completed_process, logfun)
 
             if stop_on_error and returncode:
@@ -375,8 +366,8 @@ def log_completed_process(completed_process, logfun=None):
     if completed_process.stdout:
         logfun(' (stdout)\n' + completed_process.stdout.decode('utf-8'))
 
-    if completed_process.returncode and completed_process.stderr:
-        logfun(' (stderr)\n' + completed_process.stderr.decode('utf-8'))
+    # if completed_process.stderr:
+    #     logfun(' (stderr)\n' + completed_process.stderr.decode('utf-8'))
 
     if completed_process.returncode:
         logfun = logfun0

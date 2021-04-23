@@ -769,9 +769,12 @@ def doc(ctx, what):
         project = Project(options)
         with et_micc2.logger.logtime(options):
             project.doc_cmd()
-    except RuntimeError:
-        ctx.exit(project.exit_code)
 
+    except RuntimeError:
+        print('oops')
+        pass
+
+    ctx.exit(project.exit_code)
 
 
 if __name__ == "__main__":

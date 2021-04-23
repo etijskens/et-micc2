@@ -20,6 +20,6 @@
 .. automodule:: et_micc2.static_vars
    :members:
    
-.. automodule:: micc.check_environment
+.. automodule:: et_micc2.check_environment
    :members:
 

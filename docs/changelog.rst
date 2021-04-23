@@ -2,4 +2,4 @@
 History
 *******
 
-.. include:: ../HISTORY.rst
+.. include:: ../CHANGELOG.rst

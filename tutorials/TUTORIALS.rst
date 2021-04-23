@@ -11,6 +11,9 @@
 .. _pybind11: https://pybind11.readthedocs.io/en/stable/
 .. _VSC: https://vscentrum.be
 
+.. note::
+    These are the tutorials for micc, not for micc2. This is work in progress...
+
 .. include:: ../tutorials/TUTORIAL-1.rst
 .. include:: ../tutorials/TUTORIAL-2.rst
 .. include:: ../tutorials/TUTORIAL-3.rst

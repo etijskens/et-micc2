@@ -2,7 +2,7 @@
 
 """
 Module et_micc2.project
-======================
+=======================
 
 An OO interface to *micc* projects.
 
@@ -1468,10 +1468,12 @@ class Project:
             self.error("The sphinx_click package is missing in your current environment.\n"
                        "You must install it to build documentation.")
 
-        p_docs = Path(self.options.project_path) / 'docs'
-        cmd =['make', self.options.what]
-        et_micc2.utils.execute(cmd, cwd=p_docs, logfun=self.logger.debug)
-        
+        self.exit_code = et_micc2.utils.execute(
+            ['make', self.options.what],
+            cwd=Path(self.options.project_path) / 'docs',
+            logfun=self.logger.info
+        )
+
 
 def get_extension_suffix():
     """Return the extension suffix, e.g. :file:`.cpython-37m-darwin.so`."""
