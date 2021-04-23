@@ -2,14 +2,11 @@
 Micc2
 *****
 
-.. image:: https://img.shields.io/pypi/v/micc2.svg
-        :target: https://pypi.python.org/pypi/micc2
+.. image:: https://img.shields.io/pypi/v/et-micc2.svg
+        :target: https://pypi.python.org/pypi/et-micc2
 
-.. image:: https://img.shields.io/travis/etijskens/micc2.svg
-        :target: https://travis-ci.org/etijskens/micc2
-
-.. image:: https://readthedocs.org/projects/micc2/badge/?version=latest
-        :target: https://micc2.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/et-micc2/badge/?version=latest
+        :target: https://et-micc2.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
 `Micc2_ <https://github.com/etijskens/et-micc2>`_ is a Python project manager: it helps

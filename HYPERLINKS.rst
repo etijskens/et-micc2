@@ -1,0 +1,17 @@
+.. _click: https://click.palletsprojects.com/
+.. _cmake: https://cmake.org/
+.. _gh: https://github.com/cli/cli
+.. _git: https://git-scm.com/
+.. _github: https://github.com/
+.. _micc2: https://et_micc2.readthedocs.io/en/latest/
+.. _numpy: https://numpy.org
+.. _pip: https://pypi.org/project/pip/
+.. _poetry: https://poetry.eustace.io/
+.. _pybind11: https://pybind11.readthedocs.io/en/stable/
+.. _PyPI: https://pypi.org/
+.. _pytest: https://docs.pytest.org/
+.. _readthedocs: https://readthedocs.org/
+.. _sphinx: https://sphinx.org/
+.. _sphinx_click: https://click.palletsprojects.com/
+.. _sphinx_rtd_theme: https://github.com/readthedocs/sphinx_rtd_theme/
+.. _vsc: https://vscentrum.be/

@@ -1,9 +1,7 @@
+.. include:: ../HYPERLINKS.rst
+
 TODO
 ====
-.. _readthedocs: https://readthedocs.org/
-.. _poetry: https://poetry.eustace.io/
-.. _PyPI: https://pypi.org/
-.. _micc: https://micc.readthedocs.io/en/master/
 
 * check for a the presence of a global CMake or add it as a dev dependency
   in pyproject.toml.

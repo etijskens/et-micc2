@@ -1,7 +1,9 @@
+.. include:: ../HYPERLINKS.rst
+
 Development
 ===========
 
-Sofar, `Micc <https://github.com/etijskens/et-micc2>`_ is a one-man effort:
+Sofar, micc2_ is a one-man effort:
  
 * Engelbert Tijskens <engelbert.tijskens@uantwerpen.be>
 

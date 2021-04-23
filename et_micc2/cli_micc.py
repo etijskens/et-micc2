@@ -280,7 +280,7 @@ def setup(ctx
     , default=''
 )
 @click.option('--remote'
-    , help="Create remote repo on github. 'public'*|'private'|'none'"
+    , help="Create remote repo on github. Choose from 'public'(=default), 'private', or 'none'."
     , default='public'
 )
 @click.argument('name', type=str, default='')

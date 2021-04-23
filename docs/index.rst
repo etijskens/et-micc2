@@ -12,7 +12,6 @@ Welcome to micc2's documentation!
    usage
    apps
    api
-   devenv
    faq
    tutorials
    links

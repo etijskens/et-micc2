@@ -1,4 +1,5 @@
-.. _pip: https://pypi.org/project/pip/
+.. include:: ../HYPERLINKS.rst
+
 This document aims at setting up a practical development environment for Python projects,
 allowing the integration of binary extension modules based on C++ or Fortran.
 
@@ -17,13 +18,13 @@ The tools needed by micc2_ are now install once
     and tells you which functionality you will not be able to use because of missing components.
     A missing component is not necessarily a problem. E.g. if you are not interesting in
     building documentation on your system, then you can do without sphinx_, sphinx_click_, and
-    sphinx_rtd_theme.
+    sphinx_rtd_theme_.
 
 Developing on a local machine, a desktop or a laptop, is often somewhat more practical than
 developing on the cluster. Typically, I start developing on my own machine until things are
 working well, and then I port the code to the cluster for further testing. I switch back and
 forth between both environments several times. This is facilitated with git_ using a remote
-repository at https://github.com .
+repository at github_ .
 
 
 
@@ -54,7 +55,7 @@ particular:
     system-wide. If your projects depend on different Python versions it is a good idea to
     ``pipx install`` Micc_, which we use for project management and and building binary extension
     modules.
-*   `Poetry <https://poetry.eustace.io/docs/pyproject/>`_ is used to set up virtual environments for
+*   Poetry_ is used to set up virtual environments for
     the projects we are working, for managing their dependencies and for publishing them.
 *   For building binary extension modules from C++ `CMake <https://cmake.org>`_ must be available.
 *   For Micc_ projects with binary extension the necessary compilers (C++, Fortran) must be installed
@@ -239,7 +240,7 @@ For details see :ref:`Tutorial-6`
     If you only want a graphical editor, you can use Eclipse Remote system explorer as a
     remote editor.
 
-#.  Get a git account at `github <https://github.com>`_, install git if is is not pre-installed
+#.  Get a git account at github_, install git if is is not pre-installed
     on your system, and configure it::
 
         > module load git                                   # for a more recent git version
