@@ -1475,6 +1475,22 @@ class Project:
         )
 
 
+    # def venv_cmd(self):
+    #     """"""
+    #     venv_path = self.options.project_path / self.options.venv_name
+    #     if venv_path.exists():
+    #         self.error(f'A virtual environment with name `{venv_path}` exists already.\n'
+    #                    f'Choose another name, or delete it first.')
+    # 
+    #     if not Path(self.options.python_executable).exists():
+    #         self.error(f'The Python executable `{self.options.python_executable}` is not found.')
+    # 
+    #     cmd = [self.options.python_executable, '-m', 'venv', self.options.venv_name]
+    #     if self.options.system_site_packages:
+    #         cmd.append('--system-site-packages')
+    #     self.exit_code = et_micc2.utils.execute(cmd, cwd=self.options.project_path, logfun=self.logger.info)
+
+
 def get_extension_suffix():
     """Return the extension suffix, e.g. :file:`.cpython-37m-darwin.so`."""
     return sysconfig.get_config_var('EXT_SUFFIX')

@@ -1,5 +1,7 @@
 .. include:: ../HYPERLINKS.rst
 
+this file is dangling...
+
 This document aims at setting up a practical development environment for Python projects,
 allowing the integration of binary extension modules based on C++ or Fortran.
 

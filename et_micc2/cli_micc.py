@@ -762,7 +762,10 @@ def check( ctx
 @click.pass_context
 @click.argument('what', type=str, default='html')
 def doc(ctx, what):
-    """Build documentation."""
+    """Build documentation.
+
+    :param str what: this argument is passed to the make command.
+    """
     options = ctx.obj
     options.what = what  
     try:
@@ -771,10 +774,53 @@ def doc(ctx, what):
             project.doc_cmd()
 
     except RuntimeError:
-        print('oops')
         pass
 
     ctx.exit(project.exit_code)
+
+
+####################################################################################################
+# venv
+####################################################################################################
+# @main.command()
+# @click.option('--python'
+#     , help="path to the Python executable to be used for the virtual environment. "
+#            "Default is the current Python. "
+#     , default=''
+# )
+# @click.option('--system-site-packages'
+#     , help="path to the Python executable to be used for the virtual environment. "
+#            "Default is the current Python. "
+#     , default=False, is_flag=True
+# )
+# @click.argument('name', default='')
+# @click.pass_context
+# def venv(ctx, name, python, system_site_packages):
+#     """Construct a virtual environment for this project. The project is installed in
+#     development mode.
+#
+#     :param str name: name of the virtual environment. default = f'.venv-{project_name}'.
+#     """
+#     options = ctx.obj
+#     if not name:
+#         name = f'.venv-{options.project_path.name}'
+#     options.venv_name = name
+#
+#     if not python:
+#         python = sys.executable
+#     options.python_executable = python
+#
+#     options.system_site_packages = system_site_packages
+#
+#     try:
+#         project = Project(options)
+#         with et_micc2.logger.logtime(options):
+#             project.venv_cmd()
+#
+#     except RuntimeError:
+#         pass
+#
+#     ctx.exit(project.exit_code)
 
 
 if __name__ == "__main__":
