@@ -54,7 +54,7 @@ class PkgInfo:
 
     def __init__(self, pkg_name):
         if pkg_name in PkgInfo.mock:
-            print(f'Mock: pretending moduile `{pkg_name}` is missing.')
+            print(f'Mock: pretending module `{pkg_name}` is missing.')
             self.which = ''
         else:
             try:
