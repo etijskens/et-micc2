@@ -199,10 +199,61 @@ To deactivate an activated virtual environment, run::
 
 The prompt returns back to normal.
 
-In one terminal where you want to do the project management, you activate the micc2_
-virtual environment ``venv-micc2``, and in another terminal you activate the project virtual
-environment to run tests or production runs. Both, virtual environments may, but need not,
-rely on the same Python version.
+In one terminal you activate the micc2_ virtual environment ``venv-micc2``. Here,
+you issue the project management commands, add components, modify version, build
+binary extensions, etc. In another terminal you create another virtual environment
+for the project you are working on, say project ``FOO``, typically, inside the ``FOO``
+project directory itself:
+
+    > cd path/to/FOO
+    > python -m venv .venv-FOO --system-site-packages
+    > source .venv-FOO/bin/activate
+    (.venv-FOO) >
+
+Note, that the Python version to create the virtual and need not be the same as that of
+the micc2_ environment.
+
+So far, this virtual environment does not know about ``FOO``. We must still install it.
+Typically, during development, you want an editable install, so that any changes to
+``FOO``'s source code are instantly visible in the virtual environment. Micc2_ provides
+a script for that purpose::
+
+    (.venv-FOO) > python ~/.et_micc2/scripts/install-e.py
+    Create editable install of project `FOO` in current Python environment (=/Users/etijskens/.pyenv/versions/3.8.5)?
+    Proceed (yes/no)? y
+
+    Proceeding ...
+    > /Users/etijskens/.pyenv/versions/3.8.5/bin/python -m pip install --user .
+    Processing /Users/etijskens/software/dev/workspace/FOO
+      Installing build dependencies ... done
+      Getting requirements to build wheel ... done
+        Preparing wheel metadata ... done
+    Building wheels for collected packages: foo
+      Building wheel for foo (PEP 517) ... done
+      Created wheel for foo: filename=FOO-0.0.0-py3-none-any.whl size=10686 sha256=153875968adc059610dba8cd1184fcd8ba93b658f67039fa6af8d02b07127a13
+      Stored in directory: /private/var/folders/rt/7h5lk6c955db20y1rzf1rjz00000gn/T/pip-ephem-wheel-cache-x03e7s9q/wheels/a9/a4/e2/b61066293a36081a4330481401f731ee167914546c9f637bff
+    Successfully built foo
+    Installing collected packages: foo
+      Attempting uninstall: foo
+        Found existing installation: foo 0.0.0
+        Uninstalling foo-0.0.0:
+          Successfully uninstalled foo-0.0.0
+    Successfully installed foo-0.0.0
+    WARNING: You are using pip version 21.0.1; however, version 21.1 is available.
+    You should consider upgrading via the '/Users/etijskens/.pyenv/versions/3.8.5/bin/python -m pip install --upgrade pip' command.
+    Package `foo` installed at `/Users/etijskens/.local/lib/python3.8/site-packages`.
+
+    Removing package: /Users/etijskens/.local/lib/python3.8/site-packages/foo
+    Replacing package with symbolic link: /Users/etijskens/software/dev/workspace/FOO/foo
+    Editable install of FOO is ready.
+    (.venv-FOO) >
+
+Now, the package ``FOO`` is available in ``.venv-FOO`` and any code changes to ``FOO``'s
+source code is immediately visible in ``.venv-FOO``.
+
+.. note:: Micc2 projects lack a ``setup.py`` file, and consequently ``pip install -e path/to/FOO``
+    will fail. The ``install-e.py`` script provides a work around for this. For non-editable
+    installs ``pip install path/to/FOO`` works flawless.
 
 Note that this works exactly the same way on the cluster, provided you load the appropriate
 cluster modules to expose the cluster tools that you need, prior to creating and

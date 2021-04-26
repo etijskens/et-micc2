@@ -81,7 +81,7 @@ def main(project):
             sys.exit(-1)
         if answer == '' or answer.lower().startswith('y'):
             break
-    print("\nbProceeding ...")
+    print("\nProceeding ...")
     # install, not editable
     cmd = [sys.executable, "-m", "pip", "install", '.']
     if user_flag:

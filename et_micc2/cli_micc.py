@@ -26,6 +26,7 @@ sys_path_helper()
 from et_micc2.project import Project, micc_version
 import et_micc2.logger
 import et_micc2.config
+import pkg_resources
 
 if '3.8' < sys.version:
     from et_micc2.check_environment import check_cmd
@@ -245,11 +246,13 @@ def setup(ctx
     if not answer.lower().startswith('n'):
         options.preferences.save(save_to, mkdir=True)
         print(f'Preferences saved to {save_to}.')
-        ctx.exit(0)
     else:
         print('Interrupted. Preferences not saved.')
         ctx.exit(1)
 
+    os.symlink(src=Path(pkg_resources.get_distribution('et-micc2')) / 'scripts', dst = __cfg_dir__ / 'scripts')
+
+    ctx.exit(0)
 
 ####################################################################################################
 # create
