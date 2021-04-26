@@ -36,6 +36,9 @@ def main(project):
     is installed with the `--user` flag to avoid cluttering the system Python's site-packages.
 
     :param str project: path to the project to install, defaults to CWD.
+
+    This script uses pip to install a package, and then replaces the package in the
+    site-packages directory with a symlink to the source package in the project directory.
     """
     if len(sys.argv) > 1:
         project = sys.argv[1]
