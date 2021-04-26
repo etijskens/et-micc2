@@ -147,23 +147,22 @@ system directories. So::
     > python -m pip install --user et-micc2
     > python -m pip install --user pybind11
 
-
-
 What about virtual environments?
 --------------------------------
-If the Python environment you need to run your projects is incompatible with the Python
-you need run micc2_, you can separate them into virtual environments, one for running
-micc2_, in which you install the tools (which are not system-wide available) `and Python`
-packages needed by micc2_ as above, and one for running your project, in which you install
-all tools and Python packages needed for your production work. You create a virtual
-environment like this::
+Virtual environments are extremely usefull to isolate the dependencies of different
+projects. If the your project has dependencies which are incompatible with those of
+micc2_, you can separate them into two virtual environments, one for running
+micc2_ and managing the project, and one for the project itself and its dependencies.
+Both environments can even be based on different Python versions.
+
+You create a virtual environment like this::
 
     > python -m venv venv-name
 
 This creates a directory ``venv-name`` in the current directory containing a complete
 virtual Python environment based on your current ``python`` executable. It provides just
-a bare Python installation, no site packages. If you also want the system site packages,
-specify the ``--system-site-packages`` flag::
+a bare Python installation, no site packages. If you also want the system site packages
+to be available in the virtual environment, specify the ``--system-site-packages`` flag::
 
     > python -m venv venv-name --system-site-packages
 
@@ -180,15 +179,7 @@ A virtual environment is activated as::
     > source venv-name/bin/activate
     (venv-name) >
 
-Note how the prompt is modified as to show the active virtual environment. Now you
-can use the virtual environment, and install packages in it without impacting
-anything else. E.g. a micc2_ virtual environment could be created as:
-
-    > python -m venv venv-micc2 --system-site-packages
-    > source venv-micc2/bin/activate
-    (venv-micc2) > python -m pip install et-micc2
-    (venv-micc2) > python -m pip install pybind11
-    (venv-micc2) >
+Note how the prompt is modified, as to show the active virtual environment.
 
 .. note:: Do not use the ``--user`` flag when installing in a virtual environment.
 
@@ -197,26 +188,38 @@ To deactivate an activated virtual environment, run::
     (venv-name) > deactivate
     >
 
-The prompt returns back to normal.
+The prompt returns back to normal. If you do not need your venv anymore, you can
+delete it like any other directory::
 
-In one terminal you activate the micc2_ virtual environment ``venv-micc2``. Here,
-you issue the project management commands, add components, modify version, build
-binary extensions, etc. In another terminal you create another virtual environment
-for the project you are working on, say project ``FOO``, typically, inside the ``FOO``
-project directory itself:
+    > rm -rf venv_name
+
+Now you can use the virtual environment, and install packages in it without i
+mpacting anything else. E.g. a micc2_ virtual environment could be created in
+a terminal as::
+
+    > python -m venv venv-micc2 --system-site-packages
+    > source venv-micc2/bin/activate
+    (venv-micc2) > python -m pip install et-micc2
+    (venv-micc2) > python -m pip install pybind11
+    (venv-micc2) >
+
+Here, you issue the project management commands, add components, modify version,
+build binary extensions, etc. In another terminal you create a virtual environment
+for the project you are working on, say project ``FOO``. Typically, it is created
+inside the ``FOO`` project directory itself:
 
     > cd path/to/FOO
     > python -m venv .venv-FOO --system-site-packages
     > source .venv-FOO/bin/activate
     (.venv-FOO) >
 
-Note, that the Python version to create the virtual and need not be the same as that of
-the micc2_ environment.
+Note, that the Python version to create the virtual and need not be the same as
+that of the micc2_ environment.
 
-So far, this virtual environment does not know about ``FOO``. We must still install it.
-Typically, during development, you want an editable install, so that any changes to
-``FOO``'s source code are instantly visible in the virtual environment. Micc2_ provides
-a script for that purpose::
+So far, this virtual environment ``.venv-FOO`` does not know about ``FOO``. We must
+still install ``FOO``. Typically, during development, you want an editable install,
+so that any changes to``FOO``'s source code are instantly visible in the virtual
+environment. Micc2_ provides a script for that purpose::
 
     (.venv-FOO) > python ~/.et_micc2/scripts/install-e.py
     Create editable install of project `FOO` in current Python environment (=/Users/etijskens/.pyenv/versions/3.8.5)?
@@ -249,13 +252,13 @@ a script for that purpose::
     (.venv-FOO) >
 
 Now, the package ``FOO`` is available in ``.venv-FOO`` and any code changes to ``FOO``'s
-source code is immediately visible in ``.venv-FOO``.
+source code are immediately visible in ``.venv-FOO``.
 
 .. note:: Micc2 projects lack a ``setup.py`` file, and consequently ``pip install -e path/to/FOO``
     will fail. The ``install-e.py`` script provides a work around for this. For non-editable
     installs ``pip install path/to/FOO`` works flawless.
 
-Note that this works exactly the same way on the cluster, provided you load the appropriate
-cluster modules to expose the cluster tools that you need, prior to creating and
-activating the virtual environments.
+Note that this works exactly the same way on the cluster, provided you load the
+appropriate cluster modules to expose the cluster tools that you need, prior to
+creating and activating the virtual environments.
 
