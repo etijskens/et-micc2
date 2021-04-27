@@ -251,7 +251,7 @@ def setup(ctx
         ctx.exit(1)
 
     # make the scripts directory available through a symlink in the configuration directory:
-    os.symlink(src=Path(pkg_resources.get_distribution('et-micc2')) / 'scripts', dst = __cfg_dir__ / 'scripts')
+    os.symlink(src=Path(pkg_resources.get_distribution('et-micc2').location) / 'scripts', dst = __cfg_dir__ / 'scripts')
 
     ctx.exit(0)
 
