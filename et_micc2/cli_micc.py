@@ -376,13 +376,13 @@ def create(ctx
 # convert_to_package
 ####################################################################################################
 @main.command()
-@click.option('--overwrite', is_flag=True
+@click.option('--overwrite', '-o'
     , help="Overwrite pre-existing files (without backup)."
-    , default=False
+    , is_flag=True, default=False
 )
-@click.option('--backup', is_flag=True
+@click.option('--backup', '-b'
     , help="Make backup files (.bak) before overwriting any pre-existing files."
-    , default=False
+    , is_flag=True, default=False
 )
 @click.pass_context
 def convert_to_package(ctx, overwrite, backup):

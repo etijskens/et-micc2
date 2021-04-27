@@ -386,6 +386,7 @@ class Project:
 
         # add documentation files for general Python project
         self.options.templates = "package-general-docs"
+        self.options.template_parameters = self.options.preferences
         self.options.template_parameters.update(
             {'project_short_description': self.pyproject_toml['tool']['poetry']['description']}
         )
