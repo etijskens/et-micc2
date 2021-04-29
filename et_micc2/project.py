@@ -296,7 +296,7 @@ class Project:
 
         with et_micc2.logger.logtime(self):
             with et_micc2.logger.log(self.logger.info
-                                    , f"Creating project ({self.project_name}):"
+                                    , f"Creating project directory ({self.project_name}):"
                                     ):
                 self.logger.info(f"Python {structure} ({self.package_name}): structure = {source_file}")
                 

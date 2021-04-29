@@ -262,3 +262,83 @@ Note that this works exactly the same way on the cluster, provided you load the
 appropriate cluster modules to expose the cluster tools that you need, prior to
 creating and activating the virtual environments.
 
+.. _micc2-setup:
+
+First time Micc2 setup
+----------------------
+
+When you run Micc2_ for the first time, it will complain that it has not been set
+up yet, and that you need to run ``micc2 setup``. In order to facilitate your project
+management as much as possible,  Micc2_ needs to know some personal data such as your
+name, e-mail address, github account, ...  If you do not have a github account yet,
+create a github account at https://github.com>/join/.
+
+Then, run::
+
+    > micc2 setup
+
+The dialogue that follows asks for your full name, your e-mail address, your
+github username, a default html theme for Sphinx_ documentation, and a default
+license. For the last two questions you can select a default answer by just hitting
+``enter``. Finally, Micc2_ shows you the chosen preferences and asks for permission
+to save the results. The dialogue goes like this::
+
+    Enter your full name
+    Enter `^^` to exit.
+    >: John Doe
+
+    Enter your e-mail address
+    Enter `^^` to exit.
+    >: john.doe@example.com
+
+    Enter your github username (leave empty if you do not have one,
+      or create one first at https://github.com/join). Default = []
+    Enter `^^` to exit.
+    >: jdoe
+
+    Enter Html theme for sphinx documentation. Default = [sphinx_rtd_theme]
+    Enter `^^` to exit.
+    >:
+
+    Enter software license [GNU General Public License v3]
+    Choose between:
+      0: GNU General Public License v3 (default)
+      1: MIT license
+      2: BSD license
+      3: ISC license
+      4: Apache Software License 2.0
+      5: Not open source
+    Enter `^^` to exit.
+    >:
+    >: GNU General Public License v3
+    These preferences are saved to /Users/etijskens/.micc2/micc2.cfg:
+    {
+      "full_name": "John Doe",
+      "email": "john.doe@example.com",
+      "github_username": "jdoe",
+      "sphinx_html_theme": "sphinx_rtd_theme",
+      "software_license": "GNU General Public License v3",
+      "version": "0.0.0",
+      "github_repo": "{{cookiecutter.project_name}}",
+      "git_default_branch": "main",
+      "minimal_python_version": "3.7",
+      "py": "py"
+    }
+    Continue? yes/no >:
+    Preferences saved to /Users/etijskens/.micc2/micc2.cfg.
+
+Finally, if you want to be able to automatically create remote github repositories,
+you need also a personal access token for your github account. Follow
+`these instructions <https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token>`_
+At point 7 check at least these boxes:
+
+    * repo
+    * read:org
+
+At point 9 copy the token to the clipboard and paste it in file
+:file:`~/.micc2/<your-github-username>.pat`, like this::
+
+    > echo <paste> > ~/.micc2/<your-github-username>.pat
+
+Here <paste> stands for your OS's keyboard combination for pasting in the terminal.
+( Typically: Linux: shift+ctrl+v, MACOS: command+v, Windows: ctrl+v).

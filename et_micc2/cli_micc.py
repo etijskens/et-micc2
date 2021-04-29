@@ -242,7 +242,7 @@ def setup(ctx
     options.preferences = et_micc2.config.Config(**selected)
     save_to = __cfg_dir__ / __cfg_filename__
     print(f'These preferences are saved to {save_to}:\n{options.preferences}')
-    answer = input("Continue? yes/no")
+    answer = input("Continue? yes/no >:")
     if not answer.lower().startswith('n'):
         options.preferences.save(save_to, mkdir=True)
         print(f'Preferences saved to {save_to}.')

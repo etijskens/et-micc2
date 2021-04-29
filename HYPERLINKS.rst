@@ -2,7 +2,7 @@
 .. _cmake: https://cmake.org/
 .. _gh: https://github.com/cli/cli
 .. _git: https://git-scm.com/
-.. _github: https://github.com/
+.. _GitHub: https://github.com/
 .. _micc2: https://et_micc2.readthedocs.io/en/latest/
 .. _numpy: https://numpy.org
 .. _pip: https://pypi.org/project/pip/
