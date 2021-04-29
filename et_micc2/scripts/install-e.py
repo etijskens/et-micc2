@@ -7,7 +7,6 @@ import shutil
 import os
 import pkg_resources
 
-import click
 
 def get_base_prefix_compat():
     """Get base/real prefix, or sys.prefix if there is none."""
@@ -20,9 +19,7 @@ def in_virtualenv():
     return get_base_prefix_compat() != sys.prefix
 
 
-@click.command()
-@click.argument('project', default='.')
-def main(project):
+def main():
     """Make an editable install of project `project` in the Python environment with which
     this script was called. Editable installs make changes to your project's source code
     instantly visible in the environment, so they can be tested and debugged.
@@ -42,6 +39,8 @@ def main(project):
     """
     if len(sys.argv) > 1:
         project = sys.argv[1]
+    else:
+        project = '.'
     project_path = Path(project).resolve()
 
     if not project_path.exists():
@@ -70,13 +69,13 @@ def main(project):
 
     if in_virtualenv():
         user_flag = False
-        environment = click.style('virtual environment',fg='red')
+        environment = 'virtual environment'
     else:
         user_flag = True
-        environment = click.style('current Python environment',fg='red')
+        environment = 'current Python environment'
         # print(f'Install (editable) project {project_name} in current Python environment {sys.prefix} with `--user`?')
 
-    click.echo(f"Create editable install of project `{click.style(project_name,fg='blue',bold=True)}` in {environment} (={click.style(sys.prefix,bold=True)})?")
+    print(f"Create editable install of project `{project_name}` in {environment} (={sys.prefix})?")
     while 1:
         answer = input('Proceed (yes/no)? ')
         if answer.lower().startswith('n'):
@@ -89,21 +88,21 @@ def main(project):
     cmd = [sys.executable, "-m", "pip", "install", '.']
     if user_flag:
         cmd.insert(4,'--user')
-    click.secho(f"> {' '.join(cmd)}",fg='green')
+    print(f"> {' '.join(cmd)}")
     subprocess.check_call(cmd)
     try:
         pkg_dist_info = pkg_resources.get_distribution(package_name)
     except pkg_resources.DistributionNotFound:
-        click.secho(f'Package {package_name} not found.', fg='red')
+        print(f'Package {package_name} not found.')
         raise
     else:
         location = pkg_dist_info.location
-        click.secho(f'Package `{package_name}` installed at `{location}`.\n', fg='green')
+        print(f'Package `{package_name}` installed at `{location}`.\n')
 
     # make installation editable
     if structure == 'package':
         package_path = Path(location) / package_name
-        click.secho(f'Removing package: {package_path}', fg='green')
+        print(f'Removing package: {package_path}')
         if package_path.is_symlink():
             package_path.unlink()
         else:
@@ -117,18 +116,18 @@ def main(project):
         if module_path.exists():
             module_path.unlink()
             
-        click.secho(f'Replacing package with symbolic link: {project_path / package_name}', fg='green')
+        print(f'Replacing package with symbolic link: {project_path / package_name}')
         os.symlink(src=(project_path / package_name), dst=package_path)
 
     else: # module structure
         module = f'{package_name}.py'
         package_path = Path(location) / module
-        click.secho(f'Removing package: {package_path}', fg='green')
+        print(f'Removing package: {package_path}')
         package_path.unlink()
-        click.secho(f'Replacing package with symbolic link: {project_path / module}', fg='green')
+        print(f'Replacing package with symbolic link: {project_path / module}')
         os.symlink(src=(project_path / module), dst=package_path)
 
-    click.secho(f"Editable install of {click.style(project_name,fg='blue',bold=True)} is ready.\n")
+    print(f"\nEditable install of {project_name} is ready.\n")
 
 
 if __name__ == '__main__':
