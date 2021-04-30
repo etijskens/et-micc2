@@ -37,9 +37,29 @@ __template_help = "Ordered list of Cookiecutter templates, or a single Cookiecut
 def underscore2space(text):
     return text.replace('_', ' ')
 
-__subcmds_supporting_overwrite_preferences__ = ('setup', 'create')
-__cfg_filename__ = 'micc2.cfg'
-__cfg_dir__ = Path.home() / '.micc2'
+_subcmds_supporting_overwrite_preferences = ('setup', 'create')
+_cfg_filename = 'micc2.cfg'
+_cfg_dir = Path.home() / '.micc2'
+
+_preferences_setup = { "full_name":
+                           { "text": "your full name"
+                           , "postprocess": underscore2space }
+                     , "email":
+                           { "text": "your e-mail address" }
+                     , "github_username":
+                           { "default": ""
+                           , "text": "your github username (leave empty if you do not have one,\n"
+                                     "  or create one first at https://github.com/join)" }
+                     , "sphinx_html_theme":
+                           { "default": "sphinx_rtd_theme"
+                           , "text": "Html theme for sphinx documentation" }
+                     , "software_license":
+                           { "choices": [ 'GNU General Public License v3', 'MIT license'
+                                        , 'BSD license', 'ISC license'
+                                        , 'Apache Software License 2.0', 'Not open source']
+                           , "text": "software license" }
+                     }
+
 
 ####################################################################################################
 # main
@@ -61,31 +81,31 @@ __cfg_dir__ = Path.home() / '.micc2'
 )
 # optionally overwrite preferences (supporting sub-commands only):
 @click.option('--full-name'
-    , help=f"Overwrite preference `full_name`, use underscores for spaces. (supporting sub-commands only {__subcmds_supporting_overwrite_preferences__})"
+    , help=f"Overwrite preference `full_name`, use underscores for spaces. (supporting sub-commands only {_subcmds_supporting_overwrite_preferences})"
     , default=''
 )
 @click.option('--email'
-    , help=f"Overwrite preference `email`. (supporting sub-commands only {__subcmds_supporting_overwrite_preferences__})"
+    , help=f"Overwrite preference `email`. (supporting sub-commands only {_subcmds_supporting_overwrite_preferences})"
     , default=''
 )
 @click.option('--github-username'
-    , help=f"Overwrite preference `github_username`. (supporting sub-commands only {__subcmds_supporting_overwrite_preferences__})"
+    , help=f"Overwrite preference `github_username`. (supporting sub-commands only {_subcmds_supporting_overwrite_preferences})"
     , default=''
 )
 @click.option('--sphinx-html-theme'
-    , help=f"Overwrite preference `sphinx_html_theme`. (supporting sub-commands only {__subcmds_supporting_overwrite_preferences__})"
+    , help=f"Overwrite preference `sphinx_html_theme`. (supporting sub-commands only {_subcmds_supporting_overwrite_preferences})"
     , default=''
 )
 @click.option('--software-license'
-    , help=f"Overwrite preference `software_license`. (supporting sub-commands only {__subcmds_supporting_overwrite_preferences__})"
+    , help=f"Overwrite preference `software_license`. (supporting sub-commands only {_subcmds_supporting_overwrite_preferences})"
     , default=''
 )
 @click.option('--git-default-branch'
-    , help=f"Overwrite preference `git_default_branch`. (supporting sub-commands only {__subcmds_supporting_overwrite_preferences__})"
+    , help=f"Overwrite preference `git_default_branch`. (supporting sub-commands only {_subcmds_supporting_overwrite_preferences})"
     , default=''
 )
 @click.option('--minimal_python_version'
-    , help=f"Overwrite preference `minimal_python_version`. (supporting sub-commands only {__subcmds_supporting_overwrite_preferences__})"
+    , help=f"Overwrite preference `minimal_python_version`. (supporting sub-commands only {_subcmds_supporting_overwrite_preferences})"
     , default=''
 )
 # end of preferences overwrite options
@@ -118,15 +138,22 @@ def main( ctx, verbosity, project_path, clear_log
         project_path=Path(project_path).resolve(),
         default_project_path=(project_path=='.'),
         clear_log=clear_log,
-        __cfg_filename__=__cfg_filename__,
-        __cfg_dir__=__cfg_dir__
+        _cfg_filename=_cfg_filename,
+        _cfg_dir=_cfg_dir
     )
 
     overwrite_preferences_set = {}
-    if ctx.invoked_subcommand in __subcmds_supporting_overwrite_preferences__:
+    if ctx.invoked_subcommand in _subcmds_supporting_overwrite_preferences:
         # Remove overwrite_preferences which have not been explicitly set:
         for key,value in overwrite_preferences.items():
             if value:
+                if key == 'software_license':
+                    for lic in _preferences_setup[key]['choices']:
+                        if lic.startswith(value):
+                            value = lic
+                elif key == 'full_name':
+                    value = underscore2space(value)
+
                 overwrite_preferences_set[key] = value
     else:
         for key, value in overwrite_preferences.items():
@@ -135,10 +162,10 @@ def main( ctx, verbosity, project_path, clear_log
                       f'         Ignoring `{key}={value}`.')
 
     try:
-        preferences = et_micc2.config.Config(file_loc=ctx.obj.project_path / __cfg_filename__)
+        preferences = et_micc2.config.Config(file_loc=ctx.obj.project_path / _cfg_filename)
     except FileNotFoundError:
         try:
-            preferences = et_micc2.config.Config(file_loc=__cfg_dir__ / __cfg_filename__)
+            preferences = et_micc2.config.Config(file_loc=_cfg_dir / _cfg_filename)
         except FileNotFoundError:
             preferences = None
     
@@ -202,26 +229,8 @@ def setup(ctx
                   f"Use '--force' or '-f' to overwrite the existing preferences file.")
             ctx.exit(1)
 
-    preferences_setup = { "full_name"        : { "text": "your full name"
-                                               , "postprocess": underscore2space
-                                               }
-                        , "email"            : {"text": "your e-mail address"
-                                               }
-                        , "github_username"  : {"default": ""
-                                               , "text": "your github username (leave empty if you do not have one,\n"
-                                                         "  or create one first at https://github.com/join)"
-                                               }
-                        , "sphinx_html_theme": {"default": "sphinx_rtd_theme",
-                                                "text": "Html theme for sphinx documentation"
-                                               }
-                        , "software_license" : {"choices": ['GNU General Public License v3', 'MIT license'
-                                                           , 'BSD license', 'ISC license'
-                                                           , 'Apache Software License 2.0', 'Not open source'],
-                                                "text": "software license"
-                                               }
-                        }
     selected = {}
-    for name, description in preferences_setup.items():
+    for name, description in _preferences_setup.items():
         if name in options.overwrite_preferences:
             selected[name] = options.overwrite_preferences[name]
         else:
@@ -240,7 +249,7 @@ def setup(ctx
 
     # Transfer the selected preferences to a Config object and save it to disk. 
     options.preferences = et_micc2.config.Config(**selected)
-    save_to = __cfg_dir__ / __cfg_filename__
+    save_to = _cfg_dir / _cfg_filename
     print(f'These preferences are saved to {save_to}:\n{options.preferences}')
     answer = input("Continue? yes/no >:")
     if not answer.lower().startswith('n'):
@@ -251,7 +260,7 @@ def setup(ctx
         ctx.exit(1)
 
     # make the scripts directory available through a symlink in the configuration directory:
-    os.symlink(src=Path(pkg_resources.get_distribution('et-micc2').location) / 'scripts', dst = __cfg_dir__ / 'scripts')
+    os.symlink(src=Path(pkg_resources.get_distribution('et-micc2').location) / 'scripts', dst = _cfg_dir / 'scripts')
 
     ctx.exit(0)
 
