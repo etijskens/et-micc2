@@ -10,7 +10,7 @@ Welcome to {{ cookiecutter.project_name }}'s documentation!
    installation
    api
    authors
-   history
+   changelog
 
 ##################
 Indices and tables
