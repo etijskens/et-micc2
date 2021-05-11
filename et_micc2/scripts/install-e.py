@@ -41,7 +41,9 @@ def main():
         project = sys.argv[1]
     else:
         project = '.'
+    print(project)
     project_path = Path(project).resolve()
+    print(project_path)
 
     if not project_path.exists():
         raise RuntimeError(f"Project path {project_path} does not exist.")
@@ -85,7 +87,7 @@ def main():
             break
     print("\nProceeding ...")
     # install, not editable
-    cmd = [sys.executable, "-m", "pip", "install", '.']
+    cmd = [sys.executable, "-m", "pip", "install", str(project_path)]
     if user_flag:
         cmd.insert(4,'--user')
     print(f"> {' '.join(cmd)}")
