@@ -1,1101 +1,1285 @@
-.. _micc-build: https://github.com/etijskens/et-micc2-build
+.. include:: ../HYPERLINKS.rst
 
 .. _tutorial-2:
 
-Tutorial 2: Binary extensions
-=============================
+2. A first real project
+=======================
+
+Let's start with a simple problem: a Python module that computes the
+`scalar product of two arrays <https://en.wikipedia.org/wiki/Dot_product>`_,
+generally referred to as the *dot product*. Admittedly, this not a very rewarding
+goal, as there are already many Python packages, e.g. Numpy_, that solve this problem
+in an elegant and efficient way. However, because the dot product is such a simple
+concept in linear algebra, it allows us to illustrate the usefulness of Python as a
+language for HPC, as well as the capabilities of Micc2_.
+
+First, we set up a new project for this *dot* project, with the name :file:`ET-dot`,
+``ET`` being my initials (check out :ref:`project-and-module-naming`). 
+
+.. code-block:: bash
+
+    > micc2 create ET-dot --package --remote=none
+    [INFO]           [ Creating project directory (ET-dot):
+    [INFO]               Python package (et_dot): structure = (ET-dot/et_dot/__init__.py)
+    [INFO]               [ Creating local git repository
+    [INFO]               ] done.
+    [WARNING]            Creation of remote GitHub repository not requested.
+    [INFO]           ] done.
+    
+
+We already create a package project, rather than the default module project, just to
+avoid having to ``micc2 convert-to-package`` later, and to be prepared for having to
+add other components (See the :ref:`modules-and-packages` sectionfor details on
+the difference between projects with a module structure and a package structure).
+
+We ``cd`` into the project directory, so Micc2_ knows is as the current project.
+
+.. code-block:: bash
+
+    > cd ET-dot
+
+Now, open module file :file:`et_dot.py` in your favourite editor and start coding a
+dot product method as below. The example code created by Micc2_ can be removed.
+
+.. code-block:: python
+
+    # -*- coding: utf-8 -*-
+    """
+    Package et_dot
+    ==============
+    Python module for computing the dot product of two arrays.
+    """
+    __version__ = "0.0.0"
+    
+    def dot(a,b):
+        """Compute the dot product of *a* and *b*.
+    
+        :param a: a 1D array.
+        :param b: a 1D array of the same length as *a*.
+        :returns: the dot product of *a* and *b*.
+        :raises: ValueError if ``len(a)!=len(b)``.
+        """
+        n = len(a)
+        if len(b)!=n:
+            raise ValueError("dot(a,b) requires len(a)==len(b).")
+        result = 0
+        for i in range(n):
+            result += a[i]*b[i]
+        return result
+
+We defined a :py:meth:`dot` method with an informative doc-string that describes
+the parameters, the return value and the kind of exceptions it may raise. If you like,
+you can add a ``if __name__ == '__main__':`` clause for quick-and-dirty testing or
+debugging (see :ref:`modules-and-scripts`). It is a good idea to commit this
+implementation to the local git repository:
+
+.. code-block:: bash
+
+    > git commit -a -m 'implemented dot()'
+    [master 627970b] implemented dot()
+     1 file changed, 23 insertions(+), 22 deletions(-)
+     rewrite et_dot/__init__.py (71%)
+    
+
+(If there was a remote GitHub repository, you could also push that commit
+``git push``, as to enable your colleagues to acces the code as well.)
+
+We can use the dot method in a script as follows:
+
+.. code-block:: python
+
+    from et_dot import dot
+    
+    a = [1,2,3]
+    b = [4.1,4.2,4.3]
+    a_dot_b = dot(a,b)
+
+Or we might execute these lines at the Python prompt:
+
+.. code-block:: pycon
+
+
+>>>
+    >>> from et_dot import dot
+    >>> a = [1,2,3]
+    >>> b = [4.1,4.2,4.3]
+    >>> a_dot_b = dot(a,b)
+    >>> expected = 1*4.1 + 2*4.2 +3*4.3
+    >>> print(f"a_dot_b = {a_dot_b} == {expected}")
+    a_dot_b = 25.4 == 25.4
+    
+
+.. note::
+
+   This dot product implementation is naive for several reasons:
+
+    * Python is very slow at executing loops, as compared to Fortran or C++.
+
+    * The objects we are passing in are plain Python :py:obj:`list`s. A :py:obj:`list` is a
+      very powerfull data structure, with array-like properties, but it is not exactly an
+      array. A :py:obj:`list` is in fact an array of pointers to Python objects, and
+      therefor list elements can reference anything, not just a numeric value as we would
+      expect from an array. With elements being pointers, looping over the array elements
+      implies non-contiguous memory access, another source of inefficiency.
+
+    * The dot product is a subject of Linear Algebra. Many excellent libraries have been
+      designed for this purpose. Numpy_ should be your starting point because it is well
+      integrated with many other Python packages. There is also
+      `Eigen <http://eigen.tuxfamily.org/index.php?title=Main_Page>`_, a C++
+      template library for linear algebra that is neatly exposed to Python by pybind11_.
+
+    However, starting out with a simple and naive implementation is not a bad idea at all.
+    Once it is proven correct, it can serve as reference implementation to validate later
+    improvements.
+
+.. _testing-code:
+
+2.1. Testing the code
+---------------------
+
+In order to prove that our implementation of the dot product is correct, we write some
+tests. Open the file :file:`tests/test_et_dot.py`, remove the original tests put
+in by micc2_, and add a new one like below:
+
+.. code-block:: python
+
+    import et_dot
+    
+    def test_dot_aa():
+        a = [1,2,3]
+        expected = 14
+        result = et_dot.dot(a,a)
+        assert result==expected
+
+The test :py:meth:`test_dot_aa` defines an array with 3 ``int`` numbers, and
+computes the dot product with itself. The expected result is easily calculated by
+hand. Save the file, and run the test, usi           ng Pytest_ as explained in
+:ref:`testing-your-code`. Pytest_ will show a line for every test source file an on
+each such line a ``.`` will appear for every successfull test, and a ``F`` for a failing
+test. Here is the result:
+
+.. code-block:: bash
+
+    > pytest tests
+    ============================= test session starts ==============================
+    platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.10.0, pluggy-0.13.1
+    rootdir: /Users/etijskens/software/dev/workspace/Tutorials/ET-dot
+    collected 1 item
+    
+    tests/test_et_dot.py .                                                   [100%]
+    
+    ============================== 1 passed in 0.01s ===============================
+    
+
+Great, our test succeeds. If you want some more detail you can add the ``-v`` flag.
+Pytest_ always captures the output without showing it. If you need to see it to help you
+understand errors, add the ``-s`` flag.
+
+We thus have added a single test and verified that it works by running ''pytest''. It is
+good practise to commit this to our local git repository:
+
+.. code-block:: bash
+
+    > git commit -a -m 'added test_dot_aa()'
+    [master 0988e5e] added test_dot_aa()
+     1 file changed, 7 insertions(+), 33 deletions(-)
+     rewrite tests/test_et_dot.py (98%)
+    
+
+Obviously, our test tests only one particular case, and, perhaps, other cases might
+fail. A clever way of testing is to focus on properties. From mathematics we now that
+the dot product is commutative. Let's add a test for that. Open
+:file:`test_et_dot.py` again and add this code:
+
+.. code-block:: python
+
+    import random
+    
+    def test_dot_commutative():
+        # create two arrays of length 10 with random float numbers:
+        a = []
+        b = []
+        for _ in range(10):
+            a.append(random.random())
+            b.append(random.random())
+        # test commutativity:
+        ab = et_dot.dot(a,b)
+        ba = et_dot.dot(b,a)
+        assert ab==ba
+
+.. note::
+
+   Focussing on mathematical properties sometimes requires a bit more thought. Our
+   mathematical intuition is based on the properties of real numbers - which, as a matter
+   of fact, have infinite precision. Programming languages, however, use floating
+   point numbers, which have a finite precision. The mathematical properties for
+   floating point numbers are not the same as for real numbers. we'll come to that later.
+
+.. code-block:: bash
+
+    > pytest tests -v
+    ============================= test session starts ==============================
+    platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.10.0, pluggy-0.13.1 -- /Users/etijskens/.pyenv/versions/3.8.5/bin/python
+    cachedir: .pytest_cache
+    rootdir: /Users/etijskens/software/dev/workspace/Tutorials/ET-dot
+    collecting ... collected 2 items
+    
+    tests/test_et_dot.py::test_dot_aa PASSED                                 [ 50%]
+    tests/test_et_dot.py::test_dot_commutative PASSED                        [100%]
+    
+    ============================== 2 passed in 0.01s ===============================
+    
+
+The new test passes as well.
+
+Above we used the :py:meth:`random` module from Python's standard library for
+generating the random numbers that populate the array. Every time we run the test,
+different random numbers will be generated. That makes the test more powerful and
+weaker at the same time. By running the test over and over againg new random arrays will
+be tested, growing our cofidence inour dot product implementations. Suppose,
+however, that all of a sudden thetest fails. What are we going to do? We know that
+something is wrong, but we have no means of investigating the source of the error,
+because the next time we run the test the arrays will be different again and the test may
+succeed again. The test is irreproducible. Fortunateely, that can be fixed by
+setting the seed of the random number generator:
+
+.. code-block:: python
+
+    def test_dot_commutative():
+        # Fix the seed for the random number generator of module random.
+        random.seed(0)
+        # choose array size
+        n = 10
+        # create two arrays of length 10 with zeroes:
+        a = n*[0]
+        b = n*[0]
+        # repeat the test 1000 times:
+        for _ in range(1000):
+            for i in range(10):
+                 a[i] = random.random()
+                 b[i] = random.random()
+        # test commutativity:
+        ab = et_dot.dot(a,b)
+        ba = et_dot.dot(b,a)
+        assert ab==ba
+
+.. code-block:: bash
+
+    > pytest tests -v
+    ============================= test session starts ==============================
+    platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.10.0, pluggy-0.13.1 -- /Users/etijskens/.pyenv/versions/3.8.5/bin/python
+    cachedir: .pytest_cache
+    rootdir: /Users/etijskens/software/dev/workspace/Tutorials/ET-dot
+    collecting ... collected 2 items
+    
+    tests/test_et_dot.py::test_dot_aa PASSED                                 [ 50%]
+    tests/test_et_dot.py::test_dot_commutative PASSED                        [100%]
+    
+    ============================== 2 passed in 0.02s ===============================
+    
+
+The 1000 tests all pass. If, say test 315 would fail, it would fail every time we run it
+and the source of error could be investigated.
+
+Another property is that the dot product of an array of ones with another array is the
+sum of the elements of the other array. Let us add another test for that:
+
+.. code-block:: python
+
+    def test_dot_one():
+        # Fix the seed for the random number generator of module random.
+        random.seed(0)
+        # choose array size
+        n = 10
+        # create two arrays of length 10 with zeroes, resp. ones:
+        a = n*[0]
+        one = n*[1]
+        # repeat the test 1000 times:
+        for _ in range(1000):
+            for i in range(10):
+                 a[i] = random.random()
+        # test:
+        aone = et_dot.dot(a,one)
+        expected = sum(a)
+        assert aone==expected
+
+.. code-block:: bash
+
+    > pytest tests -v
+    ============================= test session starts ==============================
+    platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.10.0, pluggy-0.13.1 -- /Users/etijskens/.pyenv/versions/3.8.5/bin/python
+    cachedir: .pytest_cache
+    rootdir: /Users/etijskens/software/dev/workspace/Tutorials/ET-dot
+    collecting ... collected 3 items
+    
+    tests/test_et_dot.py::test_dot_aa PASSED                                 [ 33%]
+    tests/test_et_dot.py::test_dot_commutative PASSED                        [ 66%]
+    tests/test_et_dot.py::test_dot_one PASSED                                [100%]
+    
+    ============================== 3 passed in 0.02s ===============================
+    
+
+Success again. We are getting quite confident in the correctness of our
+implementation. Here is yet another test:
+
+.. code-block:: python
+
+    def test_dot_one_2():
+        a1 = 1.0e16
+        a   = [a1 , 1.0, -a1]
+        one = [1.0, 1.0, 1.0]
+        # test:
+        aone = et_dot.dot(a,one)
+        expected = 1.0
+        assert aone == expected
+
+Clearly, it is a special case of the test above. The expected result is the sum of the
+elements in ``a``, that is ``1.0``. Yet it - unexpectedly - fails. Fortunately
+pytest_ produces a readable report about the failure:
+
+.. code-block:: bash
+
+    > pytest tests -v
+    ============================= test session starts ==============================
+    platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.10.0, pluggy-0.13.1 -- /Users/etijskens/.pyenv/versions/3.8.5/bin/python
+    cachedir: .pytest_cache
+    rootdir: /Users/etijskens/software/dev/workspace/Tutorials/ET-dot
+    collecting ... collected 4 items
+    
+    tests/test_et_dot.py::test_dot_aa PASSED                                 [ 25%]
+    tests/test_et_dot.py::test_dot_commutative PASSED                        [ 50%]
+    tests/test_et_dot.py::test_dot_one PASSED                                [ 75%]
+    tests/test_et_dot.py::test_dot_one_2 FAILED                              [100%]
+    
+    =================================== FAILURES ===================================
+    ________________________________ test_dot_one_2 ________________________________
+    
+        def test_dot_one_2():
+            a1 = 1.0e16
+            a   = [a1 , 1.0, -a1]
+            one = [1.0, 1.0, 1.0]
+            # test:
+            aone = et_dot.dot(a,one)
+            expected = 1.0
+    >       assert aone == expected
+    E       assert 0.0 == 1.0
+    E         +0.0
+    E         -1.0
+    
+    tests/test_et_dot.py:61: AssertionError
+    =========================== short test summary info ============================
+    FAILED tests/test_et_dot.py::test_dot_one_2 - assert 0.0 == 1.0
+    ========================= 1 failed, 3 passed in 0.05s ==========================
+    
+
+Mathematically, our expectations about the outcome of the test are certainly
+correct. Yet, pytest_ tells us it found that the result is ``0.0`` rather than
+``1.0``. What could possibly be wrong? Well our mathematical expectations are based
+on our assumption that the elements of ``a`` are real numbers. They aren't. The
+elements of ``a`` are floating point numbers, which can only represent a finite
+number of decimal digits. *Double precision* numbers, which are the default
+floating point type in Python, are typically truncated after 16 decimal digits,
+*single precision* numbers after 8. Observe the consequences of this in the Python
+statements below:
+
+.. code-block:: pycon
+
+
+>>>
+    >>> print( 1.0 + 1e16 )
+    1e+16
+    >>> print( 1e16 + 1.0 )
+    1e+16
+    
+
+Because ``1e16`` is a 1 followed by 16 zeroes, adding ``1`` would alter the 17th
+digit,which is, because of the finite precision, not represented. An approximate
+result is returned, namely ``1e16``, which is of by a relative error of only 1e-16.
+
+.. code-block:: pycon
+
+
+>>>
+    >>> print( 1e16 + 1.0 - 1e16 )
+    0.0
+    >>> print( 1e16 - 1e16 + 1.0 )
+    1.0
+    >>> print( 1.0 + 1e16 - 1e16 )
+    0.0
+    
+
+Although each of these expressions should yield ``0.0``, if they were real numbers,
+the result differs because of the finite precision. Python executes the expressions
+from left to right, so they are equivalent to: 
+
+.. code-block:: pycon
+
+    >>> 1e16 + 1.0 - 1e16 = ( 1e16 + 1.0 ) - 1e16 = 1e16 - 1e16 = 0.0
+    >>> 1e16 - 1e16 + 1.0 = ( 1e16 - 1e16 ) + 1.0 = 0.0  + 1.0  = 1.0
+    >>> 1.0 + 1e16 - 1e16 = ( 1.0 + 1e16 ) - 1e16 = 1e16 - 1e16 = 0.0
+
+There are several lessons to be learned from this:
+
+* The test does not fail because our code is wrong, but because our mind is used to
+  reasoning about real number arithmetic, rather than *floating point arithmetic*
+  rules. As the latter is subject to round-off errors, tests sometimes fail
+  unexpectedly. Note that for comparing floating point numbers the the standard
+  library provides a :py:meth:`math.isclose` method.
+
+* Another silent assumption by which we can be mislead is in the random numbers. In fact,
+  :py:meth:`random.random` generates pseudo-random numbers **in the interval
+  ``[0,1[``**, which is quite a bit smaller than ``]-inf,+inf[``. No matter how often
+  we run the test the special case above that fails will never be encountered, which may
+  lead to unwarranted confidence in the code.
+
+So let us fix the failing test using :py:meth:`math.isclose` to account for
+round-off errors by specifying an relative tolerance and negating the condition for
+the original test:
+
+.. code-block:: python
+
+    def test_dot_one_2():
+        a1 = 1.0e16
+        a   = [a1 , 1.0, -a1]
+        one = [1.0, 1.0, 1.0]
+        # test:
+        aone = et_dot.dot(a,one)
+        expected = 1.0
+        assert aone != expected
+        assert math.isclose(result, expected, rel_tol=1e-15)
+
+Another aspect that deserves testing the behavior of the code in exceptional
+circumstances. Does it indeed raise :py:exc:`ArithmeticError` if the arguments
+are not of the same length?
+
+.. code-block:: python
+
+    import pytest
+    
+    def test_dot_unequal_length():
+        a = [1,2]
+        b = [1,2,3]
+        with pytest.raises(ArithmeticError):
+            et_dot.dot(a,b)
+
+Here, :py:meth:`pytest.raises` is a *context manager* that will verify that
+:py:exc:`ArithmeticError` is raise when its body is executed. The test will succeed
+if indeed the code raises :py:exc:`ArithmeticError` and raise
+:py:exc:`AssertionErrorError` if not, causing the test to fail. For an explanation
+fo context managers see `The Curious Case of Python's Context Manager
+<https://rednafi.github.io/digressions/python/2020/03/26/python-contextmanager.html>`_.Note
+that you can easily make :meth:`et_dot.dot` raise other exceptions, e.g.
+:exc:`TypeError` by passing in arrays of non-numeric types:
+
+.. code-block:: pycon
+
+
+>>>
+    >>> import et_dot
+    >>> et_dot.dot([1,2],[1,'two'])
+    Traceback (most recent call last):
+      File "./et_rstor/__init__.py", line 418, in rstor
+        exec(line)
+      File "<string>", line 1, in <module>
+      File "./et_dot/__init__.py", line 22, in dot
+        result += a[i]*b[i]
+    TypeError: unsupported operand type(s) for +=: 'int' and 'str'
+    
+    
+
+Note that it is not the product ``a[i]*b[i]`` for ``i=1`` that is wreaking havoc, but
+the addition of its result to ``d``. Furthermore, Don't bother the link to where the
+error occured in the traceback. It is due to the fact that this course is completely
+generated with Python rather than written by hand).
+
+More tests could be devised, but the current tests give us sufficient confidence. The
+point where you stop testing and move on with the next issue, feature, or project is
+subject to various considerations, such as confidence, experience, problem
+understanding, and time pressure. In any case this is a good point to commit changes
+and additions, increase the version number string, and commit the version bumb as
+well:
+
+.. code-block:: bash
+
+    > git commit -a -m 'dot() tests added'
+    [master 1a702be] dot() tests added
+     1 file changed, 70 insertions(+)
+    
+    > micc2 version -p
+    [INFO]           (ET-dot)> version (0.0.0) -> (0.0.1)
+    
+    > git commit -a -m 'v0.0.1'
+    [master 4003409] v0.0.1
+     2 files changed, 2 insertions(+), 2 deletions(-)
+    
+
+The the ``micc2 version`` flag ``-p`` is shorthand for ``--patch``, and requests
+incrementing the patch (=last) component of the version string, as seen in the
+output. The minor component can be incremented with ``-m`` or ``--minor``, the major
+component with ``-M`` or ``--major``. 
+
+At this point you might notice that even for a very simple and well defined function, as
+the dot product, the amount of test code easily exceeds the amount of tested code by a
+factor of 5 or more. This is not at all uncommon. As the tested code here is an isolated
+piece of code, you will probably leave it alone as soon as it passes the tests and you are
+confident in the solution. If at some point, the :py:meth:`dot` would failyou should
+add a test that reproduces the error and improve the solution so that it passes the
+test.
+
+When constructing software for more complex problems, there will be several
+interacting components and running the tests after modifying one of the components
+will help you assure that all components still play well together, and spot problems
+as soon as possible.
+
+.. _improving-efficiency:
+
+2.2. Improving efficiency
+-------------------------
+
+There are times when a just a correct solution to the problem at hand issufficient. If
+``ET-dot`` is meant to compute a few dot products of small arrays, the naive
+implementation above will probably be sufficient. However, if it is to be used many
+times and for large arrays and the user is impatiently waiting for the answer, or if
+your computing resources are scarse, a more efficient implementation is needed.
+Especially in scientific computing and high performance computing, where compute
+tasks may run for days using hundreds or even thousands of of compute nodes and
+resources are to be shared with many researchers, using the resources efficiently is
+of utmost importance and efficient implementations are therefore indispensable.
+
+However important efficiency may be, it is nevertheless a good strategy for
+developing a new piece of code, to start out with a simple, even naive implementation,
+neglecting efficiency considerations totally, instead focussing on correctness.
+Python has a reputation of being an extremely productive programming language. Once
+you have proven the correctness of this first version it can serve as a reference
+solution to verify the correctness of later more efficient implementations. In
+addition, the analysis of this version can highlight the sources of inefficiency and
+help you focus your attention to the parts that really need it.
+
+.. _timing-code:
+
+2.2.1. Timing your code
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The simplest way to probe the efficiency of your code is to time it: write a simple
+script and record how long it takes to execute. Here's a script that computes the dot
+product of two long arrays of random numbers.
+
+.. code-block:: python
+
+    """File prof/run1.py"""
+    import random
+    from et_dot import dot # the dot method is all we need from et_dot
+    
+    def random_array(n=1000):
+        """Create an array with n random numbers in [0,1[."""
+        # Below we use a list comprehension (a Python idiom for 
+        # creating a list from an iterable object).
+        a = [random.random() for i in range(n)]
+        return a
+    
+    if __name__=='__main__':
+        a = random_array()
+        b = random_array()
+        print(dot(a, b))
+        print("-*# done #*-")
+
+Executing this script yields:
+
+.. code-block:: bash
+
+    > python ./prof/run1.py
+    249.48518687738064
+    -*# done #*-
+    
+
+.. note::
+
+   Every run of this script yields a slightly different outcome because we did not fix
+   ``random.seed()``. It will, however, typically be around 250. Since the average
+   outcome of ``random.random()`` is 0.5, so every entry contributes on average
+   ``0.5*0.5 = 0.25`` and as there are 1000 contributions, that makes on average 250.0.
+
+We are now ready to time our script. There are many ways to achieve this. Here is a
+`particularly good introduction <https://realpython.com/python-timer/>`_.
+The
+`et-stopwatch project <https://et-stopwatch.readthedocs.io/en/latest/readme.html>`_
+takes this a little further. It can be installed in your current Python environment
+with ``pip``:
+
+.. code-block:: bash
+
+    > python -m pip install et-stopwatch
+    Requirement already satisfied: et-stopwatch in /Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages (1.0.5)
+    WARNING: You are using pip version 21.0.1; however, version 21.1.1 is available.
+    You should consider upgrading via the '/Users/etijskens/.pyenv/versions/3.8.5/bin/python -m pip install --upgrade pip' command.
+    
+
+Although ``pip`` is complaining a bit about not being up to date, the installation is
+successful.
+
+To time the script above, modify it as below, using the :py:class:`Stopwatch` class
+as a context manager:
+
+.. code-block:: python
+
+    """File prof/run1.py"""
+    import random
+    from et_dot import dot # the dot method is all we need from et_dot
+    
+    from et_stopwatch import Stopwatch
+    
+    def random_array(n=1000):
+        """Create an array with n random numbers in [0,1[."""
+        # Below we use a list comprehension (a Python idiom for 
+        # creating a list from an iterable object).
+        a = [random.random() for i in range(n)]
+        return a
+    
+    if __name__=='__main__':
+        with Stopwatch(message="init"):
+            a = random_array()
+            b = random_array()
+        with Stopwatch(message="dot "):
+            a_dot_b = dot(a, b)
+        print(a_dot_b)
+        print("-*# done #*-")
+
+and execute it again:
+
+.. code-block:: bash
+
+    > python ./prof/run1.py
+    init : 0.000261 s
+    dot  : 9.4e-05 s
+    248.43786745917475
+    -*# done #*-
+    
+
+When the script is executed each :py:class:`with` block will print the time it takes
+to execute its body. The first :py:class:`with` block times the initialisation of
+the arrays, and the second times the computation of the dot product. Note that the
+initialization of the arrays takes a bit longer than the dot product computation.
+Computing random numbers is expensive.
+
+.. _comparison-numpy:
+
+2.2.2. Comparison to Numpy
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+As said earlier, our implementation of the dot product is rather naive. If you want to
+become a good programmer, you should understand that you are probably not the first
+researcher in need of a dot product implementation. For most linear algebra
+problems, Numpy_ provides very efficient implementations.Below the modified
+:file:`run1.py` script adds timing results for the Numpy_ equivalent of our code.
+
+.. code-block:: python
+
+    """File prof/run1.py"""
+    # ...
+    import numpy as np
+    
+    if __name__=='__main__':
+        with Stopwatch(message="et init"):
+            a = random_array()
+            b = random_array()
+        with Stopwatch(message="et dot "):
+            dot(a,b)
+        with Stopwatch(message="np init"):
+            a = np.random.rand(1000)
+            b = np.random.rand(1000)
+        with Stopwatch(message="np dot "):
+            np.dot(a,b)
+        print("-*# done #*-")
+
+Its execution yields:
+
+.. code-block:: bash
+
+    > python ./prof/run1.py
+    et init : 0.000275 s
+    et dot  : 0.0001 s
+    np init : 6.4e-05 s
+    np dot  : 6e-06 s
+    -*# done #*-
+    
+
+Obviously, numpy does significantly better than our naive dot product
+implementation. It completes the dot product in 7.5% of the time. It is important to
+understand the reasons for this improvement:
+
+* Numpy_ arrays are contiguous data structures of floating point numbers, unlike
+  Python's :py:class:`list` which we have been using for our arrays, so far. In a Python
+  :py:class:`list` object is in fact a pointer that can point to an arbitrary Python
+  object. The items in a Python :py:class:`list` object may even belong to different
+  types. Contiguous memory access is far more efficient. In addition, the memory
+  footprint of a numpy array is significantly lower that that of a plain Python list.
+
+* The loop over Numpy_ arrays is implemented in a low-level programming languange,
+  like C, C++ or Fortran. This allows to make full use of the processors hardware
+  features, such as *vectorization* and *fused multiply-add* (FMA).
+
+.. note::
+
+   Note that also the initialisation of the arrays with numpy is almost 6 times faster,
+   for roughly the same reasons.
+
+.. _conclusion:
+
+2.2.3. Conclusion
+^^^^^^^^^^^^^^^^^
+
+There are three important generic lessons to be learned from this tutorial:
+
+#. Always start your projects with a simple and straightforward implementation which
+   can be easily be proven to be correct, even if you know that it will not satisfy your
+   efficiency constraints. You should use it as a reference solution to prove the
+   correctness of later more efficient implementations.
+
+#. Write test code for proving correctness. Tests must be reproducible, and be run after
+   every code extension or modification to ensure that the changes did not break the
+   existing code.
+
+#. Time your code to understand which parts are time consuming and which not. Optimize
+   bottlenecks first and do not waste time optimizing code that does not contribute
+   significantly to the total runtime. Optimized code is typically harder to read and
+   may become a maintenance issue.
+
+#. Before you write any code, in this case our dot product implementation, spend some
+   time searching the internet to see what is already available. Especially in the field
+   of scientific and high performance computing there are many excellent libraries
+   available which are hard to beat. Use your precious time for new stuff. Consider
+   adding new features to an existing codebase, rather than starting from scratch. It
+   will improve your programming skills and gain you time, even though initially your
+   progress may seem slower. It might also give your code more visibility, and more
+   users, because you provide them with and extra feature on top of something they are
+   already used to.
+
+.. _tutorial-3:
+
+3. Binary extension modules
+===========================
 
 .. _intro-HPPython:
 
-2.1 Introduction - High Performance Python
-------------------------------------------
-Suppose for a moment that Numpy_ did not have a dot product implementation and that
-the implementation provided in Tutorial-1 is way too slow to be practical for your
-research project. Consequently, you are forced to accelarate your dot product code
-in some way or another. There are several approaches for this. Here are a number of
-highly recommended links covering them:
+3.1. Introduction - High Performance Python
+-------------------------------------------
+
+Suppose for a moment that our dot product implementation :py:meth:`et_dot.dot()`
+we developed in tutorial-2` is way too slow to be practical for the research project
+that needs it, and that we did not have access to fast dot product implementations,
+such as :py:meth:`numpy.dot()`. The major advantage we took from Python is that
+coding :py:meth:`et_dot.dot()` was extremely easy, and even coding the tests
+wasn't too difficult. In this tutorial you are about to discover that coding a highly
+efficient replacement for :py:meth:`et_dot.dot()` is not too difficult either.
+There are several approaches for this. Here are a number of highly recommended links
+covering them:
 
 * `Why you should use Python for scientific research <https://developer.ibm.com/dwblog/2018/use-python-for-scientific-research/>`_
+
 * `Performance Python: Seven Strategies for Optimizing Your Numerical Code <https://www.youtube.com/watch?v=zQeYx87mfyw>`_
+
 * `High performance Python 1 <http://www.admin-magazine.com/HPC/Articles/High-Performance-Python-1>`_
+
 * `High performance Python 2 <http://www.admin-magazine.com/HPC/Articles/High-Performance-Python-2>`_
+
 * `High performance Python 3 <http://www.admin-magazine.com/HPC/Articles/High-Performance-Python-3>`_
+
 * `High performance Python 4 <http://www.admin-magazine.com/HPC/Articles/High-Performance-Python-4>`_
 
-Two of the approaches discussed in the *High Performance Python* series involve rewriting
-your code in Modern Fortran or C++ and generate a shared library that can be imported in
-Python just as any Python module. This is exactly the approach taken in important HPC
-Python modules, such as Numpy_, pyTorch_ and pandas_.
-Such shared libraries are called *binary extension modules*. Constructing binary extension
-modules is by far the most scalable and flexible of all current acceleration strategies, as
-these languages are designed to squeeze the maximum of performance out of a CPU.
+Two of the approaches discussed in the *High Performance Python* series involve
+rewriting your code in Modern Fortran or C++ and generate a shared library that can be
+imported in Python just as any Python module. This is exactly the approach taken in
+important HPC Python modules, such as Numpy_, pyTorch_ and pandas_.Such shared
+libraries are called *binary extension modules*. Constructing binary extension
+modules is by far the most scalable and flexible of all current acceleration
+strategies, as these languages are designed to squeeze the maximum of performance
+out of a CPU.
 
-However, figuring out how to build such binary extension modules is a bit of a challenge,
-especially in the case of C++. This is in fact one of the main reasons why Micc_ was designed:
-facilitating the construction of binary extension modules and enabling the developer to create
-high performance tools with ease.
-To that end, Micc_ provides boilerplate code for binary extensions as well a practical wrapper
-around top-notch tools for building the binary extensions from Fortran and C++ source. This
-wrapper is called micc-build_. It uses CMake_ to pass the necessary parameters to the compiler.
-In between the compiler and CMake_ there is a tool that tells how a Python module is to be
-constructed from the source code. For Fortran that is f2py_ (which comes with Numpy_), and
-for C++ it is pybind11_. This is illustrated in the figure below:
+However, figuring out how to build such binary extension modules is a bit of a
+challenge, especially in the case of C++. This is in fact one of the main reasons why
+Micc2_ was designed: facilitating the construction of binary extension modules and
+enabling the developer to create high performance tools with ease. To that end,
+Micc2_ can provide boilerplate code for binary extensions as well a practical
+wrapper for building the binary extension modules, the ``micc2 build`` command.
+This command uses CMake_ to pass the build options to the compiler, while bridging the
+gap between C++ and Fortran, on one hand and Python on the other hand using pybind11_
+and f2py_. respectively. This is illustrated in the figure below:
 
-   .. image:: ../tutorials/im-building.png
+.. include:: ../tutorials/im-building.png
 
-There is a difference in how f2py_ and pybind11_ operate. F2py_ is an *executable* that inspects
-the Fortran source and create wrappers for the subprograms it finds and uses the compiler to
-build the extension module. (The wrappers are in C, so f2py_ needs a C compiler as well).
-Pybind11_ is a *C++ template library* that is used to express what needs to be exposed in the
-binary extension module.
+There is a difference in how f2py_ and pybind11_ operate. F2py_ is an *executable*
+that inspects the Fortran source and create wrappers for the subprograms it finds and
+uses the compiler to build the extension module. (The wrappers are in C, so f2py_ needs
+a C compiler as well). Pybind11_ is a *C++ template library* that is used to express
+the interface between Python and C++.
 
-.. _f90-orr-cpp:
+.. _f90-or-cpp:
 
-2.1.1 Choosing between Fortran and C++ for binary extension modules [intermediate]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    Here are a number of arguments that you may wish to take into account for choosing the
-    programming language for your binary extension modules:
+3.1.1. Choosing between Fortran and C++ for binary extension modules
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    * Fortran is a simpler language than C++.
-    * It is easier to write efficient code in Fortran than C++.
-    * C++ is a general purpose language (as is Python), whereas Fortran is meant for scientific
-      computing. Consequently, C++ is a much more expressive language.
-    * C++ comes with a huge standard library, providing lots of data structures and algorithms
-      that are hard to match in Fortran. If the standard library is not enough, there are also
-      the highly recommended `Boost <https://boost.org>`_ libraries and many other high
-      qualityh domain specific libraries. There are also domain specific libraries in Fortran,
-      but their count differs by an order of magnitude at least.
-    * With Pybind11_ you can almost expose anything from the C++ side to Python, not just
-      functions.
-    * Modern Fortran is (imho) not as good documented as C++. Useful place to look for
-      language features and idioms are:
+Here are a number of arguments that you may wish to take into account for choosing the
+programming language for your binary extension modules:
 
-      * https://www.fortran90.org/
-      * http://www.cplusplus.com/
-      * https://en.cppreference.com/w/
+* Fortran is a simpler language than C++.
 
-    In short, C++ provides much more possibilities, but it is not for the novice.
-    As to my own experience, I discovered that working on projects of moderate complexity
-    I progressed significantly faster using Fortran rather than C++, despite the fact that
-    my knowledge of Fortran is quite limited compared to C++. However, your mileage may vary.
+* It is easier to write efficient code in Fortran than C++.
+
+* C++ is a general purpose language (as is Python), whereas Fortran is meant for
+  scientific computing. Consequently, C++ is a much more expressive language.
+
+* C++ comes with a huge standard library, providing lots of data structures and
+  algorithms that are hard to match in Fortran. If the standard library is not enough,
+  there are also the highly recommended `Boost <https://boost.org>`_ libraries and
+  many other high quality domain specific libraries. There are also domain specific
+  libraries in Fortran, but their count differs by an order of magnitude at least.
+
+* With Pybind11_ you can almost expose anything from the C++ side to Python, and vice
+  versa, not just functions.
+
+* Modern Fortran is (imho) not as good documented as C++. Useful places to look for
+  language features and idioms are:
+
+    * Fortran: https://www.fortran90.org/
+
+    * C++: http://www.cplusplus.com/
+
+    * C++: https://en.cppreference.com/w/
+
+In short, C++ provides much more possibilities, but it is not for the novice. As to my
+own experience, I discovered that working on projects of moderate complexity I
+progressed significantly faster using Fortran rather than C++, despite the fact
+that my knowledge of Fortran is quite limited compared to C++. However, your mileage
+may vary.
 
 .. _add-bin-ext:
 
-2.2 Adding Binary extensions to a Micc_ project
------------------------------------------------
+3.2. Adding Binary extensions to a Micc2_ project
+-------------------------------------------------
 
-Adding a binary extension to your current project is as simple as::
+Adding a binary extension to your current project is simple. To add a binary extension
+'foo' written in (Modern) Fortran, run:
 
-    > micc add foo --f90   # add a binary extension 'foo' written in (Modern) Fortran
-    ...
-    > micc add bar --cpp   # add a binary extension 'bar' written in C++
-    ...
+.. code-block:: bash
 
-You can add as many binary extensions to your code as you want. However, the project
-must have a *package* structure (see :ref:`modules-and-packages` for how to convert
-a project with a *module* structure). Micc_ puts the source files for the foo Fortran
-binary extension in subdirectory :file:`f90_foo` of the package directory, and for the
-C++ binary extension in subdirectory :file:`cpp_bar` of the package directory.
+    > micc add foo --f90
 
-Enter your own code in the generated source code files. The output of the ``micc add``
-commands will have a line like::
+and for a C++ binary extension, run:
 
-    [INFO]               - Fortran source in       <my_project>/<my_package>/f90_foo/foo.f90.
+.. code-block:: bash
 
-or::
+    > micc add bar --cpp
 
-    [INFO]               - C++ source in       <my_project>/<my_package>/cpp_bar/bar.cpp.
+The ``add`` subcommand adds a component to your project. It specifies a name, here,
+``foo``, and a flag to specify the kind of the component, ``--f90`` for a Fortran
+binary extension module, ``--cpp`` for a C++ binary extension module. Other
+components are a Python sub-module with module structure (``--module``), or
+package structure ``--package``, and a CLI script (`--cli` and `--clisub`). More
+details about these other components are found in :ref:`tutorial-4`.
 
-where ``<my_project>`` is the project directory and ``<my_package>`` is the package directory.
+You can add as many components to your code as you want. However, the project must have a
+*package* structure (see :ref:`modules-and-packages` for how to convert a project
+with a *module* structure).
 
-This tells you where to add your code. After entering yor code, activate your project's virtual
-environment, and run ``micc-build``::
+The binary modules are build with the ``micc2 build`` command. This build allbinary
+extension modules in the project. To only build the ``foo`` binary extension use the
+``-m`` flag and specify the module to build:
 
-   > source .venv/bin/activate
-   (.venv) > micc-build
-   ...                      # a lot of output
+.. code-block:: bash
 
-If there are no syntax errors all your binary extensions will be built, and you
-will be able to import the  modules :py:mod:`foo` and :py:mod:`bar` in your
-project and use their subroutines and functions. Because :py:mod:`foo` and
-:py:mod:`bar` are submodules of your micc_ project, you must import them as::
+    > micc2 build -m foo
+
+As Micc2_ always creates complete working examples you can build the binary
+extensions right away and run their tests with pytest_
+
+If there are no syntax errors the binary extensions will be built, and you will be able
+to import the modules :py:mod:`foo` and :py:mod:`bar` in your project scripts and
+use their subroutines and functions. Because :py:mod:`foo` and :py:mod:`bar` are
+submodules of your micc_ project, you must import them as:
+
+.. code-block:: 
 
     import my_package.foo
     import my_package.bar
-
+    
     # call foofun in my_package.foo
     my_package.foo.foofun(...)
-
+    
     # call barfun in my_package.bar
     my_package.bar.barfun(...)
 
-Now that the general principles are laid out, we can go into the details.
+.. _micc2-build-options:
 
-.. _micc-build-options:
+3.2.1. Build options
+^^^^^^^^^^^^^^^^^^^^
 
-2.2.3 micc-build options
-^^^^^^^^^^^^^^^^^^^^^^^^
-
-Here is an overview of micc-build options. The most interesting options are:
-
-    * ``-m <module-to-build>``: build only the specified module, as opposed to
-      all binary extension modules in the project
-    * ``-b <build-type>``: build a ``<build-type>`` version, default=``RELEASE``,
-      otherwise ``DEBUG``, MINSIZEREL, ``RELWITHDEBINFO``.
-    * ``--clean``: perform a clean build
+Here is an overview of ``micc2 build`` options:
 
 .. code-block:: bash
 
-    > micc-build --help
-    Usage: micc-build [OPTIONS]
-
-      Build binary extension libraries (f90 and cpp modules).
-
+    > micc2 build --help
+    Usage: micc2 build [OPTIONS]
+    
+      Build binary extensions.
+    
     Options:
-      -v, --verbosity          The verbosity of the program.
-      -p, --project-path PATH  The path to the project directory. The default is
-                               the current working directory.
-
-      -m, --module TEXT        Build only this module. The module kind prefix
-                               (``cpp_`` for C++ modules, ``f90_`` for Fortran
-                               modules) may be omitted.
-
-      -b, --build-type TEXT    build type: any of the standard CMake build types:
-                               DEBUG, MINSIZEREL, RELEASE, RELWITHDEBINFO.
-
-      --clean                  Perform a clean build.
-      --cleanup                Cleanup build directory after successful build.
-      --version                Show the version and exit.
-      --help                   Show this message and exit.
+      -m, --module TEXT      Build only this module. The module kind prefix
+                             (``cpp_`` for C++ modules, ``f90_`` for Fortran
+                             modules) may be omitted.
+      -b, --build-type TEXT  build type: any of the standard CMake build types:
+                             DEBUG, MINSIZEREL, RELEASE*, RELWITHDEBINFO.
+      --clean                Perform a clean build, removes the build directory
+                             before the build.
+      --cleanup              Cleanup remove the build directory after a successful
+                             build.
+      --help                 Show this message and exit.
+    
 
 .. _building-f90:
 
-2.3 Building binary extensions from Fortran
--------------------------------------------
-Let us add a binary extension module for a dot product version written in Fortran.
-First, we verify that our ``ET-dot`` project has a package structure (assuming that
-the current working directory is the project directory :file:`ET-dot`)::
+3.3. Building binary extension modules from Fortran
+---------------------------------------------------
 
-    > micc info
-    Project ET-dot located at /home/bert/software/workspace/ET-dot
-      package: et_dot
-      version: 0.0.0
-      structure: et_dot/__init__.py (Python package)
-    >
-
-If the last line reads::
-
-   ...
-     structure: et_dot.py (Python module)
-
-you must convert the project::
-
-     > micc convert-to-package --overwrite
-     ...
-
-(See :ref:`modules-and-packages` for details).
-
-We are now ready to create a f90 module for a Fortran implementation of the
-dot product, say ``dotf``, where the ``f``, obviously, is for Fortran::
-
-    > micc add dotf --f90
-    [INFO]           [ Adding f90 module dotf to project ET-dot.
-    [INFO]               - Fortran source in       ET-dot/et_dot/f90_dotf/dotf.f90.
-    [INFO]               - Build settings in       ET-dot/et_dot/f90_dotf/CMakeLists.txt.
-    [INFO]               - Python test code in     ET-dot/tests/test_f90_dotf.py.
-    [INFO]               - module documentation in ET-dot/et_dot/f90_dotf/dotf.rst (in restructuredText format).
-    [WARNING]            Dependencies added. Run \'poetry update\' to update the project\'s virtual environment.
-    [INFO]           ] done.
-
-The output tells us where to enter the Fortran source code, the test code and the documentation.
-These files contain already working example code.
-
-The warning in the output above tells us that micc_ added some development dependencies
-to our project. These dependencies provide the machinery to build binary extension
-modules and must be installed in the virtual environment of our project. The easy
-way to do this is by running ``poetry install`` as is mentioned in the warning.
-The former will install missing dependencies, the latter will get the latest
-version of all dependencies and install them.
+So, in order to implement a more efficient dot product, let us add a Fortran binary
+extension module with name ``dotf``:
 
 .. code-block:: bash
 
-    > poetry install
-    Updating dependencies
-    Resolving dependencies... (15.1s)
+    > micc2 add dotf --f90
+    [INFO]           [ Adding f90 module dotf to project ET-dot.
+    [INFO]               - Fortran source in       ET-dot/et_dot/f90_dotf/dotf.f90.
+    [INFO]               - build settings in       ET-dot/et_dot/f90_dotf/CMakeLists.txt.
+    [INFO]               - Python test code in     ET-dot/tests/test_f90_dotf.py.
+    [INFO]               - module documentation in ET-dot/et_dot/f90_dotf/dotf.rst (restructuredText format).
+    [INFO]           ] done.
+    
 
-    Writing lock file
+The command now runs successfully, and the output tells us where to enter the Fortran
+source code, the build settings, the test code and the documentation of the added
+module. Everything related to the :file:`dotf` sub-module is in subdirectory
+:file:`ET-dot/et_dot/f90_dotf`. That directory has a ``f90_`` prefix indicating
+that it relates to a Fortran binary extension module. As useal, these files contain
+already working example code that you an inspect to learn how things work.
 
-    Package operations: 18 installs, 1 update, 0 removals
-
-      • Installing python-dateutil (2.8.1)
-      • Installing arrow (0.17.0)
-      • Installing soupsieve (2.1)
-      • Installing text-unidecode (1.3)
-      • Installing beautifulsoup4 (4.9.3)
-      • Installing binaryornot (0.4.4)
-      • Installing jinja2-time (0.2.0)
-      • Installing poyo (0.5.0)
-      • Installing python-slugify (4.0.1)
-      • Installing cookiecutter (1.7.2)
-      • Installing pypi-simple (0.8.0)
-      • Installing semantic-version (2.8.5)
-      • Updating sphinx-rtd-theme (0.5.1 -> 0.4.3)
-      • Installing tomlkit (0.5.11)
-      • Installing walkdir (0.4.1)
-      • Installing et-micc2 (1.0.12)
-      • Installing numpy (1.19.5)
-      • Installing pybind11 (2.6.1)
-      • Installing et-micc2-build (1.0.12)
-
-    Installing the current project: ET-dot (0.0.6)
-
-In fact the only dependency added in :file:`pyproject.toml` was micc-build_,
-but that depends on numpy, pybind11 and et-micc2, which in turn have their own
-sub-dependencies, all of which are nicely resolved by poetry_ and installed.
-Although micc-build_ also needs CMake_, it is not added as dependency of micc-build_>
-In view of the widespread use of CMake_, it was considered better have a system-wide
-CMake installation (see section :ref:`development-environment`).
-
-The dependency of :file:`et-micc2-build` on :file:`et-micc2` makes that ``micc`` is now
-also installed in the project's virtual environment. Therefore, when the project's
-virtual environment is activated, the active ``micc`` is the one in the project's
-virtual environment, which might be a more recent version than the system-wide micc::
-
-    > source .venv/bin/activate
-    (.venv) > which micc
-    path/to/ET-dot/.venv/bin/micc
-    (.venv) >
-
-If you do not want to use poetry_ to install the dependencies, you can lookup the
-dependencies in :file:`pyproject.toml`, see that there is only ``et-micc2-build``,
-and run ``pip install et-micc2-build`` in the Python environment you want to use
-for your project development. (Using a virtual environment is good practise, see
-:ref:`virtual-environments`).
-
-Let's continue our development of a Fortran version of the dot product. Replace the
-existing code in the Fortran source file :file:`ET-dot/et_dot/f90_dotf/dotf.f90`
-(using your favourite editor or an IDE) with:
+Let's continue our development of a Fortran version of the dot product. Open file
+:file:`ET-dot/et_dot/f90_dotf/dotf.f90` in your favorite editor or IDE and
+replace the existing example code in the Fortran source file with:
 
 .. code-block:: fortran
 
-   function dotf(a,b,n)
-     ! Compute the dot product of a and b
-     !
-       implicit none
-     !-------------------------------------------------------------------------------------------------
-       integer*4              , intent(in)    :: n
-       real*8   , dimension(n), intent(in)    :: a,b
-       real*8                                 :: dotf
-     !-------------------------------------------------------------------------------------------------
-     ! declare local variables
-       integer*4 :: i
-     !-------------------------------------------------------------------------------------------------
-       dotf = 0.
-       do i=1,n
-           dotf = dotf + a(i) * b(i)
-       end do
-   end function dotf
-
-The binary extension module can now be built by running ``micc-build``. This produces
-a lot of output, most of which is omitted here, except for the build settings discovered
-by CMake_::
-
-    [INFO] [ Building f90 module 'dotf':
-    [INFO]           --clean: shutil.removing('/Users/etijskens/software/dev/workspace/ET-dot/et_dot/f90_dotf/_cmake_build').
-    [DEBUG]          [ > cmake -D PYTHON_EXECUTABLE=/Users/etijskens/software/dev/workspace/ET-dot/.venv/bin/python -D CMAKE_BUILD_TYPE=RELEASE ..    ...
-    ...
-                       # Build settings ###################################################################################
-                       CMAKE_Fortran_COMPILER: /usr/local/bin/gfortran
-                       CMAKE_BUILD_TYPE      : RELEASE
-                       F2PY_opt              : --opt='-O3'
-                       F2PY_arch             :
-                       F2PY_f90flags         :
-                       F2PY_debug            :
-                       F2PY_defines          : -DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION;-DF2PY_REPORT_ON_ARRAY_COPY=1;-DNDEBUG
-                       F2PY_includes         :
-                       F2PY_linkdirs         :
-                       F2PY_linklibs         :
-                       module name           : dotf.cpython-38-darwin.so
-                       module filepath       : /Users/etijskens/software/dev/workspace/ET-dot/et_dot/f90_dotf/_cmake_build/dotf.cpython-38-darwin.so
-                       source                : /Users/etijskens/software/dev/workspace/ET-dot/et_dot/f90_dotf/dotf.f90
-                       python executable     : /Users/etijskens/software/dev/workspace/ET-dot/.venv/bin/python [version=Python 3.8.5]
-                         f2py executable     : /Users/etijskens/software/dev/workspace/ET-dot/.venv/bin/f2py [version=2]
-                       ####################################################################################################
-    ...
-
-    [INFO] ] done.
-    [INFO]           Binary extensions built successfully:
-    [INFO]           - /Users/etijskens/software/dev/workspace/ET-dot/et_dot/dotf.cpython-38-darwin.so
-    (.venv) >
-
-At the end of the output is a summary of all binary extensions that have been built, or
-failed to build. If the source file does not have any syntax errors, you will see a file like
-:file:`dotf.cpython-38-darwin.so` in directory :file:`ET-dot/et_dot`, Its extension depends on
-the Python version (c.q. 3.8) you are using, and on your operating system (c.q. MacOS).
-
-.. code-block:: bash
-
-    (.venv) > ls -l et_dot
-    total 8
-    -rw-r--r--  1 etijskens  staff  720 Dec 13 11:04 __init__.py
-    drwxr-xr-x  6 etijskens  staff  192 Dec 13 11:12 f90_dotf/
-    lrwxr-xr-x  1 etijskens  staff   92 Dec 13 11:12 dotf.cpython-38-darwin.so
-
-This file is the binary extension module, which can be imported like any other Python module.
-
-Since our binary extension is built, we can test it. Here is some test code. Enter it in file
-:file:`ET-dot/tests/test_f90_dotf.py`:
-
-.. code-block:: python
-
-    import numpy as np
-    # import the binary extension and rename the module locally as f90
-    import et_dot
-    #create alias to dotf binary extension module
-    f90 = et_dot.dotf
-
-    def test_dotf_aa():
-        a = np.array([0,1,2,3,4],dtype=np.float)
-        expected = np.dot(a,a)
-        # call the dotf function in the binary extension module:
-        a_dotf_a = f90.dotf(a,a)
-        assert a_dotf_a==expected
-
-The astute reader will notice the magic that is happening here: *a* is a numpy array,
-which is passed as is to our :py:meth:`et_dot.dotf.dotf` function in our binary extension.
-An invisible wrapper function will check the types of the numpy arrays, retrieve pointers
-to the memory of the numpy arrays, as well as the length of the arrays, and feed these
-into our Fortran function, which computes the dot product. Next, the wrapper creates a
-Python object and stores the outcome of computation in it, which is finally assigened to
-the Python variable :py:obj:`a_dotf_a. If you look carefully at the output of ``micc-build``,
-you will see information about the wrappers that ``f2py`` constructed. These wrappers are
-generated by f2py_ in C code, and thus it needs a C compiler, in addition to the Fortran
-compiler for compilin our :file:`dotf.f90`.
-
-Passing Numpy arrays directly to Fortran routines is *extremely productive*.
-Many useful Python packages use numpy_ for arrays, vectors, matrices, linear algebra, etc.
-Being able to pass Numpy arrays directly into your own number crunching routines
-relieves you from conversion between array types. In addition you can do the memory
-management of your arrays and their initialization most conveniently in Python.
-
-As you can see we test the outcome of dotf against the outcome of :py:meth:`numpy.dot`.
-We thrust that outcome, but beware that this test may be susceptible to round-off error
-because the representation of floating point numbers in Numpy and in Fortran may differ
-slightly.
-
-Here is the outcome of ``pytest``:
-
-.. code-block:: bash
-
-   > pytest
-   ================================ test session starts =================================
-   platform darwin -- Python 3.7.4, pytest-4.6.5, py-1.8.0, pluggy-0.13.0
-   rootdir: /Users/etijskens/software/dev/workspace/ET-dot
-   collected 8 items
-
-   tests/test_et_dot.py .......                                                   [ 87%]
-   tests/test_f90_dotf.py .                                                       [100%]
-
-   ============================== 8 passed in 0.16 seconds ==============================
-   >
-
-All our tests passed. Of course we can extend the tests in the same way as we did for the
-naive Python implementation in the previous tutorial. We leave that as an exercise to the
-reader.
-
-The way in which we accessed the binary extension module in the test code:
-
-.. code-block:: python
-
-    import et_dot
-    #create alias to dotf binary extension module
-    f90 = et_dot.dotf
-
-is only possible because micc_ has taken care for us that the file :file:`et_dot/__init__.py`
-imports the binary extension module :file:`dotf`:
-
-.. code-block:: python
-
-    import et_dot.dotf
-
-In fact, micc_ added a little magic to automatically build the binary extension module
-if it cannot be found.
-
-.. _f90-modules:
-
-2.3.1 Fortran modules [intermediate]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    This may be a bit confusing, as we have been talking about Python modules, so far.
-    Fortran also has *modules*, to group things that belong together. So, these modules
-    are something different than the binary extension modules written in Fortran, which
-    are in fact Python modules.
-    If you put your subroutines and functions inside a Fortran module, that is in a
-    ``MODULE/END MODULE`` block, as in:
-
-    .. code-block:: fortran
-
-        MODULE my_f90_module
+    function dot(a,b,n)
+      ! Compute the dot product of a and b
         implicit none
-        contains
-          function dot(a,b)
-            ...
-          end function dot
-        END MODULE my_f90_module
+      !
+      !-----------------------------------------------
+        integer*4              , intent(in)    :: n
+        real*8   , dimension(n), intent(in)    :: a,b
+        real*8                                 :: dot
+      ! declare local variables
+        integer*4 :: i
+      !-----------------------------------------------
+        dot = 0.
+        do i=1,n
+            dot = dot + a(i) * b(i)
+        end do
+    end function dot
 
-    then f2py will expose the Fortran module name :py:obj:`my_f90_module`
-    which in turn contains the function/subroutine names:
-
-    .. code-block:: Python
-
-        >>> import et_dot
-        >>> a = [1.,2.,3.]
-        >>> b = [2.,2.,2.]
-        >>> et_dot.dot(a,b) # this is the python version of the dot product
-        12
-        >>> et_dot.dotf.my_F90_module.dotf(a,b)
-        created an array from object
-        created an array from object
-        12.0
-
-    Note, the ``created an array from object`` warnings that appear when calling the
-    Fortran version of the dot product :py:obj:`dotf`. As :py:obj:`a` and :py:obj:`b` are
-    Python lists and not numpy arrays, the wrapper of ``dotf`` that was created by f2py_
-    has performed a conversion. Though this is sometimes practical, it comes at a cost:
-    a numpy array has to be created and the data in the :py:obj:`lists` are copied to
-    the numpy array which is passed to the Fortran function. When the computation is
-    done the numpy arrays are destroyed. Micc_ instructs f2py_ to issue warnings when
-    potentially expensensive copy operations are performed by specifying the
-    ``F2PY_REPORT_ON_ARRAY_COPY=1`` flag (see the build settings in the output of the
-    ``micc-build`` command.
-
-    If you are bothered by having to type ``et_dot.dotf.my_f90_module.`` every time,
-    use this Python trick, which creates an alias for the Fortran object
-    ``et_dot.dotf.my_f90_module``:
-
-    .. code-block:: Python
-
-        >>> import et_dot
-        >>> f90 = et_dot.dotf.my_f90_module
-        >>> f90.dotf(a,b)
-        12.0
-
-    You can eve create an alias for the :py:obj:`dotf` function itself:
-
-    .. code-block:: Python
-
-        >>> import et_dot
-        >>> dotf = et_dot.dotf.my_f90_module.dotf
-        >>> dotf(a,b)
-        12.0
-
-.. _control-build-f90:
-
-2.3.2 Controlling the build [intermediate]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-    The build parameters for our Fortran binary extension module are detailed in
-    the file :file:`et_dot/f90_dotf/CMakeLists.txt`. It is a rather lengthy file,
-    but most of it is boilerplate code which you should not need to touch. The
-    boilerplate sections are clearly marked. By default this file specifies that
-    a release version is to be built. The file documents a set of CMake variables
-    that can be used to control the build type:
-
-    * CMAKE_BUILD_TYPE : DEBUG | MINSIZEREL | RELEASE* | RELWITHDEBINFO
-    * F2PY_noopt : turn off optimization options
-    * F2PY_noarch : turn off architecture specific optimization options
-    * F2PY_f90flags : additional compiler options
-    * F2PY_arch : architecture specific optimization options
-    * F2PY_opt : optimization options
-
-    In addition you can specify
-
-    * preprocessor macro definitions
-    * include directories
-    * link directories
-    * link libraries
-
-    Here are the sections of :file:`CMakeLists.txt` to control the build. Uncomment
-    the parts you need and modify them to your needs.
-
-    .. code-block:: cmake
-
-        ...
-        # Set the build type:
-        #  - If you do not specify a build type, it is RELEASE by default.
-        #  - Note that the DEBUG build type will trigger f2py's '--noopt --noarch --debug' options.
-        # set(CMAKE_BUILD_TYPE DEBUG | MINSIZEREL | RELEASE | RELWITHDEBINFO)
-
-        #<< begin boilerplate code
-            ...
-        #>> end boilerplate code
-
-        ##################################################################################
-        ####################################################### Customization section ####
-        # Specify compiler options #######################################################
-        # Uncomment to turn off optimization:
-        # set(F2PY_noopt 1)
-
-        # Uncomment to turn off architecture specific optimization:
-        # set(F2PY_noarch 1)
-
-        # Set additional f90 compiler flags:
-        # set(F2PY_f90flags your_flags_here)
-
-        # Set architecture specific optimization compiler flags:
-        # set(F2PY_arch your_flags_here)
-
-        # Overwrite optimization flags
-        # set(F2PY_opt your_flags_here)
-
-        # Add preprocessor macro definitions ###############################################################
-        # add_compile_definitions(
-        #     OPENFOAM=1912                     # set value
-        #     WM_LABEL_SIZE=$ENV{WM_LABEL_SIZE} # set value from environment variable
-        #     WM_DP                             # just define the macro
-        # )
-
-        # Add include directories ##########################################################################
-        # include_directories(
-        #     path/to/dir1
-        #     path/to/dir2
-        # )
-
-        # Add link directories #############################################################################
-        # link_directories(
-        #     path/to/dir1
-        # )
-
-        # Add link libraries (lib1 -> liblib1.so) ##########################################################
-        # link_libraries(
-        #     lib1
-        #     lib2
-        # )
-        ####################################################################################################
-
-        # only boilerplate code below
-        ...
-
-.. _building-cpp:
-
-2.4 Building binary extensions from C++
----------------------------------------
-To illustrate building binary extension modules from C++ code, let us also create a
-C++ implementation for the dot product. Such modules are called *cpp modules*.
-Analogously to our :py:mod:`dotf` module we will call the cpp module :py:mod:`dotc`,
-the ``c`` referring to C++.
-
-Use the ``micc add`` command to add a cpp module:
+The binary extension module can now be built by running ``micc2 build``. This
+produces a lot of output, which comes from cmake, f2py and the compilation process:
 
 .. code-block:: bash
 
-    > micc add dotc --cpp
-    [INFO]           [ Adding cpp module dotc to project ET-dot.
-    [INFO]               - C++ source in           ET-dot/et_dot/cpp_dotc/dotc.cpp.
-    [INFO]               - build settings in       ET-dot/et_dot/cpp_dotc/CMakeLists.txt.
-    [INFO]               - module documentation in ET-dot/et_dot/cpp_dotc/dotc.rst (in restructuredText format).
-    [INFO]               - Python test code in     ET-dot/tests/test_cpp_dotc.py.
-    [INFO]           ] done.
-
-The output explains you where to add the C++ source code, the test code and the
-documentation.  Note that this time there is no warning about dependencies being
-added, because we took already care of that when we added the Fortran module
-:py:mod:`dotf` above (see :ref:`building-f90`).
-
-Micc_ uses pybind11_ to create wrappers for C++ functions. This
-is by far the most practical choice for this (see
-https://channel9.msdn.com/Events/CPP/CppCon-2016/CppCon-2016-Introduction-to-C-python-extensions-and-embedding-Python-in-C-Apps
-for a good overview of this topic). It has a lot of 'automagical' features, and
-it is a header-only C++ library.
-`Boost.Python <https://www.boost.org/doc/libs/1_70_0/libs/python/doc/html/index.html>`_
-offers very similar features, but is not header-only and its library depends on
-the python version you want to use - so you need a build a  different library for every
-Python version you want to use.
-
-Enter this code in the C++ source file :file:`ET-dot/et_dot/cpp_dotc/dotc.cpp`
-
-.. code-block:: c++
-
-   #include <pybind11/pybind11.h>
-   #include <pybind11/numpy.h>
-
-   double
-   dotc( pybind11::array_t<double> a
-       , pybind11::array_t<double> b
-       )
-   {
-       auto bufa = a.request()
-          , bufb = b.request()
-          ;
-    // verify dimensions and shape:
-       if( bufa.ndim != 1 || bufb.ndim != 1 ) {
-           throw std::runtime_error("Number of dimensions must be one");
-       }
-       if( (bufa.shape[0] != bufb.shape[0]) ) {
-           throw std::runtime_error("Input shapes must match");
-       }
-    // provide access to raw memory
-    // because the Numpy arrays are mutable by default, py::array_t is mutable too.
-    // Below we declare the raw C++ arrays for x and y as const to make their intent clear.
-       double const *ptra = static_cast<double const *>(bufa.ptr);
-       double const *ptrb = static_cast<double const *>(bufb.ptr);
-
-       double d = 0.0;
-       for (size_t i = 0; i < bufa.shape[0]; i++)
-           d += ptra[i] * ptrb[i];
-
-       return d;
-   }
-
-   // describe what goes in the module
-   PYBIND11_MODULE(dotc, m) // m is variable, holding the module description
-                            // dotc is the module's name
-   {// optional module docstring:
-       m.doc() = "pybind11 dotc plugin";
-    // list the functions you want to expose:
-    // m.def("exposed_name", function_pointer, "doc-string for the exposed function");
-       m.def("dotc", &dotc, "The dot product of two arrays 'a' and 'b'.");
-   }
-
-Obviously the C++ source code is more involved than its Fortran equivalent in the
-previous section. This is because f2py_ is a program performing clever introspection
-into the Fortran source code, whereas pybind11_ is "nothing" but a C++ template library.
-As such it is not capable of introspection and the user is obliged to use
-pybind11_ for accessing the arguments passed in by Python. At the cost of being more
-verbose, it is more flexible.
-
-We can now build the module. Because we do not want to rebuild the :py:mod:`dotf` module
-we add ``-m dotc`` to the command line, to indicate that only module :py:mod:`dotc` must
-be built::
-
-
-    (.venv) > micc build -m dotc
-    [INFO] [ Building cpp module 'dotc':
-    [DEBUG]          [ > cmake -D PYTHON_EXECUTABLE=/Users/etijskens/software/dev/workspace/ET-dot/.venv/bin/python -D pybind11_DIR=/Users/etijskens/software/dev/workspace/ET-dot/.venv/lib/python3.8/site-packages/pybind11/share/cmake/pybind11 -D CMAKE_BUILD_TYPE=RELEASE ..
+    > micc2 build --clean
+    [INFO] [ Building f90 module 'dotf':
+    [DEBUG]          [ > cmake -D PYTHON_EXECUTABLE=/Users/etijskens/.pyenv/versions/3.8.5/bin/python ..
     [DEBUG]              (stdout)
-                           -- Found pybind11: /Users/etijskens/software/dev/workspace/ET-dot/.venv/lib/python3.8/site-packages/pybind11/include (found version "2.6.1" )
+                           -- The Fortran compiler identification is GNU 10.2.0
+                           -- Checking whether Fortran compiler has -isysroot
+                           -- Checking whether Fortran compiler has -isysroot - yes
+                           -- Checking whether Fortran compiler supports OSX deployment target flag
+                           -- Checking whether Fortran compiler supports OSX deployment target flag - yes
+                           -- Detecting Fortran compiler ABI info
+                           -- Detecting Fortran compiler ABI info - done
+                           -- Check for working Fortran compiler: /usr/local/bin/gfortran - skipped
+                           -- Checking whether /usr/local/bin/gfortran supports Fortran 90
+                           -- Checking whether /usr/local/bin/gfortran supports Fortran 90 - yes
+                           
+                           # Build settings ###################################################################################
+                           CMAKE_Fortran_COMPILER: /usr/local/bin/gfortran
+                           CMAKE_BUILD_TYPE      : RELEASE
+                           F2PY_opt              : --opt='-O3'
+                           F2PY_arch             : 
+                           F2PY_f90flags         : 
+                           F2PY_debug            : 
+                           F2PY_defines          : -DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION;-DF2PY_REPORT_ON_ARRAY_COPY=1;-DNDEBUG
+                           F2PY_includes         : 
+                           F2PY_linkdirs         : 
+                           F2PY_linklibs         : 
+                           module name           : dotf.cpython-38-darwin.so
+                           module filepath       : /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/dotf.cpython-38-darwin.so
+                           source                : /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/dotf.f90
+                           python executable     : /Users/etijskens/.pyenv/versions/3.8.5/bin/python [version=Python 3.8.5]
+                             f2py executable     : /Users/etijskens/.pyenv/versions/3.8.5/bin/f2py [version=2]
+                           ####################################################################################################
                            -- Configuring done
                            -- Generating done
-                           -- Build files have been written to: /Users/etijskens/software/dev/workspace/ET-dot/et_dot/cpp_dotc/_cmake_build
-    [DEBUG]              (stderr)
-                           pybind11_DIR : /Users/etijskens/software/dev/workspace/ET-dot/.venv/lib/python3.8/site-packages/pybind11/share/cmake/pybind11
+                           -- Build files have been written to: /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build
     [DEBUG]          ] done.
     [DEBUG]          [ > make
     [DEBUG]              (stdout)
-                           Scanning dependencies of target dotc
-                           [ 50%] Building CXX object CMakeFiles/dotc.dir/dotc.cpp.o
-                           [100%] Linking CXX shared module dotc.cpython-38-darwin.so
-                           [100%] Built target dotc
+                           [100%] Generating dotf.cpython-38-darwin.so
+                           running build
+                           running config_cc
+                           unifing config_cc, config, build_clib, build_ext, build commands --compiler options
+                           running config_fc
+                           unifing config_fc, config, build_clib, build_ext, build commands --fcompiler options
+                           running build_src
+                           build_src
+                           building extension "dotf" sources
+                           f2py options: []
+                           f2py:> /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotfmodule.c
+                           creating /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8
+                           Reading fortran codes...
+                           	Reading file '/Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/dotf.f90' (format:free)
+                           Post-processing...
+                           	Block: dotf
+                           			Block: dot
+                           Post-processing (stage 2)...
+                           Building modules...
+                           	Building module "dotf"...
+                           		Creating wrapper for Fortran function "dot"("dot")...
+                           		Constructing wrapper function "dot"...
+                           		  dot = dot(a,b,[n])
+                           	Wrote C/API module "dotf" to file "/Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotfmodule.c"
+                           	Fortran 77 wrappers are saved to "/Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotf-f2pywrappers.f"
+                             adding '/Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/fortranobject.c' to sources.
+                             adding '/Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8' to include_dirs.
+                           copying /Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages/numpy/f2py/src/fortranobject.c -> /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8
+                           copying /Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages/numpy/f2py/src/fortranobject.h -> /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8
+                             adding '/Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotf-f2pywrappers.f' to sources.
+                           build_src: building npy-pkg config files
+                           running build_ext
+                           customize UnixCCompiler
+                           customize UnixCCompiler using build_ext
+                           get_default_fcompiler: matching types: '['gnu95', 'nag', 'absoft', 'ibm', 'intel', 'gnu', 'g95', 'pg']'
+                           customize Gnu95FCompiler
+                           Found executable /usr/local/bin/gfortran
+                           Found executable /usr/local/bin/gfortran
+                           customize Gnu95FCompiler
+                           customize Gnu95FCompiler using build_ext
+                           building 'dotf' extension
+                           compiling C sources
+                           C compiler: clang -Wno-unused-result -Wsign-compare -Wunreachable-code -DNDEBUG -g -fwrapv -O3 -Wall -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include
+                           
+                           creating /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/Users
+                           creating /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens
+                           creating /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software
+                           creating /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev
+                           creating /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace
+                           creating /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/Tutorials
+                           creating /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/Tutorials/ET-dot
+                           creating /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot
+                           creating /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf
+                           creating /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build
+                           creating /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8
+                           compile options: '-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION -DF2PY_REPORT_ON_ARRAY_COPY=1 -DNDEBUG -DNPY_DISABLE_OPTIMIZATION=1 -I/Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8 -I/Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages/numpy/core/include -I/Users/etijskens/.pyenv/versions/3.8.5/include/python3.8 -c'
+                           clang: /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotfmodule.c
+                           clang: /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/fortranobject.c
+                           /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotfmodule.c:144:12: warning: unused function 'f2py_size' [-Wunused-function]
+                           static int f2py_size(PyArrayObject* var, ...)
+                                      ^
+                           1 warning generated.
+                           compiling Fortran sources
+                           Fortran f77 compiler: /usr/local/bin/gfortran -Wall -g -ffixed-form -fno-second-underscore -fPIC -O3
+                           Fortran f90 compiler: /usr/local/bin/gfortran -Wall -g -fno-second-underscore -fPIC -O3
+                           Fortran fix compiler: /usr/local/bin/gfortran -Wall -g -ffixed-form -fno-second-underscore -Wall -g -fno-second-underscore -fPIC -O3
+                           compile options: '-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION -DF2PY_REPORT_ON_ARRAY_COPY=1 -DNDEBUG -I/Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8 -I/Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages/numpy/core/include -I/Users/etijskens/.pyenv/versions/3.8.5/include/python3.8 -c'
+                           gfortran:f90: /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/dotf.f90
+                           gfortran:f77: /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotf-f2pywrappers.f
+                           /usr/local/bin/gfortran -Wall -g -Wall -g -undefined dynamic_lookup -bundle /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotfmodule.o /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/fortranobject.o /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/dotf.o /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotf-f2pywrappers.o -L/usr/local/Cellar/gcc/10.2.0_3/lib/gcc/10/gcc/x86_64-apple-darwin20/10.2.0 -L/usr/local/Cellar/gcc/10.2.0_3/lib/gcc/10/gcc/x86_64-apple-darwin20/10.2.0/../../.. -L/usr/local/Cellar/gcc/10.2.0_3/lib/gcc/10/gcc/x86_64-apple-darwin20/10.2.0/../../.. -lgfortran -o ./dotf.cpython-38-darwin.so
+                           ld: warning: ld: warning: dylib (/usr/local/Cellar/gcc/10.2.0_3/lib/gcc/10/libquadmath.dylib) was built for newer macOS version (11.2) than being linked (10.15)dylib (/usr/local/Cellar/gcc/10.2.0_3/lib/gcc/10/libgfortran.dylib) was built for newer macOS version (11.2) than being linked (10.15)
+                           
+                           [100%] Built target dotf
     [DEBUG]          ] done.
     [DEBUG]          [ > make install
     [DEBUG]              (stdout)
-                           [100%] Built target dotc
+                           [100%] Built target dotf
                            Install the project...
                            -- Install configuration: "RELEASE"
-                           -- Installing: /Users/etijskens/software/dev/workspace/ET-dot/et_dot/cpp_dotc/../dotc.cpython-38-darwin.so
+                           -- Installing: /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/../dotf.cpython-38-darwin.so
     [DEBUG]          ] done.
     [INFO] ] done.
     [INFO]           Binary extensions built successfully:
-    [INFO]           - /Users/etijskens/software/dev/workspace/ET-dot/et_dot/dotc.cpython-38-darwin.so
-    (.venv) >
+    [INFO]           - /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/dotf.cpython-38-darwin.so
+    
 
-The output shows that first ``CMake`` is called, followed by ``make`` and the installation
-of the binary extension with a soft link. Finally, lists of modules that have been built
-successfully, and modules that failed to build are output.
+If there are no syntax errors in the Fortran code, the binary extension module will
+build successfully, as above and be installed in a the package directory of our
+project :file:`ET-dot/et_dot`. The full module name is
+:file:`dotf.cpython-38-darwin.so`. The extension is composed of: the kind of
+Python distribution (``cpython``), the MAJORminor version string of the Python
+version being used (``38`` as we are running Python 3.8.5), the OS on which we are
+working (``darwin``), and an extension indicating a shared library on this OS
+(``.so``). This file can be imported in a Python script, by using the filename without
+the extension, i.e. ``dotf``. As the module was built successfully, we can test it.
+Here is some test code. Enter it in file :file:`ET-dot/tests/test_f90_dotf.py`:
 
-As for the Fortran case, the ``micc-build`` command produces a lot of output, most of
-which is rather uninteresting - except in the case of errors. If the source file does
-not have any syntax errors, and the build did not experience any problems, you will
-also see a file like :file:`dotc.cpython-38-darwin.so` in directory :file:`ET-dot/et_dot`,
-which is the binary extension module that we can import in Python::
+.. code-block:: Python
 
-    (.venv) > ls -l et_dot
-    total 8
-    -rw-r--r--  1 etijskens  staff  1339 Dec 13 14:40 __init__.py
-    drwxr-xr-x  4 etijskens  staff   128 Dec 13 14:29 __pycache__/
-    drwxr-xr-x  7 etijskens  staff   224 Dec 13 14:43 cpp_dotc/
-    lrwxr-xr-x  1 etijskens  staff    93 Dec 13 14:43 dotc.cpython-38-darwin.so
-    lrwxr-xr-x  1 etijskens  staff    94 Dec 13 14:27 dotf.cpython-38-darwin.so
-    drwxr-xr-x  6 etijskens  staff   192 Dec 13 14:43 f90_dotf/
-    (.venv) >
+    import numpy as np
+    import et_dot
+    # create an alias for the dotf binary extension module
+    f90 = et_dot.dotf
+    
+    def test_dot_aa():
+        # create an numpy array of floats:
+        a = np.array([0,1,2,3,4],dtype=float)
+        # use the original dot implementation to compute the expected result:
+        expected = et_dot.dot(a,a)
+        # call the dot function in the binary extension module with the same arguments:
+        a_dot_a = f90.dot(a,a)
+        assert a_dot_a == expected
 
-.. note:: The extension of the module :file:`dotc.cpython-38-darwin.so`
-   will depend on the Python version you are using, and on the operating system.
-
-Here is the test code. It is almost exactly the same as that for the f90 module :py:mod:`dotf`,
-except for the module name. Enter the test code in :file:`ET-dot/tests/test_cpp_dotc.py`:
-
-.. code-block:: python
-
-   import numpy as np
-   import et_dot
-   # create alias to dotc binary extension module:
-   cpp = et_dot.dotc
-
-   def test_dotc_aa():
-       a = np.array([0,1,2,3,4],dtype=np.float)
-       expected = np.dot(a,a)
-       # call function dotc in the binary extension module:
-       a_dotc_a = cpp.dotc(a,a)
-       assert a_dotc_a==expected
-
-The conversion between the Numpy arrays to C++ arrays is here less magical, as the user
-must provide code to do the conversion of Python variables to C++. This has the advantage
-of showing the mechanics of the conversion more clearly, but it also leaves more space for
-mistakes, and to beginners it may seem more complicated.
-
-Finally, run pytest:
+Then run the test (we only run the test for the dotf module, as we did not touch the
+:py:meth:`et_dot.dot` implementation):
 
 .. code-block:: bash
 
-   > pytest
-   ================================ test session starts =================================
-   platform darwin -- Python 3.7.4, pytest-4.6.5, py-1.8.0, pluggy-0.13.0
-   rootdir: /Users/etijskens/software/dev/workspace/ET-dot
-   collected 9 items
-
-   tests/test_cpp_dotc.py .                                                       [ 11%]
-   tests/test_et_dot.py .......                                                   [ 88%]
-   tests/test_f90_dotf.py .                                                       [100%]
-
-   ============================== 9 passed in 0.28 seconds ==============================
-
-.. _control-build-cpp:
-
-2.4.1 Controlling the build [intermediate]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-    The build parameters for our C++ binary extension module are detailed in
-    the file :file:`et_dot/cpp_dotc/CMakeLists.txt`. It contains significantly
-    less boilerplate code (which you should not need to touch) than for the
-    Fortran case, and provides the same functionality as its counterpart for
-    Fortran binary extension modules. By default this file specifies that a
-    release version is to be built. Here is the section of :file:`et_dot/cpp_dotc/CMakeLists.txt`
-    that you might want to adjust to your needs:
-
-    .. code-block:: cmake
-
-        ###############################################################################
-        #################################################### Customization section ####
-        # set compiler:
-        # set(CMAKE_CXX_COMPILER path/to/executable)
-
-        # Set build type:
-        # set(CMAKE_BUILD_TYPE DEBUG | MINSIZEREL | RELEASE | RELWITHDEBINFO)
-
-        # Add compiler options:
-        # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} <additional C++ compiler options>")
-
-        # Add preprocessor macro definitions:
-        # add_compile_definitions(
-        #     OPENFOAM=1912                     # set value
-        #     WM_LABEL_SIZE=$ENV{WM_LABEL_SIZE} # set value from environment variable
-        #     WM_DP                             # just define the macro
-        # )
-
-        # Add include directories
-        #include_directories(
-        #     path/to/dir1
-        #     path/to/dir2
-        # )
-
-        # Add link directories
-        # link_directories(
-        #     path/to/dir1
-        # )
-
-        # Add link libraries (lib1 -> liblib1.so)
-        # link_libraries(
-        #     lib1
-        #     lib2
-        # )
-        ####################################################################################################
-
-.. _data-types:
-
-2.5 Data type issues
---------------------
-
-When interfacing several programming languages data types require special care.
-
-.. _corresponding-data-types:
-
-2.5.1 Corresponding data types [intermediate]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-    An important point of attention when writing binary extension modules - and a
-    common source of problems - is that the data types of the variables passed in from
-    Python must match the data types of the Fortran or C++ routines.
-
-    Here is a table with the most relevant numeric data types in Python, Fortran and C++.
-
-    ================  ============   =========   ====================
-    data type         Numpy/Python   Fortran     C++
-    ================  ============   =========   ====================
-    unsigned integer  uint32         N/A         signed long int
-    unsigned integer  uint64         N/A         signed long long int
-    signed integer    int32          integer*4   signed long int
-    signed integer    int64          integer*8   signed long long int
-    floating point    float32        real*4      float
-    floating point    float64        real*8      double
-    complex           complex64      complex*4   std::complex<float>
-    complex           complex128     complex*8   std::complex<double>
-    ================  ============   =========   ====================
-
-    If there is automatic conversion between two data types in Python, e.g. from
-    ``float32`` to ``float64`` the wrappers around our function will perform the
-    conversion automatically. This happens both for Fortran and C++. However, this
-    comes with the cost of copying and converting, which is sometimes not acceptable.
-
-.. _return-large:
-
-2.5.2 Returning large data structures [advanced]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    The result of a Fortran function and a C++ function in a binary extension module
-    is **always** copied back to the Python variable that will hold it. As copying
-    large data structures is detrimental to performance this shoud be avoided.
-    The solution to this problem is to write Fortran functions or subroutines and C++
-    functions that accept the result variable as an argument and modify it in place,
-    so that the copy operaton is avoided. Consider this example of a Fortran subroutine
-    that computes the sum of two arrays.
+    > pytest tests/test_f90_dotf.py
+    ============================= test session starts ==============================
+    platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.10.0, pluggy-0.13.1
+    rootdir: /Users/etijskens/software/dev/workspace/Tutorials/ET-dot
+    collected 1 item
+    
+    tests/test_f90_dotf.py .                                                 [100%]
+    
+    ============================== 1 passed in 0.30s ===============================
+    
+
+The astute reader will notice the magic that is happening here: ``a`` is a numpy array,
+which is passed as the first and second parameter to the :py:meth:`et_dot.dotf.dot`
+function defined in our binary extension module. Note that the third parameter of the
+:py:meth:`et_dot.dotf.dot` function is omitted. How did that happen? The Micc2
+build function uses f2py_ to build the binary extension module. When calling
+:py:meth:`et_dot.dotf.dot` you are in fact calling a wrapper function that f2py
+created that extracts the pointer to the memory of array ``a`` and its length. The
+wrapper function then calls the Fortran function with the approprioate parameters
+as specified in the Fortran function definition. This invisible wrapper function is
+in fact rather intelligent, it even handles type conversions. E.g. we can pass in a
+Python array, and the wrapper will convert it into a numpy array, or an array of ints,
+and the wrapper will convert it into a float array. In fact the wrapper considers all
+implicit type conversions allowed by Python. However practical this feature may be,
+type conversion requires copying the entire array and converting each element. For
+long arrays this may be prohibitively expensive. For this reason the
+:file:`et_dot/f90_dotf/CMakeLists.txt` file specifies the
+``F2PY_REPORT_ON_ARRAY_COPY=1`` flag which makes the wrappers issue a warning to
+tell you that you should modify the client program to pass types to the wrapper which to
+not require conversion.
+
+.. code-block:: pycon
+
+
+>>>
+    >>> import et_dot
+    >>> a = [1,2,3]
+    >>> b = [2,2,2]
+    >>> print(et_dot.dot(a,b))
+    12
+    >>> print(et_dot.dotf.dot(a,b))
+    12.0
+    created an array from object
+    created an array from object
+    
+
+Here, ``a`` and ``b`` are plain Python lists, not numpy arrays, andthey contain
+``int`` numbers. :py:meth:`et_dot.dot()` therefore also returns an int (``12``).
+However, the Fortran implementation :py:meth:`et_dot.dotf.dot()` expects an
+array of floats and returns a float (``12.0``). The wrapper converts the Python lists
+``a`` and ``b`` to numpy ``float`` arrays. If the binary extension module was
+compiled with ``F2PY_REPORT_ON_ARRAY_COPY=1`` (the default setting) the wrapper
+will warn you with the message``created an array from object``. If we construct the
+numpy arrays ourselves, but still of type ``int``, the wrapper has to convert the
+``int`` array into a ``float`` array, because that is what corresponds the the
+Fortran ``real*8`` type, and will warn that it *copied* the array to make the
+conversion:
+
+.. code-block:: pycon
+
+
+>>>
+    >>> import et_dot
+    >>> import numpy as np
+    >>> a = np.array([1,2,3])
+    >>> b = np.array([2,2,2])
+    >>> print(et_dot.dot(a,b))
+    12
+    >>> print(et_dot.dotf.dot(a,b))
+    12.0
+    copied an array: size=3, elsize=8
+    copied an array: size=3, elsize=8
+    
+
+Here, ``size`` refers to the length of the array, and elsize is thenumber of bytes
+needed for each element of the target array type, c.q. a ``float``.
+
+.. note::
+
+   The wrappers themselves are generated in C code, so, you not only need a Fortran
+   compiler, but also a C compiler.
+
+Note that the test code did not explicitly import :py:mod:`et_dot.dotf`, just
+:py:mod:`et_dot`. This is only possible because Micc2 has modified
+:file:`et_dot/__init__.py` to import every submodule that has been added to the
+project:
+
+.. code-block:: python
+
+    # in file et_dot/__init__.py
+    import et_dot.dotf
+
+If the submodule :py:mod:`et_dot.dotf` was not built or failed to build, that import
+statement will fail and raise a :py:exc:`ModuleNotFoundError` exception. Micc2
+has added a little extra magic to attempt to build the module automatically in that
+case:
+
+.. code-block:: python
+
+    # in file et_dot/__init__.py
+    try:
+        import et_dot.dotf
+    except ModuleNotFoundError as e:
+        # Try to build this binary extension:
+        from pathlib import Path
+        import click
+        from et_micc2.project import auto_build_binary_extension
+        msg = auto_build_binary_extension(Path(__file__).parent, "dotf")
+        if not msg:
+            import et_dot.dotf
+        else:
+            click.secho(msg, fg="bright_red")
+
+.. _f90-modules:
+
+3.3.1. Dealing with Fortran modules
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Modern Fortran has a *module* concept of its own. This may be a bit confusing, as we have
+been talking about modules in a Python context, so far. The Fortran module is meant to
+group variable and procedure definitions that conceptually belong together.
+Inside fortran they are comparable to C/C++ header files. Here is an example:
+
+.. code-block:: fortran
+
+    MODULE my_f90_module
+    implicit none
+    contains
+      function dot(a,b)
+        ...
+      end function dot
+    END MODULE my_f90_module
+
+F2py translates the module containing the Fortran ``dot`` definition into an extra
+*namespace* appearing in between the :py:mod:`dotf` Python submodule and the
+:py:meth:`dot` function, which is found in ``et_dot.dotf.my_f90_module``
+instead of in ``et_dot.dotf``.
 
-    .. code-block:: fortran
-
-       subroutine add(a,b,sumab,n)
-         ! Compute the sum of arrays a and b and overwrite array sumab with the result
-           implicit none
-
-           integer*4              , intent(in)    :: n
-           real*8   , dimension(n), intent(in)    :: a,b
-           real*8   , dimension(n), intent(inout) :: sumab
-
-         ! declare local variables
-           integer*4 :: i
-
-           do i=1,n
-               sumab(i) = a(i) + b(i)
-           end do
-       end subroutine add
-
-    The crucial issue here is that the result array ``sumab``*`` has ``intent(inout)``,
-    meaning that the ``add`` function has both read and write access to it. If
-    you qualify the intent of *sumab* as ``in`` you will not be able to overwrite it. That
-    is, obviously ok for the input parameters ``a`` and ``b``. On the other hand and rather
-    surprisingly, qualifying it with ``intent(out)`` forces f2py_ to consider the
-    variable as a left hand side variable and define a wrapper like:
-
-    .. code-block:: c
-
-        sumab = wrapper_add(a,b)
-
-    and, consequently, imply copying of the result variable.
-    While ``intent(out)`` would certainly ok in Fortran-only code, and the semantics of
-    the f2py_ interpretation is certainly correct, copying the result variable may have
-    unwanted an performance impact.
-
-    So, the general advice is: use functions to return only variables of small size, like
-    single number, or a tuple, maybe even a small fixed size array, but certainly not a
-    large array. If you have result variables of large size, compute them in place in
-    parameters with ``intent(inout)``. If there is no useful small variable to return,
-    use a subroutine instead of a function.
-
-    It is often useful to have functions return an error code, or the CPU time the
-    computation used, as in the code below:
-
-    .. code-block:: fortran
-
-       function add(a,b,sumab,n)
-         ! Compute the sum of arrays a and b and overwrite array sumab with the result
-         ! Return the CPU time consumed in seconds.
-           implicit none
-
-           integer*4              , intent(in)    :: n,add
-           real*8   , dimension(n), intent(in)    :: a,b
-           real*8   , dimension(n), intent(inout) :: sumab
-
-         ! declare local variables
-           integer*4 :: i
-           real*8 :: start, finish
-
-           call cpu_time(start)
-             do i=1,n
-               sumab(i) = a(i) + b(i)
-             end do
-           call cpu_time(finish)
-
-           add = finish-start
-
-       end function add
-
-    Note that Python does not require you to store the return value of a function.
-    The above ``add`` function might be called as:
-
-    .. code-block:: python
-
-        import numpy as np
-        import et_dot
-        # create an alias for the add function:
-        add = my_package.binextf90.add
-
-        a = np.array([1.,2.,3.])
-        b = np.array([2.,2.,2.])
-        sumab = np.empty((3,))
-        add(a, b, sumab) # ignore the cpu time returned by add.
-        cput = add(a, b, sumab) # this time don't ignore it.
-        print(cput)
-
-
-    Computing large arrays in placee can be accomplished in C++ quite similarly:
-
-    .. code-block:: c++
-
-       #include <pybind11/pybind11.h>
-       #include <pybind11/numpy.h>
-
-       namespace py = pybind11;
-
-       void
-       add ( py::array_t<double> a
-           , py::array_t<double> b
-           , py::array_t<double> sumab
-           )
-       {// request buffer description of the arguments
-           auto buf_a = a.request()
-              , buf_b = b.request()
-              , buf_sumab = sumab.request()
-              ;
-           if( buf_a.ndim != 1
-            || buf_b.ndim != 1
-            || buf_sumab.ndim != 1 )
-           {
-               throw std::runtime_error("Number of dimensions must be one");
-           }
-
-           if( (buf_a.shape[0] != buf_b.shape[0])
-            || (buf_a.shape[0] != buf_sumab.shape[0]) )
-           {
-               throw std::runtime_error("Input shapes must match");
-           }
-        // because the Numpy arrays are mutable by default, py::array_t is mutable too.
-        // Below we declare the raw C++ arrays for a and b as const to make their intent clear.
-           double const *ptr_a     = static_cast<double const *>(buf_a.ptr);
-           double const *ptr_b     = static_cast<double const *>(buf_b.ptr);
-           double       *ptr_sumab = static_cast<double       *>(buf_sumab.ptr);
-
-           for (size_t i = 0; i < buf_a.shape[0]; i++)
-               ptr_sumab[i] = ptr_a[i] + ptr_b[i];
-       }
-
-
-       PYBIND11_MODULE({{ cookiecutter.module_name }}, m)
-       {// optional module doc-string
-           m.doc() = "pybind11 {{ cookiecutter.module_name }} plugin"; // optional module docstring
-        // list the functions you want to expose:
-        // m.def("exposed_name", function_pointer, "doc-string for the exposed function");
-           m.def("add", &add, "A function which adds two arrays 'a' and 'b' and stores the result in the third, 'sumab'.");
-       }
-
-    Here, care must be taken that when casting ``buf_sumab.ptr`` one does not cast to const.
-
-.. _document-binext:
-
-2.6 Documenting binary extension modules
-----------------------------------------
-
-For Python modules the documentation is automatically extracted from the doc-strings
-in the module. However, when it comes to documenting binary extension modules, this
-does not seem a good option. Ideally, the source files :file:`ET-dot/et_dot/f90_dotf/dotf.f90`
-and :file:`ET-dot/et_dot/cpp_dotc/dotc.cpp` should document the Fortran functions and
-subroutines, and C++ functions, respectively, rahter than the Python interface. Yet
-from the perspective of ET-dot being a Python project, the users is only interested
-in the documentation of the Python interface to those functions and subroutines.
-Therefore, micc_ requires you to document the Python interface in separate :file:`.rst`
-files:
-
-* :file:`ET-dot/et_dot/f90_dotf/dotf.rst`
-* :file:`ET-dot/et_dot/cpp_dotc/dotc.rst`
-
-Here are the contents, respectively, for :file:`ET-dot/et_dot/f90_dotf/dotf.rst`:
-
-.. code-block:: rst
-
-   Module et_dot.dotf
-   ******************
-
-   Module :py:mod:`dotf` built from fortran code in :file:`f90_dotf/dotf.f90`.
-
-   .. function:: dotf(a,b)
-      :module: et_dot.dotf
-
-      Compute the dot product of *a* and *b* (in Fortran.)
-
-      :param a: 1D Numpy array with ``dtype=numpy.float64``
-      :param b: 1D Numpy array with ``dtype=numpy.float64``
-      :returns: the dot product of *a* and *b*
-      :rtype: ``numpy.float64``
-
-and for :file:`ET-dot/et_dot/cpp_dotc/dotc.rst`:
-
-.. code-block:: rst
-
-   Module et_dot.dotc
-   ******************
-
-   Module :py:mod:`dotc` built from fortran code in :file:`cpp_dotc/dotc.cpp`.
-
-   .. function:: dotc(a,b)
-      :module: et_dot.dotc
-
-      Compute the dot product of *a* and *b* (in C++.)
-
-      :param a: 1D Numpy array with ``dtype=numpy.float64``
-      :param b: 1D Numpy array with ``dtype=numpy.float64``
-      :returns: the dot product of *a* and *b*
-      :rtype: ``numpy.float64``
-
-Note that the documentation must be entirely in :file:`.rst` format (see
-restructuredText_).
-
-Build the documentation::
-
-    (.venv) > cd docs && make html
-    Already installed: click
-    Already installed: sphinx-click
-    Already installed: sphinx
-    Already installed: sphinx-rtd-theme
-    Running Sphinx v2.2.2
-    making output directory... done
-    WARNING: html_static_path entry '_static' does not exist
-    building [mo]: targets for 0 po files that are out of date
-    building [html]: targets for 7 source files that are out of date
-    updating environment: [new config] 7 added, 0 changed, 0 removed
-    reading sources... [100%] readme
-    looking for now-outdated files... none found
-    pickling environment... done
-    checking consistency... /Users/etijskens/software/dev/workspace/tmp/ET-dot/docs/apps.rst: WARNING: document isn't included in any toctree
-    done
-    preparing documents... done
-    writing output... [100%] readme
-    generating indices...  genindex py-modindexdone
-    highlighting module code... [100%] et_dot.dotc
-    writing additional pages...  search/Users/etijskens/software/dev/workspace/tmp/ET-dot/.venv/lib/python3.7/site-packages/sphinx_rtd_theme/search.html:20: RemovedInSphinx30Warning: To modify script_files in the theme is deprecated. Please insert a <script> tag directly in your theme instead.
-      {{ super() }}
-    done
-    copying static files... ... done
-    copying extra files... done
-    dumping search index in English (code: en)... done
-    dumping object inventory... done
-    build succeeded, 2 warnings.
-
-    The HTML pages are in _build/html.
-
-The documentation is built using ``make``. The :file:`Makefile` checks that the necessary components
-sphinx_, click_, sphinx-click_and `sphinx-rtd-theme <https://sphinx-rtd-theme.readthedocs.io/en/stable/>`_ are installed.
-
-You can view the result in your favorite browser::
-
-    (.venv) > open _build/html/index.html
-
-The filepath is made evident from the last output line above.
-This is what the result looks like (html):
-
-.. image:: ../tutorials/img2-1.png

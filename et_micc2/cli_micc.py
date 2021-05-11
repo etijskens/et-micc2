@@ -54,7 +54,7 @@ _preferences_setup = { "full_name":
                            { "default": "sphinx_rtd_theme"
                            , "text": "Html theme for sphinx documentation" }
                      , "software_license":
-                           { "choices": [ 'GNU General Public License v3', 'MIT license'
+                           { "choices": [ 'MIT license', 'GNU General Public License v3'
                                         , 'BSD license', 'ISC license'
                                         , 'Apache Software License 2.0', 'Not open source']
                            , "text": "software license" }
@@ -556,17 +556,17 @@ def tag(ctx):
 # add
 ####################################################################################################
 @main.command()
-@click.option('--app'
+@click.option('--cli'
     , default=False, is_flag=True
-    , help="Add a CLI ."
+    , help="Add a CLI with a single command."
 )
-@click.option('--group'
+@click.option('--clisub'
     , default=False, is_flag=True
     , help="Add a CLI with a group of sub-commands rather than a single command CLI."
 )
 @click.option('--py'
     , default=False, is_flag=True
-    , help="Add a Python module."
+    , help="Add a Python module (module structure)."
 )
 @click.option('--package'
     , help="Add a Python module with a package structure rather than a module structure:\n\n"
@@ -596,7 +596,7 @@ def tag(ctx):
 @click.pass_context
 def add(ctx
         , name
-        , app, group
+        , cli, clisub
         , py, package
         , f90
         , cpp
@@ -608,7 +608,7 @@ def add(ctx
 
     :param str name: name of the CLI or module added.
 
-    If ``app==True``: (add CLI application)
+    If ``cli==True``: (add CLI application)
 
     * :py:obj:`app_name` is also the name of the executable when the package is installed.
     * The source code of the app resides in :file:`<project_name>/<package_name>/cli_<name>.py`.
@@ -628,8 +628,8 @@ def add(ctx
     """
     options = ctx.obj
     options.add_name = name
-    options.app = app
-    options.group = group
+    options.cli = cli
+    options.clisub = clisub
     options.py = py
     options.package = package
     options.f90 = f90
@@ -699,15 +699,15 @@ def mv(ctx, cur_name, new_name, silent, entire_package, entire_project):
 )
 @click.option('-b', '--build-type'
     , help="build type: any of the standard CMake build types: "
-           "DEBUG, MINSIZEREL, RELEASE, RELWITHDEBINFO."
+           "DEBUG, MINSIZEREL, RELEASE*, RELWITHDEBINFO."
     , default='RELEASE'
 )
 @click.option('--clean'
-    , help="Perform a clean build."
+    , help="Perform a clean build, removes the build directory before the build."
     , default=False, is_flag=True
 )
 @click.option('--cleanup'
-    , help="Cleanup build directory after successful build."
+    , help="Cleanup remove the build directory after a successful build."
     , default=False, is_flag=True
 )
 @click.pass_context

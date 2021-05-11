@@ -155,7 +155,6 @@ Python idioms and readability
 * `Stop writing classes <https://www.youtube.com/watch?v=o9pEzgHorH0>`_
 * `Generators, Iterables, Iterators in Python: When and Where <https://www.pythonforthelab.com/blog/generators-iterables-iterators-python-when-and-where/>`_
 * `New Features in Python 3.9 You Should Know About <https://medium.com/@martin.heinz/new-features-in-python-3-9-you-should-know-about-14f3c647c2b4>`_
-* `The Curious Case of Python's Context Manager <https://rednafi.github.io/digressions/python/2020/03/26/python-contextmanager.html>`_
 * `Python 101 – Working with Strings <https://www.blog.pythonlibrary.org/2020/04/07/python-101-working-with-strings/>`_
 * `A Guide to Python Lambda Functions <https://adamj.eu/tech/2020/08/10/a-guide-to-python-lambda-functions/>`_
 * `Pythonic code review <https://access.redhat.com/blogs/766093/posts/2802001>`_
@@ -361,7 +360,7 @@ Tools
 * `Understanding Best Practice Python Tooling by Comparing Popular Project Templates <https://medium.com/better-programming/understanding-best-practice-python-tooling-by-comparing-popular-project-templates-6eba49229106>`_
 * `My unpopular meaning about Black code formatter <https://luminousmen.com/post/my-unpopular-opinion-about-black-code-formatter>`_
 * `Python static analysis tools <https://luminousmen.com/post/python-static-analysis-tools>`_
-* `Leverage Sublime project folders to ease your work <https://storiesinmypocket.com/articles/leverage-sublime-project-folders-ease-your-work/>`_
+* `Leverage Sublime project folders to eashttps://martinheinz.dev/blog/34e your work <https://storiesinmypocket.com/articles/leverage-sublime-project-folders-ease-your-work/>`_
 * `Deep dive into how pyenv actually works by leveraging the shim design pattern <https://mungingdata.com/python/how-pyenv-works-shims/>`_
 * `Explore binaries using this full-featured Linux tool <https://opensource.com/article/21/1/linux-radare2?utm_medium=Email&utm_campaign=weekly&sc_cid=7013a0000026SeIAAU>`_
 * `How to write a configuration file in python <https://towardsdatascience.com/from-novice-to-expert-how-to-write-a-configuration-file-in-python-273e171a8eb3>`_

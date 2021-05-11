@@ -328,7 +328,7 @@ class Project:
                         # todo this context manager does not print correctly
                         with et_micc2.logger.log(self.logger.info, f"Creating remote git repository at https://github.com/{github_username}/{self.project_name}"):
                             with et_micc2.utils.in_directory(self.project_path):
-                                pat_file = self.options.__cfg_dir__ / f'{self.options.template_parameters["github_username"]}.pat'
+                                pat_file = self.options._cfg_dir / f'{self.options.template_parameters["github_username"]}.pat'
                                 if pat_file.exists():
                                     with open(pat_file) as f:
                                         completed_process = \
@@ -568,7 +568,7 @@ class Project:
 
         This method dispatches to
 
-        * :py:meth:`add_app`,
+        * :py:meth:`add_python_cli`,
         * :py:meth:`add_python_module`,
         * :py:meth:`add_f90_module`,
         * :py:meth:`add_cpp_module`
@@ -577,13 +577,13 @@ class Project:
 
         if self.structure == 'module':
             self.error(f"Cannot add to a module project ({self.project_name}).\n"
-                       f"  Use `micc convert-to-package' on this project to convert it to a package project."
+                       f"  Run `micc2 convert-to-package` on this project to convert it to a package project."
                        )
 
         # set implied flags:
-        if self.options.group:
-            app_implied = f" [implied by --group   ({int(self.options.group)})]"
-            self.options.app = True
+        if self.options.clisub:
+            app_implied = f" [implied by --clisub   ({int(self.options.clisub)})]"
+            self.options.cli = True
         else:
             app_implied = ""
 
@@ -594,11 +594,11 @@ class Project:
             py_implied = ""
 
         # Verify that one and only one of app/py/f90/cpp flags has been selected:
-        if (not (self.options.app or self.options.py or self.options.f90 or self.options.cpp)
-                or not xor(xor(self.options.app, self.options.py), xor(self.options.f90, self.options.cpp))):
+        if (not (self.options.cli or self.options.py or self.options.f90 or self.options.cpp)
+                or not xor(xor(self.options.cli, self.options.py), xor(self.options.f90, self.options.cpp))):
             # Do not log, as the state of the project is not changed.
             self.error(f"Specify one and only one of \n"
-                       f"  --app ({int(self.options.app)}){app_implied}\n"
+                       f"  --cli ({int(self.options.cli)}){app_implied}\n"
                        f"  --py  ({int(self.options.py )}){py_implied}\n"
                        f"  --f90 ({int(self.options.f90)})\n"
                        f"  --cpp ({int(self.options.cpp)})\n"
@@ -606,7 +606,7 @@ class Project:
 
         db_entry = {'options': self.options}
 
-        if self.options.app:
+        if self.options.cli:
             # Prepare for adding an app
             app_name = self.options.add_name
             if self.app_exists(app_name):
@@ -618,14 +618,14 @@ class Project:
                            f"  * contain only [a-zA-Z], digits, hyphens, and underscores\n"
                           )
 
-            if self.options.group:
+            if self.options.clisub:
                 if not self.options.templates:
                     self.options.templates = 'app-sub-commands'
             else:
                 if not self.options.templates:
                     self.options.templates = 'app-simple'
 
-            self.add_app(db_entry)
+            self.add_python_cli(db_entry)
 
         else:
             # Prepare for adding a sub-module
@@ -702,12 +702,12 @@ class Project:
         self.serialize_db(db_entry)
 
     
-    def add_app(self, db_entry):
+    def add_python_cli(self, db_entry):
         """Add a console script (app, aka CLI) to the package."""
         project_path = self.project_path
         app_name = self.options.add_name
         cli_app_name = 'cli_' + et_micc2.utils.pep8_module_name(app_name)
-        w = 'with' if self.options.group else 'without'
+        w = 'with' if self.options.clisub else 'without'
 
         with et_micc2.logger.log(self.logger.info,
                                 f"Adding CLI {app_name} {w} sub-commands to project {project_path.name}."):
@@ -718,7 +718,7 @@ class Project:
             self.exit_code = et_micc2.expand.expand_templates(self.options)
             if self.exit_code:
                 self.logger.critical(
-                    f"Expand failed during Project.add_app for project ({self.project_name})."
+                    f"Expand failed during Project.add_python_cli for project ({self.project_name})."
                 )
                 return
 

@@ -10,7 +10,7 @@ readme = 'README.rst'
 repository = "https://github.com/{{ cookiecutter.github_username }}/{{ cookiecutter.project_name }}"
 homepage = "https://github.com/{{ cookiecutter.github_username }}/{{ cookiecutter.project_name }}"
 
-keywords = ['packaging', 'poetry']
+keywords = []
 
 [tool.poetry.dependencies]
 python = "^{{ cookiecutter.minimal_python_version }}"

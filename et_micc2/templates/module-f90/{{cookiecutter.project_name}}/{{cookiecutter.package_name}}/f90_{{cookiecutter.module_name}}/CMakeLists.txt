@@ -22,12 +22,32 @@
 #  - F2PY_linklibs : a list of libraries to be linked into the binary extension module
 # You can of course modify their values to suit your needs.
 
-# There is a lot of boilerplate code, which normally needs not to be changed. It
-# is always indented and surrounded by comment lines marking the begin and end of
+# REMARK - The wrapper functions are written in C. The C-compiler may spit out
+# large number of warnings, sometimes rendering the output nearly unreadable.
+# I could not figure out how to pass C-compiler flags to switch off these warnings
+# to f2py. An easy workaround (for Linux and Macos) is to to create a bash script
+# that hides the c-compiler and specifies the needed flags. E.g. on Macos for the
+# clang compiler i would like to turn off the warnings for nullability-completeness
+# and expansion-to-be-defined:
+#
+#   #!/bin/bash
+#   /usr/bin/clang -Wno-nullability-completeness -Wno-expansion-to-defined ${@:1}
+#
+# Save it as 'clang' in a directory on the PATH which comes before /usr/bin and make
+# it executable. F2py will then call the new 'clang' which will forward to the
+# original 'clang', but with the desired compiler flags.
+
+
+# There is a lot of boilerplate code in this file, which normally needs not to be changed.
+# It is always indented and surrounded by comment lines marking the begin and end of
 # the boilerplate code, like this:
+
 #<< begin boilerplate code
     # some code
 #>> end boilerplate code
+
+# The actual code starts here:
+# The part you might want to change is in the 'Customization section'
 
 #<< begin boilerplate code
     cmake_minimum_required(VERSION 3.4)
