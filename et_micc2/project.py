@@ -820,6 +820,23 @@ class Project:
                     f.write(text)
                 db_entry[filename] = text
 
+            self.add_import_code(db_entry)
+
+    def add_import_code(self, db_entry):
+        """Add import statement for this python s in :file:`__init__.py` of the package."""
+        module_name = self.options.add_name
+        text_to_insert = [ ""
+                         , f"import {self.package_name}.{module_name}"
+                         ]
+        file = os.path.join(self.package_name, '__init__.py')
+        et_micc2.utils.insert_in_file(
+            self.project_path / file,
+            text_to_insert,
+            startswith="__version__ = ",
+        )
+        text = '\n'.join(text_to_insert)
+        db_entry[file] = text
+
     def add_f90_module(self, db_entry):
         """Add a f90 module to this project."""
         project_path = self.project_path
