@@ -1155,12 +1155,12 @@ class Project:
             self.pyproject_toml.save()
             # Tell the user how to add the new dependencies
             msg = 'Dependencies added:\n' \
-                  'If you are using a virtual environment created with poetry, run:' \
+                  'If you are using a virtual environment created with poetry, run:\n' \
                   '    `poetry install` or `poetry update` to install missing dependencies.\n' \
-                  'If you are using a virtual environment not created with poetry, run:'
+                  'If you are using a virtual environment not created with poetry, run:\n'
             for dep,version in deps.items():
-                msg += f'    (.venv) > pip install {dep}'
-            msg += 'Otherwise, run:'
+                msg += f'    (.venv) > pip install {dep}\n'
+            msg += 'Otherwise, run:\n'
             for dep,version in deps.items():
                 msg += f'    > pip install {dep} --user'
             self.logger.warning(msg)
