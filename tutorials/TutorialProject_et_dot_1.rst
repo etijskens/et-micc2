@@ -76,7 +76,7 @@ implementation to the local git repository:
 .. code-block:: bash
 
     > git commit -a -m 'implemented dot()'
-    [master 627970b] implemented dot()
+    [master a304e1a] implemented dot()
      1 file changed, 23 insertions(+), 22 deletions(-)
      rewrite et_dot/__init__.py (71%)
     
@@ -98,8 +98,6 @@ Or we might execute these lines at the Python prompt:
 
 .. code-block:: pycon
 
-
->>>
     >>> from et_dot import dot
     >>> a = [1,2,3]
     >>> b = [4.1,4.2,4.3]
@@ -108,7 +106,6 @@ Or we might execute these lines at the Python prompt:
     >>> print(f"a_dot_b = {a_dot_b} == {expected}")
     a_dot_b = 25.4 == 25.4
     
-
 .. note::
 
    This dot product implementation is naive for several reasons:
@@ -181,7 +178,7 @@ good practise to commit this to our local git repository:
 .. code-block:: bash
 
     > git commit -a -m 'added test_dot_aa()'
-    [master 0988e5e] added test_dot_aa()
+    [master 32584ce] added test_dot_aa()
      1 file changed, 7 insertions(+), 33 deletions(-)
      rewrite tests/test_et_dot.py (98%)
     
@@ -384,22 +381,17 @@ statements below:
 
 .. code-block:: pycon
 
-
->>>
     >>> print( 1.0 + 1e16 )
     1e+16
     >>> print( 1e16 + 1.0 )
     1e+16
     
-
 Because ``1e16`` is a 1 followed by 16 zeroes, adding ``1`` would alter the 17th
 digit,which is, because of the finite precision, not represented. An approximate
 result is returned, namely ``1e16``, which is of by a relative error of only 1e-16.
 
 .. code-block:: pycon
 
-
->>>
     >>> print( 1e16 + 1.0 - 1e16 )
     0.0
     >>> print( 1e16 - 1e16 + 1.0 )
@@ -407,7 +399,6 @@ result is returned, namely ``1e16``, which is of by a relative error of only 1e-
     >>> print( 1.0 + 1e16 - 1e16 )
     0.0
     
-
 Although each of these expressions should yield ``0.0``, if they were real numbers,
 the result differs because of the finite precision. Python executes the expressions
 from left to right, so they are equivalent to: 
@@ -473,12 +464,10 @@ that you can easily make :meth:`et_dot.dot` raise other exceptions, e.g.
 
 .. code-block:: pycon
 
-
->>>
     >>> import et_dot
     >>> et_dot.dot([1,2],[1,'two'])
     Traceback (most recent call last):
-      File "./et_rstor/__init__.py", line 418, in rstor
+      File "/Users/etijskens/.local/lib/python3.8/site-packages/et_rstor/__init__.py", line 445, in rstor
         exec(line)
       File "<string>", line 1, in <module>
       File "./et_dot/__init__.py", line 22, in dot
@@ -486,7 +475,6 @@ that you can easily make :meth:`et_dot.dot` raise other exceptions, e.g.
     TypeError: unsupported operand type(s) for +=: 'int' and 'str'
     
     
-
 Note that it is not the product ``a[i]*b[i]`` for ``i=1`` that is wreaking havoc, but
 the addition of its result to ``d``. Furthermore, Don't bother the link to where the
 error occured in the traceback. It is due to the fact that this course is completely
@@ -502,14 +490,14 @@ well:
 .. code-block:: bash
 
     > git commit -a -m 'dot() tests added'
-    [master 1a702be] dot() tests added
+    [master 589e6a8] dot() tests added
      1 file changed, 70 insertions(+)
     
     > micc2 version -p
     [INFO]           (ET-dot)> version (0.0.0) -> (0.0.1)
     
     > git commit -a -m 'v0.0.1'
-    [master 4003409] v0.0.1
+    [master e305b93] v0.0.1
      2 files changed, 2 insertions(+), 2 deletions(-)
     
 
@@ -588,7 +576,7 @@ Executing this script yields:
 .. code-block:: bash
 
     > python ./prof/run1.py
-    249.48518687738064
+    237.5560153549568
     -*# done #*-
     
 
@@ -649,9 +637,9 @@ and execute it again:
 .. code-block:: bash
 
     > python ./prof/run1.py
-    init : 0.000261 s
-    dot  : 9.4e-05 s
-    248.43786745917475
+    init : 0.000329 s
+    dot  : 0.000112 s
+    258.0159744740434
     -*# done #*-
     
 
@@ -696,10 +684,10 @@ Its execution yields:
 .. code-block:: bash
 
     > python ./prof/run1.py
-    et init : 0.000275 s
-    et dot  : 0.0001 s
-    np init : 6.4e-05 s
-    np dot  : 6e-06 s
+    et init : 0.000278 s
+    et dot  : 9.3e-05 s
+    np init : 6e-05 s
+    np dot  : 7e-06 s
     -*# done #*-
     
 
@@ -970,14 +958,15 @@ replace the existing example code in the Fortran source file with:
     function dot(a,b,n)
       ! Compute the dot product of a and b
         implicit none
-      !
+        real*8 :: dot ! return  value
       !-----------------------------------------------
+      ! Declare function parameters
         integer*4              , intent(in)    :: n
         real*8   , dimension(n), intent(in)    :: a,b
-        real*8                                 :: dot
-      ! declare local variables
-        integer*4 :: i
       !-----------------------------------------------
+      ! Declare local variables
+        integer*4 :: i
+      !-----------------------------------------------'
         dot = 0.
         do i=1,n
             dot = dot + a(i) * b(i)
@@ -1097,8 +1086,8 @@ produces a lot of output, which comes from cmake, f2py and the compilation proce
                            gfortran:f90: /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/dotf.f90
                            gfortran:f77: /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotf-f2pywrappers.f
                            /usr/local/bin/gfortran -Wall -g -Wall -g -undefined dynamic_lookup -bundle /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotfmodule.o /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/fortranobject.o /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/dotf.o /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotf-f2pywrappers.o -L/usr/local/Cellar/gcc/10.2.0_3/lib/gcc/10/gcc/x86_64-apple-darwin20/10.2.0 -L/usr/local/Cellar/gcc/10.2.0_3/lib/gcc/10/gcc/x86_64-apple-darwin20/10.2.0/../../.. -L/usr/local/Cellar/gcc/10.2.0_3/lib/gcc/10/gcc/x86_64-apple-darwin20/10.2.0/../../.. -lgfortran -o ./dotf.cpython-38-darwin.so
-                           ld: warning: ld: warning: dylib (/usr/local/Cellar/gcc/10.2.0_3/lib/gcc/10/libquadmath.dylib) was built for newer macOS version (11.2) than being linked (10.15)dylib (/usr/local/Cellar/gcc/10.2.0_3/lib/gcc/10/libgfortran.dylib) was built for newer macOS version (11.2) than being linked (10.15)
-                           
+                           ld: warning: dylib (/usr/local/Cellar/gcc/10.2.0_3/lib/gcc/10/libgfortran.dylib) was built for newer macOS version (11.2) than being linked (10.15)
+                           ld: warning: dylib (/usr/local/Cellar/gcc/10.2.0_3/lib/gcc/10/libquadmath.dylib) was built for newer macOS version (11.2) than being linked (10.15)
                            [100%] Built target dotf
     [DEBUG]          ] done.
     [DEBUG]          [ > make install
@@ -1113,16 +1102,20 @@ produces a lot of output, which comes from cmake, f2py and the compilation proce
     [INFO]           - /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/dotf.cpython-38-darwin.so
     
 
-If there are no syntax errors in the Fortran code, the binary extension module will
-build successfully, as above and be installed in a the package directory of our
-project :file:`ET-dot/et_dot`. The full module name is
+The command produces a lot of output, which comes from CMake, f2py, thecompilation of
+the Fortran code, and the compilation of the wrappers of the fortran code, which are
+written in C.If there are no syntax errors in the Fortran code, the binary extension
+module will build successfully, as above and be installed in a the package directory
+of our project :file:`ET-dot/et_dot`. The full module name is
 :file:`dotf.cpython-38-darwin.so`. The extension is composed of: the kind of
 Python distribution (``cpython``), the MAJORminor version string of the Python
 version being used (``38`` as we are running Python 3.8.5), the OS on which we are
-working (``darwin``), and an extension indicating a shared library on this OS
-(``.so``). This file can be imported in a Python script, by using the filename without
-the extension, i.e. ``dotf``. As the module was built successfully, we can test it.
-Here is some test code. Enter it in file :file:`ET-dot/tests/test_f90_dotf.py`:
+working (``<module 'os' from
+'/Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/os.py'>``), and an
+extension indicating a shared library on this OS (``.so``). This file can be imported
+in a Python script, by using the filename without the extension, i.e. ``dotf``. As the
+module was built successfully, we can test it. Here is some test code. Enter it in file
+:file:`ET-dot/tests/test_f90_dotf.py`:
 
 .. code-block:: Python
 
@@ -1153,7 +1146,7 @@ Then run the test (we only run the test for the dotf module, as we did not touch
     
     tests/test_f90_dotf.py .                                                 [100%]
     
-    ============================== 1 passed in 0.30s ===============================
+    ============================== 1 passed in 0.32s ===============================
     
 
 The astute reader will notice the magic that is happening here: ``a`` is a numpy array,
@@ -1178,8 +1171,6 @@ not require conversion.
 
 .. code-block:: pycon
 
-
->>>
     >>> import et_dot
     >>> a = [1,2,3]
     >>> b = [2,2,2]
@@ -1190,23 +1181,20 @@ not require conversion.
     created an array from object
     created an array from object
     
-
 Here, ``a`` and ``b`` are plain Python lists, not numpy arrays, andthey contain
 ``int`` numbers. :py:meth:`et_dot.dot()` therefore also returns an int (``12``).
 However, the Fortran implementation :py:meth:`et_dot.dotf.dot()` expects an
 array of floats and returns a float (``12.0``). The wrapper converts the Python lists
 ``a`` and ``b`` to numpy ``float`` arrays. If the binary extension module was
-compiled with ``F2PY_REPORT_ON_ARRAY_COPY=1`` (the default setting) the wrapper
-will warn you with the message``created an array from object``. If we construct the
-numpy arrays ourselves, but still of type ``int``, the wrapper has to convert the
-``int`` array into a ``float`` array, because that is what corresponds the the
-Fortran ``real*8`` type, and will warn that it *copied* the array to make the
+compiled with
+``F2PY_REPORT_ON_ARRAY_COPY=1`` (the default setting) the wrapper will warn you with the message``created an array from object``.
+If we construct the numpy arrays ourselves, but still of type ``int``, the wrapper has
+to convert the ``int`` array into a ``float`` array, because that is what corresponds
+the the Fortran ``real*8`` type, and will warn that it *copied* the array to make the
 conversion:
 
 .. code-block:: pycon
 
-
->>>
     >>> import et_dot
     >>> import numpy as np
     >>> a = np.array([1,2,3])
@@ -1218,7 +1206,6 @@ conversion:
     copied an array: size=3, elsize=8
     copied an array: size=3, elsize=8
     
-
 Here, ``size`` refers to the length of the array, and elsize is thenumber of bytes
 needed for each element of the target array type, c.q. a ``float``.
 
@@ -1258,28 +1245,6 @@ case:
         else:
             click.secho(msg, fg="bright_red")
 
-.. _f90-modules:
-
-3.3.1. Dealing with Fortran modules
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Modern Fortran has a *module* concept of its own. This may be a bit confusing, as we have
-been talking about modules in a Python context, so far. The Fortran module is meant to
-group variable and procedure definitions that conceptually belong together.
-Inside fortran they are comparable to C/C++ header files. Here is an example:
-
-.. code-block:: fortran
-
-    MODULE my_f90_module
-    implicit none
-    contains
-      function dot(a,b)
-        ...
-      end function dot
-    END MODULE my_f90_module
-
-F2py translates the module containing the Fortran ``dot`` definition into an extra
-*namespace* appearing in between the :py:mod:`dotf` Python submodule and the
-:py:meth:`dot` function, which is found in ``et_dot.dotf.my_f90_module``
-instead of in ``et_dot.dotf``.
+Obviously, you should also add the other tests we created for the Python
+implementation. 
 

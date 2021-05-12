@@ -49,7 +49,7 @@ build the extension module. (The wrappers are in C, so f2py_ needs a C compiler 
 Pybind11_ is a *C++ template library* that is used to express what needs to be exposed in the
 binary extension module.
 
-.. _f90-orr-cpp:
+.. _f90-or-cpp:
 
 2.1.1 Choosing between Fortran and C++ for binary extension modules [intermediate]
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -885,7 +885,7 @@ When interfacing several programming languages data types require special care.
 
     .. code-block:: c
 
-        sumab = wrapper_add(a,b)
+        double* =wrapper_add(double* a,b)
 
     and, consequently, imply copying of the result variable.
     While ``intent(out)`` would certainly ok in Fortran-only code, and the semantics of

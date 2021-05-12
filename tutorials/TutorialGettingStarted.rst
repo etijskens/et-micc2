@@ -1,6 +1,6 @@
 .. include:: ../HYPERLINKS.rst
 
-.. _Tutorial-1:
+.. _TutorialGettingStarted:
 
 1. Getting started with Micc2
 =============================
@@ -554,11 +554,11 @@ When executed, this results in printing ``Hello dear students!``
 
 Python has an interesting idiom for allowing a module also to behave as a script.
 Python defines a ``__name__`` variable for each file it interprets. When the file is
-executed as a script, as in ``python script.py``, the ``__name__`` variable is set to
-``__main__`` and when the file is imported the __name__`` variable is set to
-the module name. By testing the value of the __name__`` variable we can selectively
-execute statements depending on whether a Python file is imported or executed as a
-script. E.g. below we we added some tests for the ``hello`` method:
+executed as a script, as in ``python script.py``, the
+``__name__`` variable is set to ``__main__`` and when the file is imported the __name__``
+variable is set to the module name. By testing the value of the __name__`` variable we
+can selectively execute statements depending on whether a Python file is imported or
+executed as a script. E.g. below we we added some tests for the ``hello`` method:
 
 .. code-block:: python
 
@@ -695,11 +695,11 @@ file you will find some extra code:
         print('-*# finished #*-')                              # 5
 
 On line ``# 1``, the name of the test method we want to debug is aliased as
-``the_test_you_want_to_debug``, c.q. ``test_hello_noargs``. The variable thus
-becomes an alias for the test method. Line ``# 3`` prints a message with the name of the
-test method being debugged to assure you that you are running the test you want. Line
-``# 4`` calls the test method, and, finally, line ``# 5`` prints a message just before
-quitting, to assure you that the code went well until the end.
+``the_test_you_want_to_debug``, c.q. ``test_hello_noargs``. The variable thus becomes an alias for the test method. Line ``# 3``
+prints a message with the name of the test method being debugged to assure you that you
+are running the test you want. Line ``# 4`` calls the test method, and, finally, line
+``# 5`` prints a message just before quitting, to assure you that the code went well
+until the end.
 
 .. code-block:: python
 
