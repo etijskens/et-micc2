@@ -1360,8 +1360,8 @@ class Project:
                     self.logger.info(f"Removing test file: 'tests/test_cpp_{cur_name}.py'")
                     self.remove_file(self.project_path / 'tests' / f'test_cpp_{cur_name}.py')
 
-                elif component_options['app'] or component_options['group']:
-                    self.logger.info(f"Removing app: 'cli_{cur_name}.py'")
+                elif component_options['cli'] or component_options['clisub']:
+                    self.logger.info(f"Removing CLI: 'cli_{cur_name}.py'")
                     self.remove_file(self.project_path / self.package_name / f"cli_{cur_name}.py")
                     self.logger.info(f"Removing test file: 'test_cli_{cur_name}.py'")
                     self.remove_file(self.project_path /  'tests' / f"test_cli_{cur_name}.py")
