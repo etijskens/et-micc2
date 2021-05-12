@@ -76,7 +76,7 @@ implementation to the local git repository:
 .. code-block:: bash
 
     > git commit -a -m 'implemented dot()'
-    [master a304e1a] implemented dot()
+    [master 49a8002] implemented dot()
      1 file changed, 23 insertions(+), 22 deletions(-)
      rewrite et_dot/__init__.py (71%)
     
@@ -178,7 +178,7 @@ good practise to commit this to our local git repository:
 .. code-block:: bash
 
     > git commit -a -m 'added test_dot_aa()'
-    [master 32584ce] added test_dot_aa()
+    [master d52145f] added test_dot_aa()
      1 file changed, 7 insertions(+), 33 deletions(-)
      rewrite tests/test_et_dot.py (98%)
     
@@ -490,14 +490,14 @@ well:
 .. code-block:: bash
 
     > git commit -a -m 'dot() tests added'
-    [master 589e6a8] dot() tests added
+    [master 168cb64] dot() tests added
      1 file changed, 70 insertions(+)
     
     > micc2 version -p
     [INFO]           (ET-dot)> version (0.0.0) -> (0.0.1)
     
     > git commit -a -m 'v0.0.1'
-    [master e305b93] v0.0.1
+    [master eaa6b6f] v0.0.1
      2 files changed, 2 insertions(+), 2 deletions(-)
     
 
@@ -576,7 +576,7 @@ Executing this script yields:
 .. code-block:: bash
 
     > python ./prof/run1.py
-    237.5560153549568
+    248.44727470689443
     -*# done #*-
     
 
@@ -637,9 +637,9 @@ and execute it again:
 .. code-block:: bash
 
     > python ./prof/run1.py
-    init : 0.000329 s
-    dot  : 0.000112 s
-    258.0159744740434
+    init : 0.000293 s
+    dot  : 0.000106 s
+    251.91722210282683
     -*# done #*-
     
 
@@ -684,9 +684,9 @@ Its execution yields:
 .. code-block:: bash
 
     > python ./prof/run1.py
-    et init : 0.000278 s
-    et dot  : 9.3e-05 s
-    np init : 6e-05 s
+    et init : 0.000294 s
+    et dot  : 9.6e-05 s
+    np init : 7.9e-05 s
     np dot  : 7e-06 s
     -*# done #*-
     
@@ -1146,7 +1146,7 @@ Then run the test (we only run the test for the dotf module, as we did not touch
     
     tests/test_f90_dotf.py .                                                 [100%]
     
-    ============================== 1 passed in 0.32s ===============================
+    ============================== 1 passed in 0.31s ===============================
     
 
 The astute reader will notice the magic that is happening here: ``a`` is a numpy array,
