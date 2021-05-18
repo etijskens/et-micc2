@@ -315,36 +315,40 @@ class Project:
                 proj_cfg = self.project_path / 'micc2.cfg'
                 self.options.template_parameters.save(proj_cfg)
 
-                with et_micc2.logger.log(self.logger.info, "Creating local git repository"):
-                    with et_micc2.utils.in_directory(self.project_path):
-                        cmds = [ ['git', 'init']
-                               , ['git', 'add', '*']
-                               , ['git', 'add', '.gitignore']
-                               , ['git', 'commit', '-m', '"And so this begun..."']
-                               ]
-                        returncode = et_micc2.utils.execute(cmds, self.logger.debug, stop_on_error=True)
-                if not returncode:
-                    if self.options.remote:
-                        # todo this context manager does not print correctly
-                        with et_micc2.logger.log(self.logger.info, f"Creating remote git repository at https://github.com/{github_username}/{self.project_name}"):
-                            with et_micc2.utils.in_directory(self.project_path):
-                                pat_file = self.options._cfg_dir / f'{self.options.template_parameters["github_username"]}.pat'
-                                if pat_file.exists():
-                                    with open(pat_file) as f:
-                                        completed_process = \
-                                            subprocess.run( ['gh', 'auth', 'login', '--with-token'], stdin=f, text=True )
-                                        et_micc2.utils.log_completed_process(completed_process,self.logger.debug)
+                # add git support if requested
+                if self.options.no_local:
+                    self.logger.warning("Flag `--no-local` specified: omitting git support.")
+                else:
+                    with et_micc2.logger.log(self.logger.info, "Creating local git repository"):
+                        with et_micc2.utils.in_directory(self.project_path):
+                            cmds = [ ['git', 'init']
+                                   , ['git', 'add', '*']
+                                   , ['git', 'add', '.gitignore']
+                                   , ['git', 'commit', '-m', '"And so this begun..."']
+                                   ]
+                            returncode = et_micc2.utils.execute(cmds, self.logger.debug, stop_on_error=True)
+                    if not returncode:
+                        if self.options.remote:
+                            # todo this context manager does not print correctly
+                            with et_micc2.logger.log(self.logger.info, f"Creating remote git repository at https://github.com/{github_username}/{self.project_name}"):
+                                with et_micc2.utils.in_directory(self.project_path):
+                                    pat_file = self.options._cfg_dir / f'{self.options.template_parameters["github_username"]}.pat'
+                                    if pat_file.exists():
+                                        with open(pat_file) as f:
+                                            completed_process = \
+                                                subprocess.run( ['gh', 'auth', 'login', '--with-token'], stdin=f, text=True )
+                                            et_micc2.utils.log_completed_process(completed_process,self.logger.debug)
 
-                                        cmds = [ ['gh', 'repo', 'create', self.project_name, f'--{self.options.remote}', '-y']
-                                               , ['git', 'push', '-u', 'origin', self.options.template_parameters['git_default_branch']]
-                                               ]
-                                        et_micc2.utils.execute(cmds, self.logger.debug, stop_on_error=True)
-                                else:
-                                    self.logger.error("Unable to access your GitHub account: file '~/.pat.txt' not found.\n"
-                                                      "Remote repository not created."
-                                                     )
-                    else:
-                        self.logger.warning("Creation of remote GitHub repository not requested.")
+                                            cmds = [ ['gh', 'repo', 'create', self.project_name, f'--{self.options.remote}', '-y']
+                                                   , ['git', 'push', '-u', 'origin', self.options.template_parameters['git_default_branch']]
+                                                   ]
+                                            et_micc2.utils.execute(cmds, self.logger.debug, stop_on_error=True)
+                                    else:
+                                        self.logger.error("Unable to access your GitHub account: file '~/.pat.txt' not found.\n"
+                                                          "Remote repository not created."
+                                                         )
+                        else:
+                            self.logger.warning("Creation of remote GitHub repository not requested.")
 
                 # self.logger.warning(
                 #     "Run 'poetry install' in the project directory to create a virtual "

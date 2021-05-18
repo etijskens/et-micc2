@@ -294,6 +294,10 @@ def setup(ctx
     , help="use this name for the module, rather than deriving it from the project name."
     , default=''
 )
+@click.option('--no-local'
+    , help="Do not create a local git repo. "
+    , default=False, is_flag=True
+)
 @click.option('--remote'
     , help="Create remote repo on github. Choose from 'public'(=default), 'private', or 'none'."
     , default='public'
@@ -308,6 +312,7 @@ def create(ctx
            , template
            , allow_nesting
            , publish
+           , no_local
            , remote
            ):
     """Create a new project skeleton.
@@ -354,7 +359,11 @@ def create(ctx
               )
         ctx.exit(-1)
 
-    options.remote = None if remote=='none' else remote
+    options.no_local = no_local
+    if no_local:
+        options.remote = 'none'
+    else:
+        options.remote = None if remote=='none' else remote
 
     if not template:  # default is empty list
         if options.package_structure:
