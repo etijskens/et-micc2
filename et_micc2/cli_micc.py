@@ -294,8 +294,8 @@ def setup(ctx
     , help="use this name for the module, rather than deriving it from the project name."
     , default=''
 )
-@click.option('--no-local'
-    , help="Do not create a local git repo. "
+@click.option('--no-git'
+    , help="Create the project without git support. "
     , default=False, is_flag=True
 )
 @click.option('--remote'
@@ -312,7 +312,7 @@ def create(ctx
            , template
            , allow_nesting
            , publish
-           , no_local
+           , no_git
            , remote
            ):
     """Create a new project skeleton.
@@ -359,8 +359,8 @@ def create(ctx
               )
         ctx.exit(-1)
 
-    options.no_local = no_local
-    if no_local:
+    options.no_git = no_git
+    if no_git:
         options.remote = 'none'
     else:
         options.remote = None if remote=='none' else remote

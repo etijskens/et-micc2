@@ -316,8 +316,8 @@ class Project:
                 self.options.template_parameters.save(proj_cfg)
 
                 # add git support if requested
-                if self.options.no_local:
-                    self.logger.warning("Flag `--no-local` specified: omitting git support.")
+                if self.options.no_git:
+                    self.logger.warning(f"Flag `--no-git` specified: project `{project_name}` created without git support.")
                 else:
                     with et_micc2.logger.log(self.logger.info, "Creating local git repository"):
                         with et_micc2.utils.in_directory(self.project_path):
