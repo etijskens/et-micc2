@@ -57,7 +57,7 @@ _preferences_setup = { "full_name":
                            { "choices": [ 'MIT license', 'GNU General Public License v3'
                                         , 'BSD license', 'ISC license'
                                         , 'Apache Software License 2.0', 'Not open source']
-                           , "text": "default software license" }
+                           , "text": "the default software license" }
                      }
 
 
