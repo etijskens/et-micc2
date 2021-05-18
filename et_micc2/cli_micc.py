@@ -57,7 +57,7 @@ _preferences_setup = { "full_name":
                            { "choices": [ 'MIT license', 'GNU General Public License v3'
                                         , 'BSD license', 'ISC license'
                                         , 'Apache Software License 2.0', 'Not open source']
-                           , "text": "software license" }
+                           , "text": "default software license" }
                      }
 
 
@@ -217,10 +217,12 @@ def setup(ctx
                     p_cfg_dir = Path(options.preferences['file_loc']).parent
                     p_cfg_dir_renamed = p_cfg_dir.parent / (p_cfg_dir.name + suffix)
                     if p_cfg_dir_renamed.exists():
-                        click.secho(f'Error: suffix `{suffix}` is already in use, choose anoher.', fg='bright_red')
+                        click.secho(f'Error: suffix `{suffix}` is already in use, choose another.', fg='bright_red')
                     else:
                         p_cfg_dir.rename(p_cfg_dir_renamed)
                         break
+                else:
+                    break
             # forget the previous preferences.
             options.preferences = None
         else:

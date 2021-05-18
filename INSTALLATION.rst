@@ -327,6 +327,7 @@ to save the results. The dialogue goes like this::
     Continue? yes/no >:
     Preferences saved to /Users/etijskens/.micc2/micc2.cfg.
 
+Micc2_ uses your name and e-mail address to configure git.
 Finally, if you want to be able to automatically create remote github repositories,
 you need also a personal access token for your github account. Follow
 `these instructions <https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token>`_
