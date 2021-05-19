@@ -1,9 +1,14 @@
 .. include:: ../HYPERLINKS.rst
 
-.. _git:
+.. _version-control-management:
 
-5. Version control with Git_
-============================
+5. Version control and version management
+=========================================
+
+.. _vcs-git:
+
+5.1. Version control with Git_
+------------------------------
 
 Version control systems (VCS) keep track of modifications to the code in a special
 kind of database, called a repository.
@@ -30,8 +35,8 @@ branches.
 
 .. _git-support:
 
-5.1. Git support
-----------------
+5.2. Git support from Micc2_
+----------------------------
 
 Micc2_ prepares your projects for the Git_ version control system. If you are New to
 Git_, we recommend reading
@@ -39,28 +44,25 @@ Git_, we recommend reading
 This article provides a concise introduction to get you going, and some pointers to
 more detailed documentation. 
 
-When Micc2_ creates a new project, it automatically sets up a local Git_ repository
-and commits the the created project tree with the message 'And so this begun...'.
-Micc2_ can also create a remote repository at GitHub_ as well. By default this remote
-repository is public, following the spirit of open source development. You can ask
-for a private repository by specifying ``--remote-private``, or for no remote
-repository at all by specifying ``--remote=none``. If a remote repository is
-created, the commit 'And so this begun...' is pushed to the remote repository. For
-working with remote Git_ repositories see
+For full git_ support, Micc2 must be setup as explained in :ref:`installation`. When
+Micc2_ creates a new project, it automatically sets up a local Git_ repository and
+commits the the created project tree with the message 'And so this begun...'. If you do
+not want to use this local repository, just delete the file :file:`.gitignore` and
+directory :file:`.git`. Alternatively, so create project with no git support at all
+specify ``micc2 create <project_name> --no-git``. Micc2_ can also create a remote
+repository for the project at GitHub_. By default this remote repository is public,
+following the spirit of open source development. You can ask for a private repository
+by specifying ``--remote=private``, or for no remote repository at all by
+specifying ``--remote=none``. If a remote repository is created, the commit 'And so
+this begun...' is immediately pushed to the remote repository. For working with
+remote Git_ repositories see
 `Working with remotes <https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes>`_,
 especially checkout the sections 'Pushing to Your Remotes' and 'Fetching and
 Pulling from Your Remotes'.
 
-.. note::
-
-   For creating remote repositories for your projects, Micc2_ must be set up correctly.
-   See :ref:`micc2 - setup` for details.
-
-Some files and directories are better not stored 
-
 .. _git-workflow:
 
-5.2. Git workflow
+5.3. Git workflow
 -----------------
 
 Some advice for beginners on how to use git_ with your micc project may be appropriate. 
@@ -71,7 +73,9 @@ Some advice for beginners on how to use git_ with your micc project may be appro
   answer is 'yes', tell git_ to track the file or directory with the command ``git add
   <file-or-directory>``. Otherwise, add the file the :file:`.gitignore` file in the
   project directory: ``echo <file-or-directory> >> .gitignore`` (you can also do
-  this withe an editor).
+  this withe an editor). Temporary directories, like :file:`_cmake_build` for
+  building binary extensions, or :file:`_build` for building documentation are
+  automatically added to the :file:`.gitignore` file.
 
 * Whenever a piece of work is finished and shows no obvious errors, like syntax errors,
   and passes all the tests, commit the finished work with ``git commit -m <message>``,

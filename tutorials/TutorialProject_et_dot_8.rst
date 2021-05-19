@@ -73,7 +73,7 @@ passes, of course:
     
     tests/test_foo.py::test_greet PASSED
     
-    ============================== 1 passed in 0.11s ===============================
+    ============================== 1 passed in 0.13s ===============================
     
 
 
@@ -250,6 +250,6 @@ options. Sphinx_click_ does the same to extract documentation for your CLI.
 Here, we did not exactly call the CLI as ``dotfiles``, but that is because the package
 is not yet installed. The installed executable ``dotfiles`` would just wrap the
 command as ``python path/to/et_dot/cli_dotfiles.py``. Note, that the verbosity
-parameter is using a nice Click_ feature: by adding more ``v``s the verbosity
+parameter is using a nice Click_ feature: by adding more ``v`` s the verbosity
 increases.
 

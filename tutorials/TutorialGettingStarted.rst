@@ -25,7 +25,7 @@ the necessary setup for you to use other tools as you need them. Learning to use
 following tools is certainly beneficial:
 
 * Git_: for version control. Its use is optional but highly recommended. See
-  :ref:`TUTORIAL4` for some basic git_ coverage.
+  :ref:`version-control-management` for some basic git_ coverage.
 
 * Pytest_: for (unit) testing. Also optional and also highly recommended.
 
@@ -647,7 +647,7 @@ automatically found and executed by running ``pytest`` in the project directory:
     tests/test_my_first_project.py::test_hello_noargs PASSED                 [ 50%]
     tests/test_my_first_project.py::test_hello_me PASSED                     [100%]
     
-    ============================== 2 passed in 0.01s ===============================
+    ============================== 2 passed in 0.02s ===============================
     
 
 Specifying the :file:`tests` directory ensures that Pytest_ looks for tests only in
@@ -826,7 +826,7 @@ Git_ is a version control system (VCS) that solves many practical problems relat
 the process software development, independent of whether your are the only
 developer, or whether there is an entire team working on it from different places in
 the world. You find more information about how Micc2_ cooperates with Git_ in
-:ref:`Tutorial-4`.
+:ref:`version-control-management`.
 
 .. _miscellaneous:
 

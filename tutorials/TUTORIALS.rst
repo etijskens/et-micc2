@@ -7,4 +7,7 @@
 .. include:: ../tutorials/TutorialProject_et_dot_6.rst
 .. include:: ../tutorials/TutorialProject_et_dot_7.rst
 .. include:: ../tutorials/TutorialProject_et_dot_8.rst
+.. include:: ../tutorials/TutorialVCS.rst
+.. include:: ../tutorials/TutorialVersionManagement.rst
+
 

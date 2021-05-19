@@ -76,7 +76,7 @@ implementation to the local git repository:
 .. code-block:: bash
 
     > git commit -a -m 'implemented dot()'
-    [master 49a8002] implemented dot()
+    [master 3fb1a47] implemented dot()
      1 file changed, 23 insertions(+), 22 deletions(-)
      rewrite et_dot/__init__.py (71%)
     
@@ -178,7 +178,7 @@ good practise to commit this to our local git repository:
 .. code-block:: bash
 
     > git commit -a -m 'added test_dot_aa()'
-    [master d52145f] added test_dot_aa()
+    [master f973bf6] added test_dot_aa()
      1 file changed, 7 insertions(+), 33 deletions(-)
      rewrite tests/test_et_dot.py (98%)
     
@@ -272,7 +272,7 @@ setting the seed of the random number generator:
     tests/test_et_dot.py::test_dot_aa PASSED                                 [ 50%]
     tests/test_et_dot.py::test_dot_commutative PASSED                        [100%]
     
-    ============================== 2 passed in 0.02s ===============================
+    ============================== 2 passed in 0.03s ===============================
     
 
 The 1000 tests all pass. If, say test 315 would fail, it would fail every time we run it
@@ -490,14 +490,14 @@ well:
 .. code-block:: bash
 
     > git commit -a -m 'dot() tests added'
-    [master 168cb64] dot() tests added
+    [master 27e5833] dot() tests added
      1 file changed, 70 insertions(+)
     
     > micc2 version -p
     [INFO]           (ET-dot)> version (0.0.0) -> (0.0.1)
     
     > git commit -a -m 'v0.0.1'
-    [master eaa6b6f] v0.0.1
+    [master d8d8af0] v0.0.1
      2 files changed, 2 insertions(+), 2 deletions(-)
     
 
@@ -576,7 +576,7 @@ Executing this script yields:
 .. code-block:: bash
 
     > python ./prof/run1.py
-    248.44727470689443
+    244.2487522866886
     -*# done #*-
     
 
@@ -637,9 +637,9 @@ and execute it again:
 .. code-block:: bash
 
     > python ./prof/run1.py
-    init : 0.000293 s
-    dot  : 0.000106 s
-    251.91722210282683
+    init : 0.000329 s
+    dot  : 0.000118 s
+    249.24563905517604
     -*# done #*-
     
 
@@ -684,10 +684,10 @@ Its execution yields:
 .. code-block:: bash
 
     > python ./prof/run1.py
-    et init : 0.000294 s
-    et dot  : 9.6e-05 s
-    np init : 7.9e-05 s
-    np dot  : 7e-06 s
+    et init : 0.000259 s
+    et dot  : 9.4e-05 s
+    np init : 6.3e-05 s
+    np dot  : 6e-06 s
     -*# done #*-
     
 
@@ -793,7 +793,7 @@ This command uses CMake_ to pass the build options to the compiler, while bridgi
 gap between C++ and Fortran, on one hand and Python on the other hand using pybind11_
 and f2py_. respectively. This is illustrated in the figure below:
 
-.. include:: ../tutorials/im-building.png
+.. image:: ../tutorials/im-building.png
 
 There is a difference in how f2py_ and pybind11_ operate. F2py_ is an *executable*
 that inspects the Fortran source and create wrappers for the subprograms it finds and
@@ -862,8 +862,7 @@ The ``add`` subcommand adds a component to your project. It specifies a name, he
 ``foo``, and a flag to specify the kind of the component, ``--f90`` for a Fortran
 binary extension module, ``--cpp`` for a C++ binary extension module. Other
 components are a Python sub-module with module structure (``--module``), or
-package structure ``--package``, and a CLI script (`--cli` and `--clisub`). More
-details about these other components are found in :ref:`tutorial-4`.
+package structure ``--package``, and a CLI script (`--cli` and `--clisub`). 
 
 You can add as many components to your code as you want. However, the project must have a
 *package* structure (see :ref:`modules-and-packages` for how to convert a project
@@ -1146,7 +1145,7 @@ Then run the test (we only run the test for the dotf module, as we did not touch
     
     tests/test_f90_dotf.py .                                                 [100%]
     
-    ============================== 1 passed in 0.31s ===============================
+    ============================== 1 passed in 0.40s ===============================
     
 
 The astute reader will notice the magic that is happening here: ``a`` is a numpy array,

@@ -135,7 +135,7 @@ on the contrary I/O intensive and may put the cluster's file system under stress
 So do not install any sphinx_ related packages on your cluster. Documentation should be
 built on a desktop/laptop system.
 
-Poetry_ is also missing. As long as the virtual environments created with poetry_
+Poetry_ is also missing. As long as the virtual environments created by poetry_
 have problems with honoring the ``--system-site-packages`` flag, we do not recommend
 poetry_ for use on the cluster. Publishing can be done in a desktop environment, just
 like building documentation.
