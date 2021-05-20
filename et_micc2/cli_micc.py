@@ -245,7 +245,7 @@ def setup(ctx
     # set some preferences for which the default is almost always ok
     selected['version'] = '0.0.0'  # default initial version number of a new projec
     selected["github_repo"] = "{{cookiecutter.project_name}}"  # default github repo name for a project
-    selected["git_default_branch"] = "main"  # default git branch
+    selected["git_default_branch"] = "master" # default git branch
     selected["minimal_python_version"] = "3.7"  # default minimal Python version"
     selected["py"] = "py"
 
