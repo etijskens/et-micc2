@@ -141,6 +141,11 @@ class Project:
         if et_micc2.utils.is_project_directory(project_path, self):
             # If the project already exists, we can get ourselves a logger;
             self.get_logger()
+        else:
+            # Not a project directory, only create and setup subcommands can work,
+            # (but setup does not construct a Project object)
+            if not self.options.invoked_subcommand in ('create',):
+                self.error(f'Not a project directory: `{project_path}`')
 
 
     def ask_user_to_continue_or_not(self, default=False, stop_message='Exiting.'):

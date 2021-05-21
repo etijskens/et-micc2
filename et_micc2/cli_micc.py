@@ -141,7 +141,9 @@ def main( ctx, verbosity, project_path, clear_log
         default_project_path=(project_path=='.'),
         clear_log=clear_log,
         _cfg_filename=_cfg_filename,
-        _cfg_dir=_cfg_dir
+        _cfg_dir=_cfg_dir,
+        invoked_subcommand=ctx.invoked_subcommand
+
     )
 
     overwrite_preferences_set = {}
@@ -439,7 +441,7 @@ def create(ctx
         project = Project(options)
         project.create_cmd()
     except RuntimeError:
-        ctx.exit(project.exit_code)
+        ctx.exit(2)
 
 
 ####################################################################################################
@@ -514,7 +516,7 @@ def info(ctx,name,version):
     try:
         project = Project(options)
     except RuntimeError:
-        ctx.exit(project.exit_code)
+        ctx.exit(-2)
 
     if name:
         print(project.package_name)
@@ -585,13 +587,13 @@ def version(ctx, major, minor, patch, rule, tag, short, dry_run):
     try:
         project = Project(options)
     except RuntimeError:
-        ctx.exit(project.exit_code)
+        ctx.exit(2)
 
     with et_micc2.logger.logtime(project):
         try:
             project.version_cmd()
         except RuntimeError:
-            ctx.exit(project.exit_code)
+            ctx.exit(2)
         else:
             if tag:
                 project.tag_cmd()
@@ -610,7 +612,7 @@ def tag(ctx):
         project = Project(options)
         project.tag_cmd()
     except RuntimeError:
-        ctx.exit(project.exit_code)
+        ctx.exit(2)
 
 
 ####################################################################################################
@@ -704,7 +706,7 @@ def add(ctx
         with et_micc2.logger.logtime(project):
             project.add_cmd()
     except RuntimeError:
-        ctx.exit(project.exit_code)
+        ctx.exit(2)
 
 
 ####################################################################################################
@@ -746,7 +748,7 @@ def mv(ctx, cur_name, new_name, silent, entire_package, entire_project):
         with et_micc2.logger.logtime(options):
             project.mv_component()
     except RuntimeError:
-        ctx.exit(project.exit_code)
+        ctx.exit(2)
 
 
 ####################################################################################################
@@ -790,7 +792,7 @@ def build( ctx
         with et_micc2.logger.logtime(options):
             project.build_cmd()
     except RuntimeError:
-        ctx.exit(project.exit_code)
+        ctx.exit(2)
 
 
 ####################################################################################################
