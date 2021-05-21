@@ -314,6 +314,79 @@ testing micc2
 * ``micc2 create --no-git`` fails at running ``which git``, because windows does not know ``which``.
 
 * after fixing setup problems ``micc2 create`` can create local and remote repos.
+  ``micc2 create wintest``
 
 * ``micc2 version`` is ok
 
+* ``pytest`` succeeds
+
+* ``micc2 convert-to-package`` succeeds
+
+* ``micc2 add foo --package`` succeeds
+
+* ``pytest`` succeeds
+
+* ``micc2 add app --cli`` succeeds
+
+* ``pytest`` succeeds
+
+* adding binary extension modules works too, we just have to build them...
+  That does not work so far, because the compilers are not found::
+
+    C:\Users\User\workspace\wintest>micc2 build
+    [INFO] [ Building cpp module 'cxx':
+    ['c:\\users\\user\\appdata\\local\\programs\\python\\python39', 'c:\\users\\user\\appdata\\local\\programs\\python\\python39\\lib\\site-packages', 'C:\\Users\\User\\AppData\\Roaming\\Python\\Python39\\site-packages']
+    path_to_cmake_tools=c:\users\user\appdata\local\programs\python\python39\lib\site-packages\pybind11\share\cmake\pybind11
+    [DEBUG]          [ > cmake -D PYTHON_EXECUTABLE=c:\users\user\appdata\local\programs\python\python39\python.exe -D pybind11_DIR=c:\users\user\appdata\local\programs\python\python39\lib\site-packages\pybind11\share\cmake\pybind11 ..
+    [WARNING]            > cmake -D PYTHON_EXECUTABLE=c:\users\user\appdata\local\programs\python\python39\python.exe -D pybind11_DIR=c:\users\user\appdata\local\programs\python\python39\lib\site-packages\pybind11\share\cmake\pybind11 ..
+    [WARNING]            (stdout)
+                         -- Building for: NMake Makefiles
+                         -- The CXX compiler identification is unknown
+                         CMake Error at CMakeLists.txt:24 (project):
+                           The CMAKE_CXX_COMPILER:
+
+                             cl
+
+                           is not a full path and was not found in the PATH.
+
+                           To use the NMake generator with Visual C++, cmake must be run from a shell
+                           that can use the compiler cl from the command line.  This environment is
+                           unable to invoke the cl compiler.  To fix this problem, run cmake from the
+                           Visual Studio Command Prompt (vcvarsall.bat).
+
+                           Tell CMake where to find the compiler by setting either the environment
+                           variable "CXX" or the CMake cache entry CMAKE_CXX_COMPILER to the full path
+                           to the compiler, or to the compiler name if it is in the PATH.
+
+
+                         -- Configuring incomplete, errors occurred!
+                         See also "C:/Users/User/workspace/wintest/wintest/cpp_cxx/_cmake_build/CMakeFiles/CMakeOutput.log".
+                         See also "C:/Users/User/workspace/wintest/wintest/cpp_cxx/_cmake_build/CMakeFiles/CMakeError.log".
+    [DEBUG]          ] done.
+    [INFO] ] done.
+    [INFO] [ Building f90 module 'fortran':
+    [DEBUG]          [ > cmake -D PYTHON_EXECUTABLE=c:\users\user\appdata\local\programs\python\python39\python.exe ..
+    [WARNING]            > cmake -D PYTHON_EXECUTABLE=c:\users\user\appdata\local\programs\python\python39\python.exe ..
+    [WARNING]            (stdout)
+                         -- Building for: NMake Makefiles
+                         -- The Fortran compiler identification is unknown
+                         CMake Error at CMakeLists.txt:55 (project):
+                           No CMAKE_Fortran_COMPILER could be found.
+
+                           Tell CMake where to find the compiler by setting either the environment
+                           variable "FC" or the CMake cache entry CMAKE_Fortran_COMPILER to the full
+                           path to the compiler, or to the compiler name if it is in the PATH.
+
+
+                         -- Configuring incomplete, errors occurred!
+                         See also "C:/Users/User/workspace/wintest/wintest/f90_fortran/_cmake_build/CMakeFiles/CMakeOutput.log".
+                         See also "C:/Users/User/workspace/wintest/wintest/f90_fortran/_cmake_build/CMakeFiles/CMakeError.log".
+    [DEBUG]          ] done.
+    [INFO] ] done.
+    [ERROR]          Binary extensions failing to build:
+    [ERROR]          - C:\Users\User\workspace\wintest\wintest\cxx.cp39-win_amd64.pyd
+    [ERROR]          - C:\Users\User\workspace\wintest\wintest\fortran.cp39-win_amd64.pyd
+
+    C:\Users\User\workspace\wintest>
+
+  The error messages are reasonably clear though.
