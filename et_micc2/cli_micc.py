@@ -3,6 +3,8 @@
 """
 Application micc2
 """
+import subprocess
+
 
 def sys_path_helper():
     """Make sure that et_micc2 can be imported in case this file is executed as::
@@ -179,7 +181,7 @@ def main( ctx, verbosity, project_path, clear_log
             print(f"ERROR: No configuration file found in \n"
                   f"       - {ctx.obj.project_path / 'micc2.cfg'}\n"
                   f"       - {Path.home() / '.et-micc2/.et-micc2.cfg'}\n"
-                  f"Run `micc setup` first.")
+                  f"Run `mic2 setup` first.")
             ctx.exit(1)
 
     # pass on the preferences and their overwrites to the subcommands (The overwrite_preferences
@@ -257,12 +259,32 @@ def setup(ctx
     if not answer.lower().startswith('n'):
         options.preferences.save(save_to, mkdir=True)
         print(f'Preferences saved to {save_to}.')
+        print('Configuring git:')
+        if shutil.which('git'):
+            cmd = ['git','config', '--global', 'user.name', options.preferences['github_username']]
+            print(f'  {" ".join(cmd)}')
+            subprocess.run(cmd)
+            cmd = ['git','config', '--global', 'user.email', options.preferences['email']]
+            print(f'  {" ".join(cmd)}')
+            subprocess.run(cmd)
+        else:
+            print('WARNING: git not found, could not configure git.')
+            ctx.exit(1)
+
     else:
         print('Interrupted. Preferences not saved.')
         ctx.exit(1)
 
     # make the scripts directory available through a symlink in the configuration directory:
-    os.symlink(src=Path(pkg_resources.get_distribution('et-micc2').location) / 'scripts', dst = _cfg_dir / 'scripts')
+    if hasattr(os, 'enable_symlink') and not os.enable_symlink():
+        raise WindowsError()
+    src = Path(pkg_resources.get_distribution('et-micc2').location) / 'et_micc2/scripts'
+    dst = _cfg_dir / 'scripts'
+    dst.unlink(missing_ok=True)
+    os.symlink( src=src
+              , dst=dst
+              , target_is_directory=True    # needed on windows
+              )
 
     ctx.exit(0)
 
