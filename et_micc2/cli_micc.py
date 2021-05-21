@@ -197,18 +197,27 @@ def main( ctx, verbosity, project_path, clear_log
 @click.option('--force', '-f', is_flag=True
     , help="Overwrite existing setup."
     , default=False
-              )
+)
+@click.option('--modify', '-m', is_flag=True
+    , help="Modify existing setup."
+    , default=False
+)
 @click.pass_context
-def setup(ctx
-          , force
-          ):
+def setup( ctx
+         , force
+         , modify
+        ):
     """Setup your micc preferences.
 
     This command must be run once before you can use micc to manage your projects.
     """
     options = ctx.obj
 
-    if not options.preferences is None:
+    if options.preferences is None:
+        pass
+    else:
+        if modify:
+            force = True
         if force:
             click.secho(f"Overwriting earlier setup: \n    {options.preferences['file_loc']}", fg='bright_red')
             click.secho("Enter a suffix for the configuration directory if you want to make a backup.")
@@ -225,8 +234,10 @@ def setup(ctx
                         break
                 else:
                     break
+
             # forget the previous preferences.
-            options.preferences = None
+            if not modify:
+                options.preferences = None
         else:
             print(f"Micc2 has already been set up:\n"
                   f"    {options.preferences['file_loc']}\n"
@@ -238,6 +249,9 @@ def setup(ctx
         if name in options.overwrite_preferences:
             selected[name] = options.overwrite_preferences[name]
         else:
+            if modify: # use the previous setting as default
+                if not 'choices' in description:
+                    description['default'] = options.preferences[name]
             try:
                 selected[name] = et_micc2.config.get_param(name, description)
             except KeyboardInterrupt:
