@@ -311,4 +311,9 @@ testing micc2
 
 * ``micc2 setup`` goes ok, but the soft link to ``site-packages\et_micc2\scripts`` lost upper case so it does not work.
 
-* ``micc2 create --no-git`` fails at running ``which git``, because windows does not know ``which``
+* ``micc2 create --no-git`` fails at running ``which git``, because windows does not know ``which``.
+
+* after fixing setup problems ``micc2 create`` can create local and remote repos.
+
+* ``micc2 version`` is ok
+

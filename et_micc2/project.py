@@ -345,8 +345,9 @@ class Project:
                                                    ]
                                             et_micc2.utils.execute(cmds, self.logger.debug, stop_on_error=True)
                                     else:
-                                        self.logger.error("Unable to access your GitHub account: file '~/.pat.txt' not found.\n"
-                                                          "Remote repository not created."
+                                        self.logger.error(f"Unable to access your GitHub account: \n"
+                                                          f"    File not found: '{pat_file}'.\n"
+                                                          f"Remote repository not created."
                                                          )
                         else:
                             self.logger.warning("Creation of remote GitHub repository not requested.")
@@ -486,8 +487,8 @@ class Project:
             if self.options.short:
                 print(self.version)
             else:
-                click.echo("Project " + click.style(f"({self.project_name}) ", fg='cyan')
-                           + "version " + click.style(f"({self.version}) ", fg='cyan')
+                click.echo("Project " + click.style(f"({self.project_name}) ", fg='green')
+                           + "version " + click.style(f"({self.version}) ", fg='green')
                            )
         else:
             r = f"--{self.options.rule}"
