@@ -302,8 +302,13 @@ environment
     Installing collected packages: pylev, pastel, msgpack, crashtest, webencodings, pywin32-ctypes, ptyprocess, lockfile, filelock, distlib, clikit, cachecontrol, appdirs, virtualenv, shellingham, requests-toolbelt, poetry-core, pkginfo, pexpect, keyring, html5lib, cleo, cachy, poetry
     Successfully installed appdirs-
 
+* we replace ``site-packages\et_micc2`` with a symbolic link to ``workspace\et-micc2\et_micc2`` (development
+  mode). Seems to work.
+
 -------------
 testing micc2
 -------------
 
-* ``micc2 setup`` goes ok, but the soft link to the 
+* ``micc2 setup`` goes ok, but the soft link to ``site-packages\et_micc2\scripts`` lost upper case so it does not work.
+
+* ``micc2 create --no-git`` fails at running ``which git``, because windows does not know ``which``

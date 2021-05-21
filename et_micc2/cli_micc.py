@@ -3,6 +3,8 @@
 """
 Application micc2
 """
+import subprocess
+
 
 def sys_path_helper():
     """Make sure that et_micc2 can be imported in case this file is executed as::
@@ -168,7 +170,7 @@ def main( ctx, verbosity, project_path, clear_log
             preferences = et_micc2.config.Config(file_loc=_cfg_dir / _cfg_filename)
         except FileNotFoundError:
             preferences = None
-    
+
     if preferences is None:
         # no preferences file found
         if ctx.invoked_subcommand == 'setup':
@@ -249,7 +251,7 @@ def setup(ctx
     selected["minimal_python_version"] = "3.7"  # default minimal Python version"
     selected["py"] = "py"
 
-    # Transfer the selected preferences to a Config object and save it to disk. 
+    # Transfer the selected preferences to a Config object and save it to disk.
     options.preferences = et_micc2.config.Config(**selected)
     save_to = _cfg_dir / _cfg_filename
     print(f'These preferences are saved to {save_to}:\n{options.preferences}')
@@ -257,12 +259,32 @@ def setup(ctx
     if not answer.lower().startswith('n'):
         options.preferences.save(save_to, mkdir=True)
         print(f'Preferences saved to {save_to}.')
+        print('Configuring git:')
+        if shutil.which('git'):
+            cmd = ['git','config', '--global', 'user.name', options.preferences['github_username']]
+            print(f'  {" ".join(cmd)}')
+            subprocess.run(cmd)
+            cmd = ['git','config', '--global', 'user.email', options.preferences['email']]
+            print(f'  {" ".join(cmd)}')
+            subprocess.run(cmd)
+        else:
+            print('WARNING: git not found, could not configure git.')
+            ctx.exit(1)
+
     else:
         print('Interrupted. Preferences not saved.')
         ctx.exit(1)
 
     # make the scripts directory available through a symlink in the configuration directory:
-    os.symlink(src=Path(pkg_resources.get_distribution('et-micc2').location) / 'scripts', dst = _cfg_dir / 'scripts')
+    if hasattr(os, 'enable_symlink') and not os.enable_symlink():
+        raise WindowsError()
+    src = Path(pkg_resources.get_distribution('et-micc2').location) / 'et_micc2/scripts'
+    dst = _cfg_dir / 'scripts'
+    dst.unlink(missing_ok=True)
+    os.symlink( src=src
+              , dst=dst
+              , target_is_directory=True    # needed on windows
+              )
 
     ctx.exit(0)
 
@@ -420,7 +442,7 @@ def convert_to_package(ctx, overwrite, backup):
     options = ctx.obj
     options.overwrite = overwrite
     options.backup = backup
-    
+
     try:
         project = Project(options)
         with et_micc2.logger.logtime(options):
@@ -540,7 +562,7 @@ def version(ctx, major, minor, patch, rule, tag, short, dry_run):
     with et_micc2.logger.logtime(project):
         try:
             project.version_cmd()
-        except RuntimeError:    
+        except RuntimeError:
             ctx.exit(project.exit_code)
         else:
             if tag:
@@ -791,7 +813,7 @@ def doc(ctx, what):
     :param str what: this argument is passed to the make command.
     """
     options = ctx.obj
-    options.what = what  
+    options.what = what
     try:
         project = Project(options)
         with et_micc2.logger.logtime(options):
