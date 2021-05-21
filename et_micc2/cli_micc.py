@@ -281,6 +281,20 @@ def setup( ctx
             cmd = ['git','config', '--global', 'user.email', options.preferences['email']]
             print(f'  {" ".join(cmd)}')
             subprocess.run(cmd)
+            # git personal access token
+            print('Paste your GitHub personal access token, or the file location containing it:')
+            pat = input(':> ')
+            if pat:
+                p = Path(pat)
+                dst = p_cfg_dir/f'{options.preferences["github_username"]}.pat'
+                if p.exists():
+                    shutil.copyfile(p, dst)
+                else:
+                    with dst.open(mode='w+') as f:
+                        f.write(pat)
+            else:
+                print('No GitHub personal access token specified.')
+
         else:
             print('WARNING: git not found, could not configure git.')
             ctx.exit(1)
