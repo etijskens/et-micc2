@@ -95,8 +95,9 @@ class ToolInfo:
             print(f'Mock: pretending tool `{exe}` is missing.')
             self.which = ''
         else:
-            completed_which = subprocess.run(['which', exe], capture_output=True, text=True)
-            self.which = completed_which.stdout.strip().replace('\n', ' ')
+            # completed_which = subprocess.run(['which', exe], capture_output=True, text=True)
+            # self.which = completed_which.stdout.strip().replace('\n', ' ')
+            self.which = shutil.which(exe)
 
         if self.which:
             if on_vsc_cluster() and not accept_cluster_os_tools and is_os_tool(self.which):
@@ -109,13 +110,13 @@ class ToolInfo:
     def version(self):
         """Return the version string of the tool, or an empty string if the tool is not available."""
         if self.which:
-            completed_version = subprocess.run([tool, '--version'], capture_output=True, text=True)
+            completed_version = subprocess.run([self.exe, '--version'], capture_output=True, text=True)
             self.version = completed_version.stdout.strip().replace('\n\n','\n')#.replace('\n','\n        ')
         else:
             self.version = ''
         return self.version
 
-__exit_missing_component__ = -1
+_exit_missing_component = -1
 
 class Project:
     """
@@ -163,7 +164,7 @@ class Project:
             answer = True if answer.startswith('y') else False
 
         if not answer:
-            self.error(stop_message, exit_code=__exit_missing_component__)
+            self.error(stop_message, exit_code=_exit_missing_component)
 
 
     @property
@@ -200,7 +201,7 @@ class Project:
             self.error(f"Cannot create project in ({self.options.project_path}):\n"
                        f"  Directory must be empty.")
 
-        if not ToolInfo('git').is_available():
+        if not self.options.no_git and not ToolInfo('git').is_available():
             if on_vsc_cluster():
                 self.warning('Your current environment has no suitable git command.\n'
                              'Load a cluster module that has git.\n'
@@ -1034,7 +1035,7 @@ class Project:
                                    '    (.venv) > pip install pybind11\n'
                                    'otherwise,\n'
                                    '    > pip install pybind11 --user\n'
-                                  , exit_code=__exit_missing_component__
+                                  , exit_code=_exit_missing_component
                                   )
                     else:
                         if pybind11.version() < __pybind11_required_version__:
