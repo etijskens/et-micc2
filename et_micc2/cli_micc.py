@@ -290,13 +290,13 @@ def setup( ctx
         ctx.exit(1)
 
     # make the scripts directory available through a symlink in the configuration directory:
-    if hasattr(os, 'enable_symlink') and not os.enable_symlink():
-        raise WindowsError()
+    if sys.platform=='win32':
+        if hasattr(os, 'enable_symlink') and not os.enable_symlink():
+            raise WindowsError('Symlinking is disabled.')
     src = Path(pkg_resources.get_distribution('et-micc2').location) / 'et_micc2/scripts'
     dst = _cfg_dir / 'scripts'
     dst.unlink(missing_ok=True)
-    os.symlink( src=src
-              , dst=dst
+    os.symlink( src=src, dst=dst
               , target_is_directory=True    # needed on windows
               )
 
