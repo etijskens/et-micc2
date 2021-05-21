@@ -179,7 +179,7 @@ def main( ctx, verbosity, project_path, clear_log
             print(f"ERROR: No configuration file found in \n"
                   f"       - {ctx.obj.project_path / 'micc2.cfg'}\n"
                   f"       - {Path.home() / '.et-micc2/.et-micc2.cfg'}\n"
-                  f"Run `micc setup` first.")
+                  f"Run `micc2 setup` first.")
             ctx.exit(1)
 
     # pass on the preferences and their overwrites to the subcommands (The overwrite_preferences
