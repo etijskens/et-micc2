@@ -3,10 +3,18 @@
 Micc2_ can be installed in different ways on your system.
 Here is a simple decision scheme:
 
-* If your system is your own desktop or laptop, go to :ref:`desktop installation`
-* If your system is a VSC HPC cluster, go to :ref:`VSC cluster installation`. There
-  are only a few important differences with the desktop installation.
-  Installation on other HPC clusters is problably quite similar.
+* if your OS is MACOS or Linux:
+
+  * If your system is your own desktop or laptop, go to :ref:`desktop installation`
+  * If your system is a VSC HPC cluster, go to :ref:`VSC cluster installation`.
+    There are only a few important differences with the desktop installation.
+    Installation on other HPC clusters is problably quite similar.
+
+* If your OS is Windows, go to :ref:`windows-options`. Micc2_ was initially developed
+  for HPC purposes. As most HPC clusters have a Linux OS, Micc2_ was developed for Linux,
+  and, by extension, MACOS. However, many HPC users are running Windows on their desktop,
+  so after Micc2_ settled, (some) support for Windows was added.
+
 
 .. _desktop installation:
 
@@ -261,6 +269,45 @@ source code are immediately visible in ``.venv-FOO``.
 Note that this works exactly the same way on the cluster, provided you load the
 appropriate cluster modules to expose the cluster tools that you need, prior to
 creating and activating the virtual environments.
+
+.. _windows_options:
+
+Windows
+-------
+If you want to use Micc2_ on Windows, you have a few options,
+most of which are incompletely tested. 
+
+Native Windows Python environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Native Python on Windows is compiled with the C/C++ compilers distributed with
+Visual Studio. Micc2_ works nicely in this environment, and can build binary
+extensions from C++ code using the Visual Studio compilers (You need the
+*Build Tools for Visual Studio 2019*). According to
+`this article <https://stackoverflow.com/questions/25671354/using-f2py-with-windows-x64-and-intel-fortran>`_
+it should also be possible to build binary extensions from Fortran code when
+you install the Intel Fortran compiler. Unfortunately, I cannot test it because
+I do not have a Windows machine, and my Macbook has not enough disk space for
+installing the complete Intel OneAPI Base Toolkit and Intel OneAPI HPC toolkit ...
+
+This is probably the most Windows-like approach possible. Note that PyCharm_
+is available for Windows too.
+
+WSL-2
+^^^^^
+Modern Windows versions are equiped with *Windows Subsystem for Linux*, a
+compatibility layer for running Linux binary executables (in ELF format)
+natively on Windows 10. It provides you with a (virtual) Linux terminal
+which should be able to run all the tools just as in a MACOS or Linux
+terminal. It should be possible to build binary extension from C++ and
+Fortran code using the Gnu Compiler Collection (GCC).
+
+Cygwin
+^^^^^^
+Cygwin_ is a large collection of GNU and Open Source tools which provide
+functionality similar to a Linux distribution on Windows. It provides all
+the necessary tools for building binary extension from C++ and Fortran code
+using the Gnu Compiler Collection (GCC).
+
 
 .. _micc2-setup:
 

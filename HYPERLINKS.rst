@@ -1,5 +1,6 @@
 .. _click: https://click.palletsprojects.com/
 .. _cmake: https://cmake.org/
+.. _cygwin: https://www.cygwin.com
 .. _f2py: https://numpy.org/doc/stable/f2py/
 .. _gh: https://github.com/cli/cli
 .. _git: https://git-scm.com/
