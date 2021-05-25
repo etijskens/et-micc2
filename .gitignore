@@ -120,6 +120,9 @@ _build/
 # backup files
 *.bak
 
+# Visual Studio
+.vs
+ 
 # PyCharm
 .idea/
 

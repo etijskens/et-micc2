@@ -1560,6 +1560,11 @@ def build_binary_extension(options):
                 cmake_cmd = ['cmake',
                              '-D', f"PYTHON_EXECUTABLE={sys.executable}",
                              ]
+                if sys.platform == 'win32':
+                    cmake_cmd.extend(['-G', 'NMake Makefiles'])
+                    make = 'nmake'
+                else:
+                    make = 'make'
 
                 if options.module_kind == 'cpp':
                     cmake_cmd.extend(['-D', f"pybind11_DIR={path_to_cmake_tools()}"])
@@ -1568,8 +1573,8 @@ def build_binary_extension(options):
 
                 cmds = [
                     cmake_cmd,
-                    ['make'],
-                    ['make', 'install']
+                    [make],
+                    [make, 'install']
                 ]
                 exit_code = et_micc2.utils.execute(
                     cmds, build_logger.debug, stop_on_error=True, env=os.environ.copy()
