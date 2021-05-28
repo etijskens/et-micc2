@@ -287,12 +287,21 @@ To use Micc2_ in a native Windows environment, the following components are need
 * gh (GitHub cli) <- https://github.com/cli/cli/releases , latest stable release.
 * cmake <- https://cmake.org , latest stable release.
 * poetry <- https://python-poetry.org/docs/#installation , optional, latest stable release.
+* pycharm <- https://www.jetbrains.com/pycharm.
 
 For building binary extension modules from C++:
-* The C++ compiler from Microsoft Visual Studio <- https://visualstudio.microsoft.com/downloads/.
+
+* The C++ compiler from Microsoft Visual Studio <- https://visualstudio.microsoft.com/downloads/ .
   Make sure you install the *desktop development tools*.
 
+  .. image:: ../images/vs_DesktopDevelopment.png
+
+  Every time you open a cmd prompt to execute ``micc2 build`` you must run
+  ``vcvarsall.bat x86_amd64`` to set the environment variables for the Visual
+  Studio compiler.
+
 For building binary extension modules from Fortran:
+
 * The C++ compiler from Microsoft Visual Studio <- https://visualstudio.microsoft.com/downloads/
   (as above).
 * The Fortran compiler from Intel. At the time of writing this was part of the
@@ -306,32 +315,36 @@ The documentation below is based on Visual Studio 2019, and Intel oneAPI toolkit
 Installation issues of with the Intel oneAPI toolkits
 """""""""""""""""""""""""""""""""""""""""""""""""""""
 
+This is only needed for building binary extensions from Fortran.
+
 #. Do **NOT** install the Intel oneAPI toolkits in the default location, because
-   that path contains spaces (``C:\Program Files (x86)\Intel\oneAPI``). I installed
-   it at ``C:\Intel\oneAPI``.
+   that path contains spaces (:file:`C:\Program Files (x86)\\Intel\\oneAPI`), which
+   causes ``f2py`` to fail with an uninformative error. I installed it at
+   :file:`C:\\Intel\\oneAPI`.
 
 #. The executables of the Intel oneAPI toolkits are added to the path by calling
    (using the above installation location)::
 
       > C:\Intel\oneAPI\setvars.bat
 
-#. The Intel oneAPI toolkits come with their own Python distribution, v3.7.9, and
-   include a number of useful packages, e.g. Numpy_. The versions are typically not
-   the latest, but they are well optimized. It is recommended to install other
-   packages in user space, to avoid modifying the oneAPI installation::
+#. The Intel oneAPI toolkits v2021.2.0 come with their own Python distribution, v3.7.9,
+   and include a number of useful packages, e.g. Numpy_. The versions are typically not
+   the latest, but they are well optimized. We recommend it. It is recommended to install
+   other packages in user space, to avoid modifying the oneAPI installation::
 
       > pip install <some_package> --user
 
-   If the installed packages also install an executable file, just like Micc2_, you
-   must add the diretory :file:`%UserProfile%\AppData\Roaming\Python\Python37\Scripts`
-   to the PATH. (The path depends on the Python version of the Intel Python distribution).
-   Otherwise the executable file will not be found by the system.
+   If you install in user space, and the installed packages also installs an executable
+   file or CLI, like Micc2_, you must add the directory
+   :file:`%UserProfile%\\AppData\\Roaming\\Python\\Python37\\Scripts` to the PATH. ``Pip``
+   will warn you if it installs CLIs in a location that is not on the path. Note that
+   the path depends on the Python version of the Intel Python distribution, here 3.7.x.
 
-#. Because f2py_ calls ``vcvarsall.bat`` of Visual Studio every time the PATH
-   variable gets too long and ``micc2 build`` fails. This can be circumvented by
-   renaming ``vcvarsall.bat`` to, e.g. ``vcvarsall-orig.bat`` and putting a
-   ``vcvarsall.bat`` in place that returns immediately. These commands do the
-   trick::
+#. Because ``f2py`` calls ``vcvarsall.bat`` of Visual Studio every time, the PATH
+   variable can get too long and ``micc2 build`` will fail, again with an uninformative
+   message. This can be circumvented by renaming ``vcvarsall.bat`` to, e.g.
+   :file:`vcvarsall-orig.bat` and putting a :file:`vcvarsall.bat` in place that returns
+   immediately. These commands do the trick::
 
         > cd C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build
         > rename vcvarsall.bat vcvarsall_orig.bat
@@ -339,29 +352,18 @@ Installation issues of with the Intel oneAPI toolkits
 
 #. To make everything run smoothly, here is a batch script that sets the neccessary
    environment variables for Visual Studio, the Intel oneAPI toolkits, and adds the
-   location of scripts ::
+   location of scripts in user space to the PATH::
 
       call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall_orig.bat" x86_amd64
       call \Intel\oneAPI\setvars.bat
       set "PATH=%UserProfile%\AppData\Roaming\Python\Python37\Scripts;%PATH%"
 
+   Run this script every time you open a cmd prompt to work with these
 
-Native Python on Windows is compiled with the C/C++ compilers distributed with
-Visual Studio. Micc2_ works nicely in this environment, and can build binary
-extensions from C++ code using the Visual Studio compilers (You need the
-*Build Tools for Visual Studio 2019*). According to
-`this article <https://stackoverflow.com/questions/25671354/using-f2py-with-windows-x64-and-intel-fortran>`_
-it should also be possible to build binary extensions from Fortran code when
-you install the Intel Fortran compiler. Unfortunately, I cannot test it because
-I do not have a Windows machine, and my Macbook has not enough disk space for
-installing the complete Intel OneAPI Base Toolkit and Intel OneAPI HPC toolkit ...
-
-This is probably the most Windows-like approach possible. Note that PyCharm_
-is available for Windows too.
-
-Open Visual Studio, Tools/Get tools and features...
-
-.. image:: ../images/vs_DesktopDevelopment.png
+In principle it should be possible to build Fortran binary extension modules
+for other Python distributions than the Intel Python distribution as well.
+Unfortunately you are in for a headache figuring out how to exclude the
+Intel Python distribution from the path set by :file:`\\Intel\\oneAPI\\setvars.bat`.
 
 WSL-2
 ^^^^^
@@ -378,7 +380,6 @@ Cygwin_ is a large collection of GNU and Open Source tools which provide
 functionality similar to a Linux distribution on Windows. It provides all
 the necessary tools for building binary extension from C++ and Fortran code
 using the Gnu Compiler Collection (GCC).
-
 
 .. _micc2-setup:
 
