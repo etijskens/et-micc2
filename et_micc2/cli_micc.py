@@ -288,7 +288,7 @@ def setup( ctx
             pat = input(':> ')
             if pat:
                 p = Path(pat)
-                dst = p_cfg_dir/f'{options.preferences["github_username"]}.pat'
+                dst = _cfg_dir/f'{options.preferences["github_username"]}.pat'
                 if p.exists():
                     shutil.copyfile(p, dst)
                 else:
