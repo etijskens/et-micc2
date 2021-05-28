@@ -270,15 +270,82 @@ Note that this works exactly the same way on the cluster, provided you load the
 appropriate cluster modules to expose the cluster tools that you need, prior to
 creating and activating the virtual environments.
 
-.. _windows_options:
+.. _windows-options:
 
 Windows
 -------
 If you want to use Micc2_ on Windows, you have a few options,
-most of which are incompletely tested. 
+most of which are incompletely tested.
 
 Native Windows Python environment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To use Micc2_ in a native Windows environment, the following components are needed
+
+* python <- https://python.org , pick the version you need, or like most. If in doubt,
+  go for the latest stable release.
+* git <- https://git-scm.com , latest stable release.
+* gh (GitHub cli) <- https://github.com/cli/cli/releases , latest stable release.
+* cmake <- https://cmake.org , latest stable release.
+* poetry <- https://python-poetry.org/docs/#installation , optional, latest stable release.
+
+For building binary extension modules from C++:
+* The C++ compiler from Microsoft Visual Studio <- https://visualstudio.microsoft.com/downloads/.
+  Make sure you install the *desktop development tools*.
+
+For building binary extension modules from Fortran:
+* The C++ compiler from Microsoft Visual Studio <- https://visualstudio.microsoft.com/downloads/
+  (as above).
+* The Fortran compiler from Intel. At the time of writing this was part of the
+  *Intel oneAPI HPC Toolkit*, which also requires the installation of the
+  *Intel oneAPI base Toolkit*. The section below describes a few issues that
+  need your attention to get things working.
+
+The documentation below is based on Visual Studio 2019, and Intel oneAPI toolkits
+2021.2.0.
+
+Installation issues of with the Intel oneAPI toolkits
+"""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+#. Do **NOT** install the Intel oneAPI toolkits in the default location, because
+   that path contains spaces (``C:\Program Files (x86)\Intel\oneAPI``). I installed
+   it at ``C:\Intel\oneAPI``.
+
+#. The executables of the Intel oneAPI toolkits are added to the path by calling
+   (using the above installation location)::
+
+      > C:\Intel\oneAPI\setvars.bat
+
+#. The Intel oneAPI toolkits come with their own Python distribution, v3.7.9, and
+   include a number of useful packages, e.g. Numpy_. The versions are typically not
+   the latest, but they are well optimized. It is recommended to install other
+   packages in user space, to avoid modifying the oneAPI installation::
+
+      > pip install <some_package> --user
+
+   If the installed packages also install an executable file, just like Micc2_, you
+   must add the diretory :file:`%UserProfile%\AppData\Roaming\Python\Python37\Scripts`
+   to the PATH. (The path depends on the Python version of the Intel Python distribution).
+   Otherwise the executable file will not be found by the system.
+
+#. Because f2py_ calls ``vcvarsall.bat`` of Visual Studio every time the PATH
+   variable gets too long and ``micc2 build`` fails. This can be circumvented by
+   renaming ``vcvarsall.bat`` to, e.g. ``vcvarsall-orig.bat`` and putting a
+   ``vcvarsall.bat`` in place that returns immediately. These commands do the
+   trick::
+
+        > cd C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build
+        > rename vcvarsall.bat vcvarsall_orig.bat
+        > echo @exit /B 0 > vcvarsall.bat
+
+#. To make everything run smoothly, here is a batch script that sets the neccessary
+   environment variables for Visual Studio, the Intel oneAPI toolkits, and adds the
+   location of scripts ::
+
+      call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall_orig.bat" x86_amd64
+      call \Intel\oneAPI\setvars.bat
+      set "PATH=%UserProfile%\AppData\Roaming\Python\Python37\Scripts;%PATH%"
+
+
 Native Python on Windows is compiled with the C/C++ compilers distributed with
 Visual Studio. Micc2_ works nicely in this environment, and can build binary
 extensions from C++ code using the Visual Studio compilers (You need the
@@ -291,6 +358,10 @@ installing the complete Intel OneAPI Base Toolkit and Intel OneAPI HPC toolkit .
 
 This is probably the most Windows-like approach possible. Note that PyCharm_
 is available for Windows too.
+
+Open Visual Studio, Tools/Get tools and features...
+
+.. image:: ../images/vs_DesktopDevelopment.png
 
 WSL-2
 ^^^^^
