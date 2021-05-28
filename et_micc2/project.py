@@ -1574,11 +1574,28 @@ def build_binary_extension(options):
                 cmds = [
                     cmake_cmd,
                     [make],
-                    [make, 'install']
+                    # [make, 'install']
                 ]
+                # This is a fix for the native Windows case, when using the
+                # Intel Python distribution and building a f90 binary extension
+                fix = sys.platform == 'win32' and 'intel' in sys.executable and options.module_kind == 'f90'
+                if not fix:
+                    cmds.append([make, 'install'])
+
                 exit_code = et_micc2.utils.execute(
                     cmds, build_logger.debug, stop_on_error=True, env=os.environ.copy()
                 )
+
+                if fix:
+                    from glob import glob
+                    search = str(options.package_path/f'f90_{options.module_name}/_cmake_build/') \
+                             + f'{os.sep}{options.module_name}.*.pyd'
+                    # print(search)
+                    pyd = glob(search)
+                    dst = options.package_path / f'{options.module_name}.pyd'
+                    build_logger.info(f'Installing `{pyd[0]}` as {dst}')
+                    shutil.copyfile(pyd[0], dst)
+
                 if build_options.cleanup:
                     build_logger.info(f"--cleanup: shutil.removing('{build_dir}').")
                     shutil.rmtree(build_dir)
