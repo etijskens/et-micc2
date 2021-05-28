@@ -327,7 +327,7 @@ class Project:
                 else:
                     with et_micc2.logger.log(self.logger.info, "Creating local git repository"):
                         with et_micc2.utils.in_directory(self.project_path):
-                            cmds = [ ['git', 'init']
+                            cmds = [ ['git', 'init', f'--initial-branch={self.options.template_parameters["git_default_branch"]}']
                                    , ['git', 'add', '*']
                                    , ['git', 'add', '.gitignore']
                                    , ['git', 'commit', '-m', '"And so this begun..."']
