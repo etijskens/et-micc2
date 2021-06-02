@@ -1061,6 +1061,8 @@ class Project:
                     failed.append(binary_extension)
                 else:
                     succeeded.append(binary_extension)
+
+
         build_logger = self.logger
         if succeeded:
             build_logger.info("\n\nBinary extensions built successfully:")
@@ -1557,9 +1559,9 @@ def build_binary_extension(options):
                 shutil.rmtree(output_dir)
             output_dir.mkdir(parents=True, exist_ok=True)
             with et_micc2.utils.in_directory(output_dir):
-                cmake_cmd = ['cmake',
-                             '-D', f"PYTHON_EXECUTABLE={sys.executable}",
-                             ]
+                cmake_cmd = ['cmake', '-D', f"PYTHON_EXECUTABLE={sys.executable}"]
+                for key,val in options.build_options.cmake.items():
+                    cmake_cmd.extend(['-D', f"{key}={val}"])
                 if sys.platform == 'win32':
                     cmake_cmd.extend(['-G', 'NMake Makefiles'])
                     make = 'nmake'
@@ -1571,10 +1573,9 @@ def build_binary_extension(options):
 
                 cmake_cmd.append('..')
 
-                cmds = [
-                    cmake_cmd,
-                    [make],
-                    # [make, 'install']
+                cmds = [ cmake_cmd
+                       , [make, 'VERBOSE=1']
+                       # [make, 'install']
                 ]
                 # This is a fix for the native Windows case, when using the
                 # Intel Python distribution and building a f90 binary extension
