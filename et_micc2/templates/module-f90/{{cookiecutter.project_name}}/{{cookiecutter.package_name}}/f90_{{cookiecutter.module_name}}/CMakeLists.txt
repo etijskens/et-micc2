@@ -79,11 +79,11 @@ list(APPEND F2PY_defines "-DF2PY_REPORT_ON_ARRAY_COPY=1")
     # message("CMAKE_Fortran_FLAGS_RELWITHDEBINFO : ${CMAKE_Fortran_FLAGS_RELWITHDEBINFO}")
     # message("CMAKE_Fortran_FLAGS_MINSIZEREL     : ${CMAKE_Fortran_FLAGS_MINSIZEREL}")
     # message("CMAKE_Fortran_FLAGS_DEBUG          : ${CMAKE_Fortran_FLAGS_DEBUG}")
-    if(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
+    if(CMAKE_BUILD_TYPE STREQUAL "Release")
         # CMAKE_Fortran_FLAGS_RELEASE = -O3 -DNDEBUG -O3
         set(F2PY_opt "-O3")
         list(APPEND F2PY_defines "-DNDEBUG")
-    elseif( CMAKE_BUILD_TYPE STREQUAL "RELWITHDEBINFO")
+    elseif( CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
         # CMAKE_Fortran_FLAGS_RELWITHDEBINFO = -O2 -g -DNDEBUG
         set(F2PY_opt "-O2")
         list(APPEND F2PY_defines "-DNDEBUG")

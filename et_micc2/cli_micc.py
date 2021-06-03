@@ -5,6 +5,11 @@ Application micc2
 """
 import subprocess
 
+S = """Build binary extensions.
+
+    :param str module;:::;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    """
+
 
 def sys_path_helper():
     """Make sure that et_micc2 can be imported in case this file is executed as::
@@ -755,15 +760,11 @@ def mv(ctx, cur_name, new_name, silent, entire_package, entire_project):
 # build
 ####################################################################################################
 @main.command()
-@click.option('-m', '--module'
-    , help="Build only this module. The module kind prefix (``cpp_`` "
-           "for C++ modules, ``f90_`` for Fortran modules) may be omitted."
-    , default=''
-)
+@click.argument('module', type=str, default='')
 @click.option('-b', '--build-type'
     , help="build type: any of the standard CMake build types: "
-           "DEBUG, MINSIZEREL, RELEASE*, RELWITHDEBINFO."
-    , default='RELEASE'
+           "Debug, MinSizeRel, Release, RelWithHDebInfo."
+    , default=''
 )
 @click.option('--clean'
     , help="Perform a clean build, removes the build directory before the build."
@@ -780,13 +781,20 @@ def build( ctx
          , clean
          , cleanup
          ):
-    """Build binary extensions."""
+    """Build binary extensions.
+
+    :param str module: build a binary extension module, or all binary
+        extension modules if not specified.
+    """
     options = ctx.obj
     options.build_options = SimpleNamespace( module_to_build = module
                                            , clean           = clean
                                            , cleanup         = cleanup
-                                           , cmake           = {'CMAKE_BUILD_TYPE': build_type}
+                                           , cmake           = {}
                                            )
+    if build_type:
+        options.build_options.cmake['CMAKE_BUILD_TYPE'] = build_type
+
     try:
         project = Project(options)
         with et_micc2.logger.logtime(options):

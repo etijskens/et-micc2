@@ -1011,56 +1011,63 @@ class Project:
         succeeded = []
         failed = []
         for d in dirs:
-            if ((package_path / d).is_dir()
-                    and (d.startswith("f90_") or d.startswith("cpp_")) ):
-                if self.options.build_options.module_to_build and not d.endswith(self.options.build_options.module_to_build):
-                    # build only module module_to_build.
-                    continue
-
-                module_kind, module_name = d.split('_', 1)
-                if module_kind == 'f90':
-                    # Exit if f2py is not available
-                    if not ToolInfo('f2py').is_available():
-                        msg = 'Building a Fortran binary extension requires f2py, which is not available in your current environment.\n'\
-                              '(F2py is part of the numpy Python package).'
-                        if on_vsc_cluster():
-                            msg += 'Load a cluster module that has the numpy package pre-installed.'
+            if (package_path / d).is_dir():
+                build_d = False
+                for prefix in ('cpp_','f90_'):
+                    if d.startswith(prefix):
+                        # d is a directory with a binary extension module
+                        if self.options.build_options.module_to_build:
+                            # build only one module, check if it is the one specified by module_to_build
+                            build_d = d == f'{prefix}{self.options.build_options.module_to_build}' or \
+                                      d == self.options.build_options.module_to_build
                         else:
-                            msg += 'If you are using a virtual environment, install numpy as:\n' \
-                                   '    (.venv) > pip install numpy\n' \
-                                   'otherwise,\n' \
-                                   '    > pip install numpy --user\n'
-                        self.error(msg)
+                            # build all binary extension modules
+                            build_d = True
+                if build_d:
+                    module_kind, module_name = d.split('_', 1)
+                    if module_kind == 'f90':
+                        # Exit if f2py is not available
+                        if not ToolInfo('f2py').is_available():
+                            msg = 'Building a Fortran binary extension requires f2py, which is not available in your current environment.\n' \
+                                  '(F2py is part of the numpy Python package).'
+                            if on_vsc_cluster():
+                                msg += 'Load a cluster module that has the numpy package pre-installed.'
+                            else:
+                                msg += 'If you are using a virtual environment, install numpy as:\n' \
+                                       '    (.venv) > pip install numpy\n' \
+                                       'otherwise,\n' \
+                                       '    > pip install numpy --user\n'
+                            self.error(msg)
 
-                elif module_kind == 'cpp':
-                    # exit if pybind11 is not available, and warn if too old...
-                    pybind11 = PkgInfo('pybind11')
-                    if not pybind11.is_available():
-                        self.error('Building C++ binary extensions requires pybind11, which is not available in your current environment.\n'
-                                   'If you are using a virtual environment, install it as .\n'
-                                   '    (.venv) > pip install pybind11\n'
-                                   'otherwise,\n'
-                                   '    > pip install pybind11 --user\n'
-                                  , exit_code=_exit_missing_component
-                                  )
+                    elif module_kind == 'cpp':
+                        # exit if pybind11 is not available, and warn if too old...
+                        pybind11 = PkgInfo('pybind11')
+                        if not pybind11.is_available():
+                            self.error('Building C++ binary extensions requires pybind11, which is not available in your current environment.\n'
+                                       'If you are using a virtual environment, install it as .\n'
+                                       '    (.venv) > pip install pybind11\n'
+                                       'otherwise,\n'
+                                       '    > pip install pybind11 --user\n'
+                                       , exit_code=_exit_missing_component
+                                       )
+                        else:
+                            if pybind11.version() < __pybind11_required_version__:
+                                self.warning(f'Building C++ binary extensions requires pybind11, which is available in your current environment (v{pybind11.version()}).\n'
+                                             f'However, you may experience problems because it is older than v{__pybind11_required_version__}.\n'
+                                             'Upgrading is recommended.'
+                                             )
+
+                    binary_extension = package_path / (module_name + extension_suffix)
+                    self.options.module_srcdir_path = package_path / d
+                    self.options.module_kind = module_kind
+                    self.options.module_name = module_name
+                    self.options.package_path = package_path
+                    self.exit_code = build_binary_extension(self.options)
+
+                    if self.exit_code:
+                        failed.append(binary_extension)
                     else:
-                        if pybind11.version() < __pybind11_required_version__:
-                            self.warning(f'Building C++ binary extensions requires pybind11, which is available in your current environment (v{pybind11.version()}).\n'
-                                         f'However, you may experience problems because it is older than v{__pybind11_required_version__}.\n'
-                                          'Upgrading is recommended.'
-                                         )
-
-                binary_extension = package_path / (module_name + extension_suffix)
-                self.options.module_srcdir_path = package_path / d
-                self.options.module_kind = module_kind
-                self.options.module_name = module_name
-                self.options.package_path = package_path
-                self.exit_code = build_binary_extension(self.options)
-
-                if self.exit_code:
-                    failed.append(binary_extension)
-                else:
-                    succeeded.append(binary_extension)
+                        succeeded.append(binary_extension)
 
 
         build_logger = self.logger

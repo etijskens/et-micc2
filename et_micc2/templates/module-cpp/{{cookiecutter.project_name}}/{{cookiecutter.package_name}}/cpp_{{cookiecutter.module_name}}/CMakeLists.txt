@@ -47,7 +47,7 @@
 # set(CMAKE_CXX_COMPILER path/to/executable)
 
 # Set build type:
-# set(CMAKE_BUILD_TYPE DEBUG | MINSIZEREL | RELEASE | RELWITHDEBINFO)
+# set(CMAKE_BUILD_TYPE Debug | MinSizeRel | Release | RelWithHDebInfo)
 
 # Add compiler options:
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} <additional C++ compiler options>")
