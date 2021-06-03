@@ -763,7 +763,7 @@ def mv(ctx, cur_name, new_name, silent, entire_package, entire_project):
 @click.argument('module', type=str, default='')
 @click.option('-b', '--build-type'
     , help="build type: any of the standard CMake build types: "
-           "Debug, MinSizeRel, Release, RelWithHDebInfo."
+           "Release (default), Debug, RelWithDebInfo, MinSizeRel."
     , default=''
 )
 @click.option('--clean'

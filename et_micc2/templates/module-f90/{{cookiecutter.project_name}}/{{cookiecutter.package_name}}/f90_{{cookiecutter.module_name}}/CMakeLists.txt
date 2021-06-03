@@ -13,7 +13,7 @@
 #  - F2PY_arch     ->  f2py --arch=<${F2PY_arch}>
 #  - F2PY_f90flags ->  f2py --f90flags=<${F2PY_arch}>
 #  - F2PY_debug    ->  f2py --debug
-# Suitable values for these are estimated from CMAKE_BUILD_TYPE (RELEASE by default).
+# Suitable values for these are estimated from CMAKE_BUILD_TYPE (Release by default).
 #
 # In addition the following CMake variables are defined:
 #  - F2PY_defines  : a list of defines passed to the Fortran compiler
@@ -54,8 +54,8 @@
 
     project({{ cookiecutter.module_name }} Fortran)
     if(NOT CMAKE_BUILD_TYPE)
-        # RELEASE is the default build type:
-        set(CMAKE_BUILD_TYPE RELEASE)
+        # we explicitly set the CMAKE_BUILD_TYPE to infer build flags for f2py
+        set(CMAKE_BUILD_TYPE Release)
     endif()
 
     # Set the module name:
@@ -68,9 +68,9 @@ list(APPEND F2PY_defines "-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION")
 list(APPEND F2PY_defines "-DF2PY_REPORT_ON_ARRAY_COPY=1")
 
 # Set the build type:
-#  - If you do not specify a build type, it is RELEASE by default.
+#  - If you do not specify a build type, it is Release by default.
 #  - Note that the DEBUG build type will trigger f2py's '--noopt --noarch --debug' options.
-# set(CMAKE_BUILD_TYPE DEBUG | MINSIZEREL | RELEASE | RELWITHDEBINFO)
+# set(CMAKE_BUILD_TYPE Debug | MinSizeRel | Release | RelWithHDebInfo)
 
 #<< begin boilerplate code
     # Infer variables from CMAKE_BUILD_TYPE
@@ -83,20 +83,24 @@ list(APPEND F2PY_defines "-DF2PY_REPORT_ON_ARRAY_COPY=1")
         # CMAKE_Fortran_FLAGS_RELEASE = -O3 -DNDEBUG -O3
         set(F2PY_opt "-O3")
         list(APPEND F2PY_defines "-DNDEBUG")
+
     elseif( CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
         # CMAKE_Fortran_FLAGS_RELWITHDEBINFO = -O2 -g -DNDEBUG
         set(F2PY_opt "-O2")
         list(APPEND F2PY_defines "-DNDEBUG")
         set(F2PY_debug "--debug")
-    elseif( CMAKE_BUILD_TYPE STREQUAL "MINSIZEREL")
+
+    elseif( CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")
         # CMAKE_Fortran_FLAGS_MINSIZEREL = -Os -DNDEBUG -Os
         set(F2PY_opt "-Os")
         list(APPEND F2PY_defines "-DNDEBUG")
-    elseif( CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+
+    elseif( CMAKE_BUILD_TYPE STREQUAL "Debug")
         # CMAKE_Fortran_FLAGS_DEBUG = -g
         set(F2PY_opt "-O0")
         list(APPEND F2PY_defines "-DDEBUG")
         set(F2PY_debug "--debug")
+
     endif()
 #>> end boilerplate code
 
