@@ -446,13 +446,13 @@ class Project:
                 click.echo("  contents:")
                 for f in files:
                     # filters
-                    if '{' in str(f):
-                        continue
-                    if 'package-' in str(f):  # very ad hoc solution, only relevant to the et_micc2 project itself
+                    sf = str(f)
+                    if '_cmake_build' in sf \
+                    or '{' in str(f) \
+                    or 'package-' in sf \
+                    or 'build_' in sf:
                         continue
                     if f.name == "__init__.py" and f.parent.samefile(package_path):  # ignore the top-level __init__.py
-                        continue
-                    if 'build_' in str(f):
                         continue
 
                     fg = 'green'

@@ -767,7 +767,8 @@ def mv(ctx, cur_name, new_name, silent, entire_package, entire_project):
     , default=''
 )
 @click.option('--clean'
-    , help="Perform a clean build, removes the build directory before the build."
+    , help="Perform a clean build, removes the build directory before the build, if there is one. "
+           "Note that this option is necessary if the extension's ``CMakeLists.txt`` was modified."
     , default=False, is_flag=True
 )
 @click.option('--cleanup'
@@ -783,9 +784,18 @@ def build( ctx
          ):
     """Build binary extensions.
 
-    :param str module: build a binary extension module, or all binary
-        extension modules if not specified.
+    :param str module: build a binary extension module. If not specified or all binary
+        extension modules are built.
     """
+    # Warn for non standard build_type:
+    if not build_type in ('','Release', 'Debug', 'RelWithDebInfo', 'MinSizeRel'):
+        print(f'[Warning]\nNon-standard build type: `{build_type}`\n'
+              f'(Standard build types are: Release, Debug, RelWithDebInfo, MinSizeRel)')
+        answer = input('>: Continue? (y/N)')
+        if answer != 'y':
+            print('')
+            ctx.exit(-1)
+
     options = ctx.obj
     options.build_options = SimpleNamespace( module_to_build = module
                                            , clean           = clean
