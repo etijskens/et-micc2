@@ -92,7 +92,7 @@ consequently act on the project in the current working directory. E.g.:
 .. code-block:: bash
 
     > micc2 info
-    Project my-first-project located at /Users/etijskens/software/dev/workspace/Tutorials/my-first-project
+    Project my-first-project located at /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/my-first-project
       package: my_first_project
       version: 0.0.0
       structure: my_first_project.py (Python module)
@@ -182,7 +182,7 @@ it to a *package* structure project at any time running (in the project director
     > micc2 convert-to-package
     [INFO]           Converting Python module project my-first-project to Python package project.
     [WARNING]        Pre-existing files that would be overwritten:
-    [WARNING]          /Users/etijskens/software/dev/workspace/Tutorials/my-first-project/docs/index.rst
+    [WARNING]          /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/my-first-project/docs/index.rst
     Aborting because 'overwrite==False'.
       Rerun the command with the '--backup' flag to first backup these files (*.bak).
       Rerun the command with the '--overwrite' flag to overwrite these files without backup.
@@ -200,7 +200,7 @@ command with the ``--overwrite`` flag:
     > micc2 convert-to-package --overwrite
     [INFO]           Converting Python module project my-first-project to Python package project.
     [WARNING]        '--overwrite' specified: pre-existing files will be overwritten WITHOUT backup:
-    [WARNING]        overwriting /Users/etijskens/software/dev/workspace/Tutorials/my-first-project/docs/index.rst
+    [WARNING]        overwriting /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/my-first-project/docs/index.rst
     
 
 If there are some files in the list you did change (this is rarely the case), rerun the
@@ -214,7 +214,7 @@ structure:
 .. code-block:: bash
 
     > micc2 info
-    Project my-first-project located at /Users/etijskens/software/dev/workspace/Tutorials/my-first-project
+    Project my-first-project located at /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/my-first-project
       package: my_first_project
       version: 0.0.0
       structure: my_first_project/__init__.py (Python package)
@@ -292,10 +292,7 @@ message:
 .. code-block:: bash
 
     > micc create 1proj
-    [ERROR]
-    The project name (1proj) does not yield a PEP8 compliant module name:
-      The project name must start with char, and contain only chars, digits, hyphens and underscores.
-      Alternatively, provide an explicit module name with the --module-name=<name>.
+    /bin/sh: /Users/etijskens/.local/bin/micc: /Users/etijskens/.local/pipx/venvs/et-micc/bin/python: bad interpreter: No such file or directory
     
 
 The last line indicates that you can specify an explicit module name, unrelated to the
@@ -641,13 +638,13 @@ automatically found and executed by running ``pytest`` in the project directory:
     ============================= test session starts ==============================
     platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.10.0, pluggy-0.13.1 -- /Users/etijskens/.pyenv/versions/3.8.5/bin/python
     cachedir: .pytest_cache
-    rootdir: /Users/etijskens/software/dev/workspace/Tutorials/my-first-project
+    rootdir: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/my-first-project
     collecting ... collected 2 items
     
     tests/test_my_first_project.py::test_hello_noargs PASSED                 [ 50%]
     tests/test_my_first_project.py::test_hello_me PASSED                     [100%]
     
-    ============================== 2 passed in 0.02s ===============================
+    ============================== 2 passed in 0.01s ===============================
     
 
 Specifying the :file:`tests` directory ensures that Pytest_ looks for tests only in

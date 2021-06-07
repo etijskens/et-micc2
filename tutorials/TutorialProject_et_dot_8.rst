@@ -68,12 +68,12 @@ passes, of course:
     ============================= test session starts ==============================
     platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.10.0, pluggy-0.13.1 -- /Users/etijskens/.pyenv/versions/3.8.5/bin/python
     cachedir: .pytest_cache
-    rootdir: /Users/etijskens/software/dev/workspace/Tutorials/ET-dot
+    rootdir: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot
     collecting ... collected 1 item
     
     tests/test_foo.py::test_greet PASSED
     
-    ============================== 1 passed in 0.13s ===============================
+    ============================== 1 passed in 0.15s ===============================
     
 
 

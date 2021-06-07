@@ -97,9 +97,9 @@ relevant lines and modify them to your needs.
 
     ...                                                         # (boilerplate code omitted for clarity)
     # Set the build type:
-    #  - If you do not specify a build type, it is RELEASE by default.
+    #  - If you do not specify a build type, it is Release by default.
     #  - Note that the DEBUG build type will trigger f2py's '--noopt --noarch --debug' options.
-    # set(CMAKE_BUILD_TYPE DEBUG | MINSIZEREL | RELEASE | RELWITHDEBINFO)
+    # set(CMAKE_BUILD_TYPE Debug | MinSizeRel | Release | RelWithHDebInfo)
     ...                                                         # (boilerplate code omitted for clarity)
     ####################################################################################################
     ######################################################################### Customization section ####
@@ -228,14 +228,11 @@ introspection into the Fortran source code, whereas pybind11_ is just a C++ temp
 library and as such it needs a little help from the user. This is, however, compensated
 by the flexibility of Pybind11_.
 
-We can now build the module. By default ``micc2 build`` builds all binary extension
-modules in the project. As we do not want to rebuild the :py:mod:`dotf` module, we add
-``-m dotc`` to the command line, to indicate that only module :py:mod:`dotc` must be
-built:
+We can now build the module:
 
 .. code-block:: 
 
-    micc2 build -m dotc
+    micc2 build dotc
     [INFO] [ Building cpp module 'dotc':
     [DEBUG]          [ > cmake -D PYTHON_EXECUTABLE=/Users/etijskens/.pyenv/versions/3.8.5/bin/python -D pybind11_DIR=/Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages/pybind11/share/cmake/pybind11 ..
     [DEBUG]              (stdout)
@@ -255,13 +252,23 @@ built:
                            -- Found pybind11: /Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages/pybind11/include (found version "2.6.2" )
                            -- Configuring done
                            -- Generating done
-                           -- Build files have been written to: /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/cpp_dotc/_cmake_build
+                           -- Build files have been written to: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc/_cmake_build
     [DEBUG]          ] done.
-    [DEBUG]          [ > make
+    [DEBUG]          [ > make VERBOSE=1
     [DEBUG]              (stdout)
+                           /usr/local/Cellar/cmake/3.20.1/bin/cmake -S/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc -B/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc/_cmake_build --check-build-system CMakeFiles/Makefile.cmake 0
+                           /usr/local/Cellar/cmake/3.20.1/bin/cmake -E cmake_progress_start /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc/_cmake_build/CMakeFiles /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc/_cmake_build//CMakeFiles/progress.marks
+                           /Library/Developer/CommandLineTools/usr/bin/make  -f CMakeFiles/Makefile2 all
+                           /Library/Developer/CommandLineTools/usr/bin/make  -f CMakeFiles/dotc.dir/build.make CMakeFiles/dotc.dir/depend
+                           cd /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc/_cmake_build && /usr/local/Cellar/cmake/3.20.1/bin/cmake -E cmake_depends "Unix Makefiles" /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc/_cmake_build /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc/_cmake_build /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc/_cmake_build/CMakeFiles/dotc.dir/DependInfo.cmake --color=
+                           /Library/Developer/CommandLineTools/usr/bin/make  -f CMakeFiles/dotc.dir/build.make CMakeFiles/dotc.dir/build
                            [ 50%] Building CXX object CMakeFiles/dotc.dir/dotc.cpp.o
+                           /Library/Developer/CommandLineTools/usr/bin/c++ -Ddotc_EXPORTS -isystem /Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages/pybind11/include -isystem /Users/etijskens/.pyenv/versions/3.8.5/include/python3.8 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk -fPIC -fvisibility=hidden -flto -std=gnu++11 -MD -MT CMakeFiles/dotc.dir/dotc.cpp.o -MF CMakeFiles/dotc.dir/dotc.cpp.o.d -o CMakeFiles/dotc.dir/dotc.cpp.o -c /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc/dotc.cpp
                            [100%] Linking CXX shared module dotc.cpython-38-darwin.so
+                           /usr/local/Cellar/cmake/3.20.1/bin/cmake -E cmake_link_script CMakeFiles/dotc.dir/link.txt --verbose=1
+                           /Library/Developer/CommandLineTools/usr/bin/c++  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk -bundle -Wl,-headerpad_max_install_names -Xlinker -undefined -Xlinker dynamic_lookup -flto -o dotc.cpython-38-darwin.so CMakeFiles/dotc.dir/dotc.cpp.o 
                            [100%] Built target dotc
+                           /usr/local/Cellar/cmake/3.20.1/bin/cmake -E cmake_progress_start /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc/_cmake_build/CMakeFiles 0
     [DEBUG]          ] done.
     [DEBUG]          [ > make install
     [DEBUG]              (stdout)
@@ -269,11 +276,11 @@ built:
                            [100%] Built target dotc
                            Install the project...
                            -- Install configuration: ""
-                           -- Installing: /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/cpp_dotc/../dotc.cpython-38-darwin.so
+                           -- Installing: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc/../dotc.cpython-38-darwin.so
     [DEBUG]          ] done.
     [INFO] ] done.
     [INFO]           Binary extensions built successfully:
-    [INFO]           - /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/et_dot/dotc.cpython-38-darwin.so
+    [INFO]           - /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/dotc.cpython-38-darwin.so
     ['/Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages', '/Users/etijskens/.local/lib/python3.8/site-packages']
     path_to_cmake_tools=/Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages/pybind11/share/cmake/pybind11
     
@@ -311,11 +318,11 @@ created for the Python implementation.
     pytest tests/test_cpp_dotc.py
     ============================= test session starts ==============================
     platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.10.0, pluggy-0.13.1
-    rootdir: /Users/etijskens/software/dev/workspace/Tutorials/ET-dot
+    rootdir: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot
     collected 1 item
     
     tests/test_cpp_dotc.py .                                                 [100%]
     
-    ============================== 1 passed in 0.26s ===============================
+    ============================== 1 passed in 0.28s ===============================
     
 

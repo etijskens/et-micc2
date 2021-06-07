@@ -2,13 +2,16 @@
 .. _cmake: https://cmake.org/
 .. _cygwin: https://www.cygwin.com
 .. _f2py: https://numpy.org/doc/stable/f2py/
+.. _gdb: https://www.gnu.org/software/gdb/
 .. _gh: https://github.com/cli/cli
 .. _git: https://git-scm.com/
 .. _GitHub: https://github.com/
+.. _lldb: https://lldb.llvm.org
 .. _micc: https://micc.readthedocs.io/en/latest/
 .. _micc2: https://et_micc2.readthedocs.io/en/latest/
 .. _numpy: https://numpy.org/
 .. _pandas: https://pandas.pydata.org/
+.. _pdb: https://docs.python.org/3/library/pdb.html
 .. _pip: https://pypi.org/project/pip/
 .. _poetry: https://poetry.eustace.io/
 .. _pybind11: https://pybind11.readthedocs.io/en/stable/

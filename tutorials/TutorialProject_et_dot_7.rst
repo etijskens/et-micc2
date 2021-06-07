@@ -2,7 +2,7 @@
 
 .. _document-binary-extensions:
 
-2.6. Documenting binary extension modules
+3.6. Documenting binary extension modules
 -----------------------------------------
 
 For Python modules the documentation is automatically extracted from the
@@ -80,11 +80,11 @@ The (html) documentation is build as always:
                             reading sources... [ 85%] installation
                             reading sources... [100%] readme
                             
-                            /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/docs/changelog.rst:1: WARNING: Problems with "include" directive path:
+                            /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/changelog.rst:1: WARNING: Problems with "include" directive path:
                             InputError: [Errno 2] No such file or directory: '../HISTORY.rst'.
                             looking for now-outdated files... none found
                             pickling environment... done
-                            checking consistency... /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/docs/apps.rst: WARNING: document isn't included in any toctree
+                            checking consistency... /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/apps.rst: WARNING: document isn't included in any toctree
                             done
                             preparing documents... done
                             writing output... [ 14%] api
@@ -95,23 +95,23 @@ The (html) documentation is build as always:
                             writing output... [ 85%] installation
                             writing output... [100%] readme
                             
-                            /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
-                            /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
-                            /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
-                            /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
-                            /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
-                            /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
-                            /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
-                            /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
-                            generating indices... genindex /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
-                            py-modindex /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
+                            /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
+                            /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
+                            /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
+                            /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
+                            /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
+                            /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
+                            /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
+                            /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
+                            generating indices... genindex /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
+                            py-modindex /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
                             done
                             highlighting module code... [ 50%] et_dot
-                            /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
+                            /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
                             highlighting module code... [100%] et_dot.dotc
                             
-                            /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
-                            writing additional pages... search /Users/etijskens/software/dev/workspace/Tutorials/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
+                            /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
+                            writing additional pages... search /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
                             done
                             copying static files... done
                             copying extra files... done

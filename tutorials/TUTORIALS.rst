@@ -9,5 +9,6 @@
 .. include:: ../tutorials/TutorialProject_et_dot_8.rst
 .. include:: ../tutorials/TutorialVCS.rst
 .. include:: ../tutorials/TutorialVersionManagement.rst
+.. include:: ../tutorials/TutorialPublish.rst
 
 

@@ -2,8 +2,8 @@
 
 .. _version-management:
 
-4.1. Version management
------------------------
+6. Version management
+=====================
 
 Version numbers are practical, even for a small software project used only by
 yourself. For larger projects, certainly when other users start using them, they
@@ -43,7 +43,7 @@ Suppose we are the project director of package :file:`foo`:
 .. code-block:: 
 
     micc2 info
-    Project foo located at /Users/etijskens/software/dev/workspace/Tutorials/foo
+    Project foo located at /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/foo
       package: foo
       version: 0.0.0
       structure: foo.py (Python module)

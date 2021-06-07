@@ -2,8 +2,8 @@
 
 .. _publishing:
 
-5.1. Publishing your code
--------------------------
+7. Publishing your code
+=======================
 
 By publising your code other users can easily reuse your code. Although a public
 GitHub_ repository makes that possible, Python provides the Python Package Index
@@ -11,8 +11,8 @@ GitHub_ repository makes that possible, Python provides the Python Package Index
 
 .. _publish-pypi:
 
-5.1.1. Publishing to the Python Package Index
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7.1. Publishing to the Python Package Index
+-------------------------------------------
 
 Poetry_ provides really easy interface to publishing your code to the Python Package
 Index (PyPI_). To install poetry see
@@ -57,7 +57,7 @@ Python environment as:
     > pip install et-foo
     ...
 
-5.1.2. Publishing packages with binary extension modules
+7.1.1. Publishing packages with binary extension modules
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Packages with binary extension modules are published in exactly the same way. That
@@ -72,8 +72,8 @@ Obviously, this 'auto-build', can only succeed if the necessary tools are
 available. In case of failure because of missing tools, micc2_ will tell you which
 tools are missing.
 
-5.1.3. Publishing your documentation on readthedocs.org
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7.2. Publishing your documentation on readthedocs.org
+-----------------------------------------------------
 
 Publishing your documentation to `Readthedocs <https://readthedocs.org>`_
 relieves the users of your code from having to build documentation themselves.
