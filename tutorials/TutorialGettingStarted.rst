@@ -242,7 +242,7 @@ short, but probably not unique. Even :file:`my_dot_product` is probably not
 unique, and, in addition, confusing to any user that might want to adopt *your*
 :file:`my_dot_product`. A unique name - or at least a name that has not been taken
 before - becomes really important when you want to publish your code for others to use
-it (see :ref:`Tutorial-5` for details). The standard place to publish Python code is
+it (see :ref:`publishing` for details). The standard place to publish Python code is
 the `Python Package Index <https://pypi.org>`_, where you find hundreds of
 thousands of projects, many of which are really interesting and of high quality. Even
 if there are only a few colleagues that you want to share your code with, you make their

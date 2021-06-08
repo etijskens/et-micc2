@@ -40,7 +40,7 @@ not already in use on PyPI_. As there are 100s of projects on PyPI_, it is wise 
 that. You can do this manually, but micc2_ also provides a ``--publish`` flag for the
 ``micc2 create`` command that verifies that the project name is still available on
 PyPI_. If the name is already taken, the project will not be created and micc2_ will
-suggest to choose another project name. See :ref:`project-name` for
+suggest to choose another project name. See :ref:`project-and-module-naming` for
 recommendations of how to choose project names. If the name is not yet taken, it is wise
 to publish the freshly created project right away (even without any useful
 contents), to make sure that no one else can publish a project with the same name.
@@ -75,14 +75,13 @@ tools are missing.
 7.2. Publishing your documentation on readthedocs.org
 -----------------------------------------------------
 
-Publishing your documentation to `Readthedocs <https://readthedocs.org>`_
-relieves the users of your code from having to build documentation themselves.
-Making it happen is very easy. First, make sure the git repository of your code is
-pushed on Github_. Second, create a Readthedocs_ account if you do not already have
-one. Then, go to your Readthedocs_ page, go to *your projects* and hit import
-project. After filling in the fields, the documentation will be rebuild and
-published automatically every time you push your code to the Github_ remote
-repository.
+Publishing your documentation to Readthedocs_ relieves the users of your code from
+having to build documentation themselves. Making it happen is very easy. First, make
+sure the git repository of your code is pushed on Github_. Second, create a
+Readthedocs_ account if you do not already have one. Then, go to your Readthedocs_
+page, go to *your projects* and hit import project. After filling in the fields, the
+documentation will be rebuild and published automatically every time you push your
+code to the Github_ remote repository.
 
 .. note::
 

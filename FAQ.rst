@@ -12,7 +12,7 @@ environments and managing dependencies manually failed.
 
 Can I use micc_ on the (VSC) clusters?
 --------------------------------------
-Yes, see `Tutorial 7 - Using micc projects on the VSC clusters`_.
+Yes, see :ref:`VSC-cluster-installation`.
 
 Why doesn't micc_ have rename and remove commands?
 --------------------------------------------------

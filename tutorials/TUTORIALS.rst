@@ -10,5 +10,6 @@
 .. include:: ../tutorials/TutorialVCS.rst
 .. include:: ../tutorials/TutorialVersionManagement.rst
 .. include:: ../tutorials/TutorialPublish.rst
+.. include:: ../tutorials/TutorialDebugging.rst
 
 

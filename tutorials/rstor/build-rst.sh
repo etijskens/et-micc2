@@ -20,6 +20,7 @@ done
 python ./tutorials/rstor/TutorialVCS.py
 python ./tutorials/rstor/TutorialVersionManagement.py
 python ./tutorials/rstor/TutorialPublish.py
+python ./tutorials/rstor/TutorialDebugging.py
 
 ####################################################################################################
 echo "Building documentation ..."

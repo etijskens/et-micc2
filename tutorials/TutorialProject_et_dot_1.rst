@@ -76,7 +76,7 @@ implementation to the local git repository:
 .. code-block:: bash
 
     > git commit -a -m 'implemented dot()'
-    [main cfa3e24] implemented dot()
+    [main a4a3f1d] implemented dot()
      1 file changed, 23 insertions(+), 22 deletions(-)
      rewrite et_dot/__init__.py (71%)
     
@@ -178,7 +178,7 @@ good practise to commit this to our local git repository:
 .. code-block:: bash
 
     > git commit -a -m 'added test_dot_aa()'
-    [main a023ef9] added test_dot_aa()
+    [main 8d92290] added test_dot_aa()
      1 file changed, 7 insertions(+), 33 deletions(-)
      rewrite tests/test_et_dot.py (98%)
     
@@ -366,7 +366,7 @@ pytest_ produces a readable report about the failure:
     tests/test_et_dot.py:61: AssertionError
     =========================== short test summary info ============================
     FAILED tests/test_et_dot.py::test_dot_one_2 - assert 0.0 == 1.0
-    ========================= 1 failed, 3 passed in 0.04s ==========================
+    ========================= 1 failed, 3 passed in 0.05s ==========================
     
 
 Mathematically, our expectations about the outcome of the test are certainly
@@ -490,14 +490,14 @@ well:
 .. code-block:: bash
 
     > git commit -a -m 'dot() tests added'
-    [main c34f793] dot() tests added
+    [main 2958c51] dot() tests added
      1 file changed, 70 insertions(+)
     
     > micc2 version -p
     [INFO]           (ET-dot)> version (0.0.0) -> (0.0.1)
     
     > git commit -a -m 'v0.0.1'
-    [main 900c0c4] v0.0.1
+    [main 034a654] v0.0.1
      2 files changed, 2 insertions(+), 2 deletions(-)
     
 
@@ -576,7 +576,7 @@ Executing this script yields:
 .. code-block:: bash
 
     > python ./prof/run1.py
-    261.6646694128996
+    251.7091505466474
     -*# done #*-
     
 
@@ -637,9 +637,9 @@ and execute it again:
 .. code-block:: bash
 
     > python ./prof/run1.py
-    init : 0.000349 s
-    dot  : 0.000124 s
-    249.538199687036
+    init : 0.000292 s
+    dot  : 0.000106 s
+    254.1287104986123
     -*# done #*-
     
 
@@ -684,10 +684,10 @@ Its execution yields:
 .. code-block:: bash
 
     > python ./prof/run1.py
-    et init : 0.000292 s
-    et dot  : 0.000119 s
-    np init : 6.2e-05 s
-    np dot  : 7e-06 s
+    et init : 0.000258 s
+    et dot  : 9.4e-05 s
+    np init : 5.7e-05 s
+    np dot  : 6e-06 s
     -*# done #*-
     
 
@@ -1159,7 +1159,7 @@ Then run the test (we only run the test for the dotf module, as we did not touch
     
     tests/test_f90_dotf.py .                                                 [100%]
     
-    ============================== 1 passed in 0.31s ===============================
+    ============================== 1 passed in 0.34s ===============================
     
 
 The astute reader will notice the magic that is happening here: ``a`` is a numpy array,

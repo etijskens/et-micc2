@@ -56,7 +56,7 @@ def TutorialPublish():
         "``--publish`` flag for the ``micc2 create`` command that verifies that the "
         "project name is still available on PyPI_. If the name is already taken, the "
         "project will not be created and micc2_ will suggest to choose another project "
-        "name. See :ref:`project-name` for recommendations of how to choose project "
+        "name. See :ref:`project-and-module-naming` for recommendations of how to choose project "
         "names. If the name is not yet taken, it is wise to publish the freshly created "
         "project right away (even without any useful contents), to make sure that no one "
         "else can publish a project with the same name."
@@ -101,7 +101,7 @@ def TutorialPublish():
     Heading('Publishing your documentation on readthedocs.org', level=3)
 
     Paragraph(
-        "Publishing your documentation to `Readthedocs <https://readthedocs.org>`_ "
+        "Publishing your documentation to Readthedocs_ "
         "relieves the users of your code from having to build documentation themselves. "
         "Making it happen is very easy. First, make sure the git repository of your code "
         "is pushed on Github_. Second, create a Readthedocs_ account if you do not already "

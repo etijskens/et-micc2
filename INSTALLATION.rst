@@ -81,7 +81,7 @@ to install them:
 
         > python -m pip install [--user] poetry
 
-.. _VSC cluster installation:
+.. _VSC-cluster-installation:
 
 Installation on a HPC cluster
 -----------------------------
