@@ -5,7 +5,7 @@ Can I use Anaconda Python distributions?
 Yes, but installing your own conda distribution is not recommended on VSC clusters because it uses a lot
 of disk space. If you cannot avoid it, install on the data file system.
 
-Can I use micc_ on the (VSC) clusters?
+Can I use micc2_ on the (VSC) clusters?
 --------------------------------------
 Yes, see :ref:`VSC-cluster-installation`.
 
