@@ -9,8 +9,8 @@ Can I use micc2_ on the (VSC) clusters?
 --------------------------------------
 Yes, see :ref:`VSC-cluster-installation`.
 
-IDEs
-----
+IDEs and editors
+----------------
 I have been using different IDEs over time:
 
 * eclipse_ + pydev_: steep learning curve, because of limited documentation. works well as a
@@ -22,3 +22,5 @@ I have been using different IDEs over time:
 
 Currently, I consider Visual Studio Code as the most complete IDE for mixed language development
 for HPC environments. In addition, it is free and open source.
+
+Editors such as SublimeText and Atoms, or vim are useful too, but provide no integrated debugging.
