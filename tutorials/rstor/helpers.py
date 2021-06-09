@@ -23,5 +23,5 @@ def process(doc):
         json.dump(doc.heading_numbers,f)
 
 
-workspace = Path() / '../tutorials-workspace-tmp'
+workspace = Path() / '../et-micc2-tutorials-workspace-tmp'
 snippets = Path(__file__).parent / 'snippets'
