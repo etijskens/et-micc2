@@ -1,12 +1,23 @@
 .. include:: ../HYPERLINKS.rst
 
-8. Debugging binary extensions
+9. Debugging binary extensions
 ==============================
 
 Debugging is the process of executing a program step by step, in order to discover
 where and why it goes wrong. It is an indispensable step in software development.
 Although tests may tell you what part of your code fails, but the origin of the failure
-is not always clear.
+is not always clear. As explained in the tutorials (see :ref:`testing-your-code`)
+unit tests are useful for two reasons:
+
+#. they assure that your code does not get broken while you add features, or modify it, and
+
+#. they constrain the part of the code that has an issue. If a test fails, the origin of the
+   must be somewhere in the part of the code that is tested. By keeping the tested parts
+   small, you will find the flaw sooner, and proceed faster. 
+
+For small projects inserting print statements in flawed code can be a good approach to
+discover the flaw, but it is cumbersome and in the case of binary extensions requires
+rebuilding the code often. Debugging is a more scalable approach. 
 
 Graphical Debuggers as provided in IDEes, e.g. PyCharm, Eclipse_ + pydev_, Visual
 Studio, present a great user experience, but not all are capable of debugging mixed
@@ -18,8 +29,9 @@ for more information.
 
 * eclipse: debugging binaries should be possible but not really mixed mode.
 
-* Visual Studio: `Mixed language Python & C++ debugging with Python Tools for Visual
-  Studio <https://www.youtube.com/watch?v=zEDFH1vMA24>_.
+* Visual Studio:
+  `Mixed language Python & C++ debugging with Python Tools for Visual Studio <https://www.youtube.com/watch?v=zEDFH1vMA24>`_.
+  
 
 For HPC environments there is also:
 
@@ -73,7 +85,7 @@ extensions are built with debug information.
 It is recommend to debug small scripts, rather than complete applications. This is,
 however, not always possible.
 
-8.1. Mixed Python/C++ debugging with lldb and pdb
+9.1. Mixed Python/C++ debugging with lldb and pdb
 -------------------------------------------------
 
 This section illustrates mixed language debugging of a Python script calling a
@@ -244,7 +256,7 @@ information. We step out of it with the ``finish`` command, to end up back in ``
     -> assert (z == expected_z).all()
     (Pdb)
 
-8.2. Mixed Python/Fortran debugging with gdb and pdb on Linux
+9.2. Mixed Python/Fortran debugging with gdb and pdb on Linux
 -------------------------------------------------------------
 
 This time we will debug the ``tests/test_f90_fortran.py`` script which calls the

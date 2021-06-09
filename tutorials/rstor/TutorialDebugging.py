@@ -23,7 +23,7 @@ def TutorialDebugging():
     )
     List(
         [ 'they assure that your code does not get broken while you add features, or modify it, and'
-          'they constrain the part of the code that has an issue. If a test fails, the origin of the '
+        , 'they constrain the part of the code that has an issue. If a test fails, the origin of the '
           'must be somewhere in the part of the code that is tested. By keeping the tested parts small, '
           'you will find the flaw sooner, and proceed faster. '
         ]
@@ -42,9 +42,11 @@ def TutorialDebugging():
     List(
         [ "Pycharm_: only Python, but great user experience."
         , "eclipse: debugging binaries should be possible but not really mixed mode."
-        , "Visual Studio: `Mixed language Python & C++ debugging with Python Tools for Visual Studio <https://www.youtube.com/watch?v=zEDFH1vMA24>_."
+        , "Visual Studio code: provides mixed language debugging Python/C++/Fortran."
         ]
     )
+    Note('June 8, 2021: On MACOS, Visual Studio Code, as it uses lldb under the hood, also does not show the variables '
+         'in a Fortran binary extension. It is unclear whether that is due to a quirk in f2py or lldb.')
     Paragraph(
         "For HPC environments there is also:"
     )
@@ -376,8 +378,21 @@ def TutorialDebugging():
         ]
     )
 
-    Note('Fortran support in ``Lldb`` seems to be limited. I could step but not print the variables.')
+    Note('Fortran support in ``Lldb`` seems to be limited. It is possible to step through the code, but not the '
+         'variables are invisible. It is unclear whether this is due to a quirk in lldb or f2py on MACOS.')
 
+    Heading('Visual Studio Code', level=4)
+
+    Paragraph(
+        'Visual Studio Code is free, open source, and available for Windows, Linux and MACOS. It supports graphical '
+        'mixed language debugging for Python, C++ and Fortran. In addition it is possible to work remotely using '
+        'ssh. So, it should be possible to use it for development on the (VSC) clusters. Here are some useful links;'
+    )
+    List(
+        [ '`mixed language debugging <https://nadiah.org/2020/03/01/example-debug-mixed-python-c-in-visual-studio-code/>`_'
+        , '`Remote Development using SSH <https://code.visualstudio.com/docs/remote/ssh>`_'
+        ]
+    )
     process(doc)
 
 if __name__ == '__main__':
