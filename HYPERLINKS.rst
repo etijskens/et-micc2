@@ -1,6 +1,7 @@
 .. _click: https://click.palletsprojects.com/
 .. _cmake: https://cmake.org/
 .. _cygwin: https://www.cygwin.com
+.. _eclipse: https://www.eclipse.org/downloads/packages/release/2021-03/r/eclipse-ide-scientific-computing
 .. _f2py: https://numpy.org/doc/stable/f2py/
 .. _gdb: https://www.gnu.org/software/gdb/
 .. _gh: https://github.com/cli/cli
@@ -15,6 +16,9 @@
 .. _pip: https://pypi.org/project/pip/
 .. _poetry: https://poetry.eustace.io/
 .. _pybind11: https://pybind11.readthedocs.io/en/stable/
+.. _pycharm: https://www.jetbrains.com/pycharm/
+.. _pydev: https://www.pydev.org/
+.. _pyenv: https://github.com/pyenv/pyenv
 .. _PyPI: https://pypi.org/
 .. _pytest: https://docs.pytest.org/
 .. _pytorch: https://pytorch.org/
@@ -23,3 +27,4 @@
 .. _sphinx_click: https://click.palletsprojects.com/
 .. _sphinx_rtd_theme: https://github.com/readthedocs/sphinx_rtd_theme/
 .. _vsc: https://vscentrum.be/
+.. _visual_studio_code: https://code.visualstudio.com

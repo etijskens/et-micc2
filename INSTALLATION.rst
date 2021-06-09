@@ -6,7 +6,7 @@ Here is a simple decision scheme:
 * if your OS is MACOS or Linux:
 
   * If your system is your own desktop or laptop, go to :ref:`desktop installation`
-  * If your system is a VSC HPC cluster, go to :ref:`VSC cluster installation`.
+  * If your system is a VSC HPC cluster, go to :ref:`VSC-cluster-installation`.
     There are only a few important differences with the desktop installation.
     Installation on other HPC clusters is problably quite similar.
 

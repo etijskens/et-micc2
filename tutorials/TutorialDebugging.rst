@@ -1,6 +1,6 @@
 .. include:: ../HYPERLINKS.rst
 
-9. Debugging binary extensions
+8. Debugging binary extensions
 ==============================
 
 Debugging is the process of executing a program step by step, in order to discover
@@ -29,9 +29,13 @@ for more information.
 
 * eclipse: debugging binaries should be possible but not really mixed mode.
 
-* Visual Studio:
-  `Mixed language Python & C++ debugging with Python Tools for Visual Studio <https://www.youtube.com/watch?v=zEDFH1vMA24>`_.
-  
+* Visual Studio code: provides mixed language debugging Python/C++/Fortran.
+
+.. note::
+
+   June 8, 2021: On MACOS, Visual Studio Code, as it uses lldb under the hood, also does not
+   show the variables in a Fortran binary extension. It is unclear whether that is due to a
+   quirk in f2py or lldb.
 
 For HPC environments there is also:
 
@@ -85,7 +89,7 @@ extensions are built with debug information.
 It is recommend to debug small scripts, rather than complete applications. This is,
 however, not always possible.
 
-9.1. Mixed Python/C++ debugging with lldb and pdb
+8.1. Mixed Python/C++ debugging with lldb and pdb
 -------------------------------------------------
 
 This section illustrates mixed language debugging of a Python script calling a
@@ -256,7 +260,7 @@ information. We step out of it with the ``finish`` command, to end up back in ``
     -> assert (z == expected_z).all()
     (Pdb)
 
-9.2. Mixed Python/Fortran debugging with gdb and pdb on Linux
+8.2. Mixed Python/Fortran debugging with gdb and pdb on Linux
 -------------------------------------------------------------
 
 This time we will debug the ``tests/test_f90_fortran.py`` script which calls the
@@ -360,6 +364,21 @@ procedure is very similar. Only the ``gdb`` commands differ a somewhat from thee
 
 .. note::
 
-   Fortran support in ``Lldb`` seems to be limited. I could step but not print the
-   variables.
+   Fortran support in ``Lldb`` seems to be limited. It is possible to step through the
+   code, but not the variables are invisible. It is unclear whether this is due to a quirk
+   in lldb or f2py on MACOS.
+
+8.2.1. Visual Studio Code
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Visual_studio_code is an IDE that misfree, open source, and available for Windows,
+Linux and MACOS. It supports graphical mixed language debugging for Python, C++ and
+Fortran. In addition it is possible to work remotely using ssh (as is eclipse_). You
+can edit remote files with Visual Studio's builtin editor, and have a remote terminal
+as well. The above debugging approaches can be applied in a remote terminal. So, it is
+possible to use it for development on the (VSC) clusters. Here are some useful links;
+
+* `mixed language debugging <https://nadiah.org/2020/03/01/example-debug-mixed-python-c-in-visual-studio-code/>`_
+
+* `Remote Development using SSH <https://code.visualstudio.com/docs/remote/ssh>`_
 

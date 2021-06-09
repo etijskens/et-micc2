@@ -384,9 +384,11 @@ def TutorialDebugging():
     Heading('Visual Studio Code', level=4)
 
     Paragraph(
-        'Visual Studio Code is free, open source, and available for Windows, Linux and MACOS. It supports graphical '
-        'mixed language debugging for Python, C++ and Fortran. In addition it is possible to work remotely using '
-        'ssh. So, it should be possible to use it for development on the (VSC) clusters. Here are some useful links;'
+        'Visual_studio_code is an IDE that misfree, open source, and available for Windows, Linux and MACOS. '
+        'It supports graphical mixed language debugging for Python, C++ and Fortran. In addition it is possible to '
+        'work remotely using ssh (as is eclipse_). You can edit remote files with Visual Studio\'s builtin editor, '
+        'and have a remote terminal as well. The above debugging approaches can be applied in a remote terminal. '
+        'So, it is possible to use it for development on the (VSC) clusters. Here are some useful links;'
     )
     List(
         [ '`mixed language debugging <https://nadiah.org/2020/03/01/example-debug-mixed-python-c-in-visual-studio-code/>`_'

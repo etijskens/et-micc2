@@ -76,7 +76,7 @@ implementation to the local git repository:
 .. code-block:: bash
 
     > git commit -a -m 'implemented dot()'
-    [main a4a3f1d] implemented dot()
+    [main 60e873e] implemented dot()
      1 file changed, 23 insertions(+), 22 deletions(-)
      rewrite et_dot/__init__.py (71%)
     
@@ -178,7 +178,7 @@ good practise to commit this to our local git repository:
 .. code-block:: bash
 
     > git commit -a -m 'added test_dot_aa()'
-    [main 8d92290] added test_dot_aa()
+    [main a7af306] added test_dot_aa()
      1 file changed, 7 insertions(+), 33 deletions(-)
      rewrite tests/test_et_dot.py (98%)
     
@@ -272,7 +272,7 @@ setting the seed of the random number generator:
     tests/test_et_dot.py::test_dot_aa PASSED                                 [ 50%]
     tests/test_et_dot.py::test_dot_commutative PASSED                        [100%]
     
-    ============================== 2 passed in 0.01s ===============================
+    ============================== 2 passed in 0.02s ===============================
     
 
 The 1000 tests all pass. If, say test 315 would fail, it would fail every time we run it
@@ -366,7 +366,7 @@ pytest_ produces a readable report about the failure:
     tests/test_et_dot.py:61: AssertionError
     =========================== short test summary info ============================
     FAILED tests/test_et_dot.py::test_dot_one_2 - assert 0.0 == 1.0
-    ========================= 1 failed, 3 passed in 0.05s ==========================
+    ========================= 1 failed, 3 passed in 0.07s ==========================
     
 
 Mathematically, our expectations about the outcome of the test are certainly
@@ -490,14 +490,14 @@ well:
 .. code-block:: bash
 
     > git commit -a -m 'dot() tests added'
-    [main 2958c51] dot() tests added
+    [main 6c18e60] dot() tests added
      1 file changed, 70 insertions(+)
     
     > micc2 version -p
     [INFO]           (ET-dot)> version (0.0.0) -> (0.0.1)
     
     > git commit -a -m 'v0.0.1'
-    [main 034a654] v0.0.1
+    [main ce5b139] v0.0.1
      2 files changed, 2 insertions(+), 2 deletions(-)
     
 
@@ -576,7 +576,7 @@ Executing this script yields:
 .. code-block:: bash
 
     > python ./prof/run1.py
-    251.7091505466474
+    231.0084237109499
     -*# done #*-
     
 
@@ -637,9 +637,9 @@ and execute it again:
 .. code-block:: bash
 
     > python ./prof/run1.py
-    init : 0.000292 s
-    dot  : 0.000106 s
-    254.1287104986123
+    init : 0.00036 s
+    dot  : 0.000122 s
+    248.40894110825718
     -*# done #*-
     
 
@@ -684,10 +684,10 @@ Its execution yields:
 .. code-block:: bash
 
     > python ./prof/run1.py
-    et init : 0.000258 s
-    et dot  : 9.4e-05 s
-    np init : 5.7e-05 s
-    np dot  : 6e-06 s
+    et init : 0.000293 s
+    et dot  : 9.5e-05 s
+    np init : 5.8e-05 s
+    np dot  : 1e-05 s
     -*# done #*-
     
 
@@ -1084,8 +1084,8 @@ The binary extension module can now be built:
                            creating /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build
                            creating /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8
                            compile options: '-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION -DF2PY_REPORT_ON_ARRAY_COPY=1 -DNDEBUG -DNPY_DISABLE_OPTIMIZATION=1 -I/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8 -I/Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages/numpy/core/include -I/Users/etijskens/.pyenv/versions/3.8.5/include/python3.8 -c'
-                           clang: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotfmodule.c
                            clang: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/fortranobject.c
+                           clang: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotfmodule.c
                            /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotfmodule.c:144:12: warning: unused function 'f2py_size' [-Wunused-function]
                            static int f2py_size(PyArrayObject* var, ...)
                                       ^
