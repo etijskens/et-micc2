@@ -220,7 +220,7 @@ class Project:
 
             self.ask_user_to_continue_or_not(stop_message='Project not created.')
 
-        if self.options.remote:
+        if self.options.remote != 'none':
             # Check that we have github username
             github_username = self.options.template_parameters['github_username']
             if not github_username:
