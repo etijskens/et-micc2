@@ -7,7 +7,7 @@ Module et_micc2.project
 An OO interface to *micc* projects.
 
 """
-import os, sys, site, subprocess
+import os, sys, site, subprocess, re
 import sysconfig
 import shutil
 import json
@@ -205,8 +205,9 @@ class Project:
         if self.options.project_path.exists() and os.listdir(str(self.options.project_path)):
             self.error(f"Cannot create project in ({self.options.project_path}):\n"
                        f"  Directory must be empty.")
-
-        if not self.options.no_git and not ToolInfo('git').is_available():
+        
+        toolinfo_git = ToolInfo('git')
+        if not self.options.no_git and not toolinfo_git.is_available():
             if on_vsc_cluster():
                 self.warning('Your current environment has no suitable git command.\n'
                              'Load a cluster module that has git.\n'
@@ -327,11 +328,24 @@ class Project:
                 else:
                     with et_micc2.logger.log(self.logger.info, "Creating local git repository"):
                         with et_micc2.utils.in_directory(self.project_path):
-                            cmds = [ ['git', 'init', f'--initial-branch={self.options.template_parameters["git_default_branch"]}']
-                                   , ['git', 'add', '*']
-                                   , ['git', 'add', '.gitignore']
-                                   , ['git', 'commit', '-m', '"And so this begun..."']
-                                   ]
+                            vs = toolinfo_git.version()
+                            re_git_version = re.compile('^git version (\d+\.\d*\.\d*).*')
+                            m = re_git_version.match(vs)
+                            git_Mmp = m[1]
+                            print(git_Mmp)
+                            if git_Mmp > '2.30':
+                                cmds = [ ['git', 'init', f'--initial-branch={self.options.template_parameters["git_default_branch"]}']
+                                       ]
+                            else:
+                                cmds = [ ['git', 'init']
+                                       ]
+                            cmds.extend(
+                                    [ ['git', 'add', '*']
+                                    , ['git', 'add', '.gitignore']
+                                    , ['git', 'commit', '-m', '"And so this begun..."']
+                                    ]
+                            )
+                                
                             returncode = et_micc2.utils.execute(cmds, self.logger.debug, stop_on_error=True)
                     if not returncode:
                         if self.options.remote:
