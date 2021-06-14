@@ -5,10 +5,6 @@ Application micc2
 """
 import subprocess
 
-S = """Build binary extensions.
-
-    :param str module;:::;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    """
 
 
 def sys_path_helper():

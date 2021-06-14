@@ -20,7 +20,7 @@ I have been using different IDEs over time:
 * Visual_Studio_Code_: local and remote editing, mixed language debugging Python/C++/Fortran.
   remote terminal allowing remote mixed language debugging. cross platform.
 
-Currently, I consider Visual Studio Code as the most complete IDE for mixed language development
-for HPC environments. In addition, it is free and open source.
+Currently, I consider Visual Studio Code as the most complete IDE for mixed language development for HPC environments.
+In addition, it is free and open source. See also `Modern Python developer's toolkit <https://pycon.switowski.com/>`_.
 
 Editors such as SublimeText and Atoms, or vim are useful too, but provide no integrated debugging.
