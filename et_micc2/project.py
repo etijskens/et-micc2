@@ -7,6 +7,7 @@ Module et_micc2.project
 An OO interface to *micc* projects.
 
 """
+from et_micc2.cli_micc import S
 import os, sys, site, subprocess, re
 import sysconfig
 import shutil
@@ -718,10 +719,11 @@ class Project:
                                          f'However, you may experience problems because it is older than v{__pybind11_required_version__}.\n'
                                           'Upgrading is recommended.'
                                          )
-                    # prepare for adding a C++ sub-module:
-                    if not self.options.templates:
-                        self.options.templates = 'module-cpp'
-                    self.add_cpp_module(db_entry)
+                    if self.options.cpp:
+                        # prepare for adding a C++ sub-module:
+                        if not self.options.templates:
+                            self.options.templates = 'module-cpp'
+                        self.add_cpp_module(db_entry)
 
         self.deserialize_db()
         self.serialize_db(db_entry)

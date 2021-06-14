@@ -672,42 +672,32 @@ def add(ctx
         , overwrite
         , backup
         ):
-    """Add a module or CLI to the projcect.
+    """Add a component to the projcect, e.g. CLI, sub-module, sub-package, binary extension 
+    module (C++, Fortran, C++/CUDA )
 
-    :param str name: name of the CLI or module added.
-
-    If ``cli==True``: (add CLI application)
-
-    * :py:obj:`app_name` is also the name of the executable when the package is installed.
-    * The source code of the app resides in :file:`<project_name>/<package_name>/cli_<name>.py`.
-
-
-    If ``py==True``: (add Python module)
-
-    * Python source  in :file:`<name>.py*`or :file:`<name>/__init__.py`, depending on the :py:obj:`package` flag.
-
-    If ``f90==True``: (add f90 module)
-
-    * Fortran source in :file:`f90_<name>/<name>.f90` for f90 binary extension modules.
-
-    If ``cpp==True``: (add cpp module)
-
-    * C++ source     in :file:`cpp_<name>/<name>.cpp` for cpp binary extension modules.
+    :param str name: name of the component.
     """
     options = ctx.obj
     options.add_name = name
+    
     options.cli = cli
     options.clisub = clisub
     options.py = py
     options.package = package
     options.f90 = f90
     options.cpp = cpp
+        
     options.templates = templates
     options.overwrite = overwrite
     options.backup = backup
     options.template_parameters = options.preferences.data
     try:
         project = Project(options)
+        n_selected = cli+clisub+py+package+f90+cpp+cu
+        if n_selected == 0:
+            project.error('You must select a component type.')
+        if n_selected > 1:
+            project.error(f'You must select just one component type, not {n_selected}.')
         with et_micc2.logger.logtime(project):
             project.add_cmd()
     except RuntimeError:
