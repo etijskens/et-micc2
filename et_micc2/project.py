@@ -333,7 +333,7 @@ class Project:
                             re_git_version = re.compile('^git version (\d+\.\d*\.\d*).*')
                             m = re_git_version.match(vs)
                             git_Mmp = m[1]
-                            print(git_Mmp)
+                            # print(git_Mmp)
                             if git_Mmp > '2.30':
                                 cmds = [ ['git', 'init', f'--initial-branch={self.options.template_parameters["git_default_branch"]}']
                                        ]
