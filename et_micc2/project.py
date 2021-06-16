@@ -7,7 +7,7 @@ Module et_micc2.project
 An OO interface to *micc* projects.
 
 """
-from et_micc2.cli_micc import S
+# from et_micc2.cli_micc import S
 import os, sys, site, subprocess, re
 import sysconfig
 import shutil
