@@ -689,7 +689,7 @@ def add(ctx
     options.template_parameters = options.preferences.data
     try:
         project = Project(options)
-        n_selected = cli+clisub+py+package+f90+cpp+cu
+        n_selected = cli+clisub+py+package+f90+cpp # yes, you can add bool variables, they are literally 0|1
         if n_selected == 0:
             project.error('You must select a component type.')
         if n_selected > 1:
