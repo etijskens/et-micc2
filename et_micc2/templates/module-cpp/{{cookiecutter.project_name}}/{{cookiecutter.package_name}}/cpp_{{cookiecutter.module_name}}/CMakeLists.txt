@@ -61,6 +61,8 @@
 #     WM_DP                             # just define the macro
 # )
 
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
+
 # Add include directories
 #include_directories(
 #     path/to/dir1

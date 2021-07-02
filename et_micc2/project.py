@@ -607,7 +607,7 @@ class Project:
                        )
 
         # set implied flags:
-        if self.options.clisub:
+        if self.options.clisub: # cli with subcommands
             app_implied = f" [implied by --clisub   ({int(self.options.clisub)})]"
             self.options.cli = True
         else:
@@ -633,8 +633,11 @@ class Project:
         db_entry = {'options': self.options}
 
         if self.options.cli:
-            # Prepare for adding an app
+            # Prepare for adding a single command cli
             app_name = self.options.add_name
+            if os.sep in app_name:
+                self.error("CLIs must be located in the package directory. They cannot be path-like.")
+
             if self.app_exists(app_name):
                 self.error(f"Project {self.project_name} has already an app named {app_name}.")
 
@@ -655,15 +658,23 @@ class Project:
 
         else:
             # Prepare for adding a sub-module
-            module_name = self.options.add_name
+            module_path, module_name = self.get_parent_name(self.options.add_name)
 
-            # Verify that the name is not already used:
-            if self.module_exists(module_name):
-                self.error(f"Project {self.project_name} has already a module named {module_name}.")
+            # Verify that the parent submodule has a package structure:
+            if not (self.project_path / self.package_name / module_path / '__init__.py').is_file();
+                self.error(f'The parent module `{module_path}` does not exists or is not a package (no {module_path}{os.sep}__init__.py).')
+
+            # Verify that the module_name is not already used:
+            existing = self.module_exists(module_path, module_name)
+            if existing:
+                self.error(f"Project {self.project_name} has already a module named {self.options.add_name}: \n"
+                           f"    {existing}"
+                          )
 
             # Verify that the name is valid:
             if (not et_micc2.utils.verify_project_name(module_name)
-                    or module_name != et_micc2.utils.pep8_module_name(module_name)):
+                or module_name != et_micc2.utils.pep8_module_name(module_name)
+               ):
                 self.error(f"Not a valid module name ({module_name}). Valid names:\n"
                            f"  * start with a letter [a-zA-Z]\n"
                            f"  * contain only [a-zA-Z], digits, and underscores\n"
@@ -727,6 +738,11 @@ class Project:
 
         self.deserialize_db()
         self.serialize_db(db_entry)
+
+
+    def get_parent_name(self,module):
+        p = Path(module)
+        return p.parent, p.name
 
     
     def add_python_cli(self, db_entry):
@@ -809,10 +825,11 @@ class Project:
     def add_python_module(self, db_entry):
         """Add a python sub-module or sub-package to this project."""
         project_path = self.project_path
-        module_name = self.options.add_name
+        p = Path()
+        module_path, module_name = self.get_parent_name(self.options.add_name)
 
-        if not module_name == et_micc2.utils.pep8_module_name(module_name):
-            self.error(f"Not a valid module_name: {module_name}")
+        # if not module_name == et_micc2.utils.pep8_module_name(module_name):
+        #     self.error(f"Not a valid module_name: {module_name}")
 
         source_file = f"{module_name}{os.sep}__init__.py" if self.options.package else f"{module_name}.py"
         with et_micc2.logger.log(self.logger.info,
@@ -1111,7 +1128,8 @@ class Project:
         """
         return (self.project_path / self.package_name / f"cli_{app_name}.py").is_file()
 
-    def module_exists(self, module_name):
+
+    def module_exists(self, module_path, module_name):
         """Test if there is already a module with name py:obj:`module_name` in this project.
 
         This can be either a Python module, package, or a binary extension module.
@@ -1119,46 +1137,57 @@ class Project:
         :param str module_name: module name
         :returns: bool
         """
-        return (self.py_module_exists(module_name)
-                or self.py_package_exists(module_name)
-                or self.cpp_module_exists(module_name)
-                or self.f90_module_exists(module_name)
-                )
+        return (    self.py_module_exists (module_path, module_name)
+                 or self.py_package_exists(module_path, module_name)
+                 or self.cpp_module_exists(module_path, module_name)
+                 or self.f90_module_exists(module_path, module_name)
+               )
 
-    def py_module_exists(self, module_name):
+    def py_module_exists(self, module_path, module_name):
         """Test if there is already a python module with name :py:obj:`module_name`
         in the project at :file:`project_path`.
 
         :param str module_name: module name
-        :returns: bool
+        :returns: None or str containing the existing module
         """
-        file = self.project_path / self.package_name / f'{module_name}.py'
-        return file.is_file()
+        pyfile = module_path / f'{module_name}.py'
+        if (self.project_path / self.package_name / pyfile).is_file():
+            return pyfile
 
-    def py_package_exists(self, module_name):
+
+    def py_package_exists(self, module_path, module_name):
         """Test if there is already a python package with name :py:obj:`module_name`
         in the project at :file:`project_path`.
 
         :param str module_name: module name
-        :returns: bool
+        :returns: None or str containing the existing module
         """
-        return (self.project_path / self.package_name / module_name / '__init__.py').is_file()
+        initfile = module_path / module_name / '__init__.py'
+        if (self.project_path / self.package_name / initfile).is_file():
+            return initfile
 
-    def f90_module_exists(self, module_name):
+
+    def f90_module_exists(self, module_path, module_name):
         """Test if there is already a f90 module with name py:obj:`module_name` in this project.
 
         :param str module_name: module name
-        :returns: bool
+        :returns: None or str containing the existing module
         """
-        return (self.project_path / self.package_name / ('f90_' + module_name) / f"{module_name}.f90").is_file()
+        f90file = module_path / ('f90_' + module_name) / f"{module_name}.f90"
+        if (self.project_path / self.package_name / f90file).is_file():
+            return module_path / ('f90_' + module_name)
 
-    def cpp_module_exists(self, module_name):
+
+    def cpp_module_exists(self, module_path, module_name):
         """Test if there is already a cpp module with name py:obj:`module_name` in this project.
 
         :param str module_name: module name
-        :returns: bool
+        :returns: None or str containing the existing module
         """
-        return (self.project_path / self.package_name / ('cpp_' + module_name) / f"{module_name}.cpp").is_file()
+        cppfile = module_path / ('cpp_' + module_name) / f"{module_name}.cpp"
+        if (self.project_path / self.package_name / cppfile).is_file():
+            return module_path / ('cpp_' + module_name)
+
 
     def add_dependencies(self, deps):
         """Add dependencies to the :file:`pyproject.toml` file.

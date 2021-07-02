@@ -671,7 +671,8 @@ def add(ctx
     """Add a component to the projcect, e.g. CLI, sub-module, sub-package, binary extension 
     module (C++, Fortran, C++/CUDA )
 
-    :param str name: name of the component.
+    :param str name: name of the component. Maybe path-like relative to package directory to
+        create sub-sub-modules.
     """
     options = ctx.obj
     options.add_name = name

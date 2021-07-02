@@ -256,6 +256,7 @@ Debugging
 * `Introspection in Python <https://anvil.works/blog/introspection-in-python>`_
 * `Learn to debug code with the GNU Debugger <https://opensource.com/article/21/3/debug-code-gdb?utm_medium=Email&utm_campaign=weekly&sc_cid=7013a000002vsCLAAY>`_
 * `GDBGUI - A browser-based frontend to gdb <https://www.gdbgui.com>`_
+* `GDB Tutorial - a walkthrough with examples <https://www.cs.umd.edu/~srhuang/teaching/cmsc212/gdb-tutorial-handout.pdf>`_
 * `Debugging Python and C(++) extensions with gdb and pdb <https://www.researchgate.net/figure/Debugging-both-C-extensions-and-Python-code-with-gdb-and-pdb_fig2_220307949>`_
 
 Logging
