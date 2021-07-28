@@ -13,6 +13,7 @@ For Beginners
 * `How do I start learning Python? <https://automationpanda.com/2020/02/18/how-do-i-start-learning-python/>`_
 * `Learn Python Programming <https://www.programiz.com/python-programming>`_
 * `Python cheat sheet <https://websitesetup.org/wp-content/uploads/2020/04/Python-Cheat-Sheet.pdf>`_
+* `Getting started with Python <https://stackoverflow.blog/2021/07/14/getting-started-with-python/>`_
 
 Python as a language
 --------------------
@@ -31,6 +32,7 @@ Software engineering
   Julia in mind rather than Python, but the principles remain valid.
 * `Clean architecture  <https://github.com/preslavmihaylov/booknotes/tree/master/architecture/clean-architecture>`_
 * `The Grand Unified Theory of Software Architecture <https://danuker.go.ro/the-grand-unified-theory-of-software-architecture.html>`_
+* `best practices for writing code comments <https://stackoverflow.blog/2021/07/05/best-practices-for-writing-code-comments/>`_
 
 Python internals
 ----------------
@@ -256,6 +258,7 @@ Debugging
 * `Introspection in Python <https://anvil.works/blog/introspection-in-python>`_
 * `Learn to debug code with the GNU Debugger <https://opensource.com/article/21/3/debug-code-gdb?utm_medium=Email&utm_campaign=weekly&sc_cid=7013a000002vsCLAAY>`_
 * `GDBGUI - A browser-based frontend to gdb <https://www.gdbgui.com>`_
+* `GDB Tutorial - a walkthrough with examples <https://www.cs.umd.edu/~srhuang/teaching/cmsc212/gdb-tutorial-handout.pdf>`_
 * `Debugging Python and C(++) extensions with gdb and pdb <https://www.researchgate.net/figure/Debugging-both-C-extensions-and-Python-code-with-gdb-and-pdb_fig2_220307949>`_
 
 Logging
@@ -380,6 +383,7 @@ git and other VCS
 * `Git is my buddy: Effective Git as a solo developer <https://mikkel.ca/blog/git-is-my-buddy-effective-solo-developer/?utm_source=tldrnewsletter>`_
 * `A practical guide to using the git stash command <https://opensource.com/article/21/4/git-stash?utm_medium=Email&utm_campaign=weekly&sc_cid=7013a000002w0CEAAY>`_
 * `gitlab <https://learn.gitlab.com/>`_
+* `git flight rules <https://github.com/k88hudson/git-flight-rules?utm_source=tldrnewsletter>`
 
 Development environment, developement workflow
 ----------------------------------------------
