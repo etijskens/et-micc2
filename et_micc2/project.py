@@ -351,7 +351,7 @@ class Project:
                     if not returncode:
                         if self.options.remote:
                             # todo this context manager does not print correctly
-                            with et_micc2.logger.log(self.logger.info, f"Creating remote git repository at https://github.com/{github_username}/{self.project_name}"):
+                            with et_micc2.logger.log(self.logger.info, f"Creating remote git repository at git://github.com/{github_username}/{self.project_name}"):
                                 with et_micc2.utils.in_directory(self.project_path):
                                     pat_file = self.options._cfg_dir / f'{self.options.template_parameters["github_username"]}.pat'
                                     if pat_file.exists():
@@ -361,8 +361,11 @@ class Project:
                                             et_micc2.utils.log_completed_process(completed_process,self.logger.debug)
 
                                             cmds = [ ['gh', 'repo', 'create', self.project_name, f'--{self.options.remote}', '-y']
+                                                   # next line is for accessing github via ssh
+                                                   , ['git', 'remote', 'set-url', 'origin', f'git@github.com:{github_username}/{self.project_name}.git']
                                                    , ['git', 'push', '-u', 'origin', self.options.template_parameters['git_default_branch']]
                                                    ]
+                                            print(cmds)
                                             et_micc2.utils.execute(cmds, self.logger.debug, stop_on_error=True)
                                     else:
                                         self.logger.error(f"Unable to access your GitHub account: \n"
