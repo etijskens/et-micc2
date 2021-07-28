@@ -365,7 +365,6 @@ class Project:
                                                    , ['git', 'remote', 'set-url', 'origin', f'git@github.com:{github_username}/{self.project_name}.git']
                                                    , ['git', 'push', '-u', 'origin', self.options.template_parameters['git_default_branch']]
                                                    ]
-                                            print(cmds)
                                             et_micc2.utils.execute(cmds, self.logger.debug, stop_on_error=True)
                                     else:
                                         self.logger.error(f"Unable to access your GitHub account: \n"
@@ -664,7 +663,7 @@ class Project:
             module_path, module_name = self.get_parent_name(self.options.add_name)
 
             # Verify that the parent submodule has a package structure:
-            if not (self.project_path / self.package_name / module_path / '__init__.py').is_file();
+            if not (self.project_path / self.package_name / module_path / '__init__.py').is_file():
                 self.error(f'The parent module `{module_path}` does not exists or is not a package (no {module_path}{os.sep}__init__.py).')
 
             # Verify that the module_name is not already used:
@@ -686,6 +685,7 @@ class Project:
             if self.options.py:
                 # prepare for adding a Python sub-module:
                 # self.options.structure = 'package' if self.options.package else 'module'
+                self.options.module_path = module_path
                 if not self.options.templates:
                     self.options.templates = 'module-py'
                 self.add_python_module(db_entry)
@@ -828,7 +828,6 @@ class Project:
     def add_python_module(self, db_entry):
         """Add a python sub-module or sub-package to this project."""
         project_path = self.project_path
-        p = Path()
         module_path, module_name = self.get_parent_name(self.options.add_name)
 
         # if not module_name == et_micc2.utils.pep8_module_name(module_name):

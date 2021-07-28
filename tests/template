@@ -1,0 +1,2 @@
+This is {{tmpl.bar}} and this is {{tmpl.foo}}.
+And this is {{tmpl.foobar}}.
