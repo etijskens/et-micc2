@@ -45,7 +45,7 @@ def test_expand_file():
 
 
 def test_expand_folder():
-    path_to_template = Path("./tests/template_folder_{{tmpl.dname}}")
+    path_to_template = Path("./tests/template_folder")
     assert path_to_template.exists()
 
     destination = Path("./tests/expanded_folder")
@@ -67,9 +67,11 @@ def test_expand_folder():
     assert (destination / 'template_folder_expanded_dname/template_file_expanded_fname').is_file()
     assert (destination / 'template_folder_expanded_dname/template_subfolder_expanded_dnamesub').is_dir()
     assert (destination / 'template_folder_expanded_dname/template_subfolder_expanded_dnamesub/sub_template_file_expanded_fname').is_file()
+
     expected = "This is expanded_bar and this is expanded_foo.\nAnd this is expanded_foobar."
     assert (destination / 'template_folder_expanded_dname/template_file_expanded_fname').read_text() == expected
     assert (destination / 'template_folder_expanded_dname/template_subfolder_expanded_dnamesub/sub_template_file_expanded_fname').read_text() == expected
+
 
 # ==============================================================================
 # The code below is for debugging a particular test in eclipse/pydev.

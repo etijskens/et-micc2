@@ -25,6 +25,7 @@ import et_micc2.config
 import et_micc2.utils
 import et_micc2.expand
 import et_micc2.logger
+import et_micc2.tmpl
 import pkg_resources
 
 
@@ -293,9 +294,10 @@ class Project:
                                f"    The project is not created."
                                )
 
-        structure, source_file = ('package', f'({relative_project_path}{os.sep}{self.package_name}{os.sep}__init__.py)') \
-                                 if self.options.package_structure else \
-                                 ('module' , f'({relative_project_path}{os.sep}{self.package_name}.py)')
+        structure, source_file = ('package', f'({relative_project_path}{os.sep}{self.package_name}{os.sep}__init__.py)')
+        # structure, source_file = ('package', f'({relative_project_path}{os.sep}{self.package_name}{os.sep}__init__.py)') \
+        #                          if self.options.package_structure else \
+        #                          ('module' , f'({relative_project_path}{os.sep}{self.package_name}.py)')
 
         self.options.verbosity = max(1, self.options.verbosity)
 
@@ -310,17 +312,20 @@ class Project:
                 
                 # project_name must come before github_repo because the value of github_repo depends on project_name
                 template_parameters = et_micc2.config.Config( project_name=self.project_name
-                                                               , package_name=self.package_name )
+                                                            , package_name=self.package_name )
                 template_parameters.update(self.options.template_parameters.data)
                 self.options.template_parameters = template_parameters
                 
                 self.options.overwrite = False
-                self.exit_code = et_micc2.expand.expand_templates(self.options)
-                if self.exit_code:
-                    self.logger.critical(f"Exiting ({self.exit_code}) ...")
-                    return
+                # self.exit_code = et_micc2.expand.expand_templates(self.options)
+                # if self.exit_code:
+                #     self.logger.critical(f"Exiting ({self.exit_code}) ...")
+                #     return
+                for template in self.options.templates:
+                    path_to_template = Path(__FILE__).parent / 'templates' / template
+                    et_micc2.tmpl.expand_folder(path_to_template, self.project_path.parent, self.options.template_parameters.data)
 
-                proj_cfg = self.project_path / 'micc2.cfg'
+                proj_cfg = self.project_path / 'micc3.cfg'
                 self.options.template_parameters.save(proj_cfg)
 
                 # add git support if requested

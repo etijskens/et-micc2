@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "{{tmpl.project_name}}"
+version = "0.0.0"
+description = "{{tmpl.project_short_description}}"
+authors = ["{{tmpl.full_name}} <{{tmpl.email}}>"]
+license = "MIT"
+
+readme = 'README.rst'
+
+repository = "https://github.com/{{tmpl.github_username}}/{{tmpl.project_name}}"
+homepage = "https://github.com/{{tmpl.github_username}}/{{tmpl.project_name}}"
+
+keywords = []
+
+[tool.poetry.dependencies]
+python = "^{{tmpl.minimal_python_version}}"
+
+[tool.poetry.dev-dependencies]
+
+[tool.poetry.scripts]
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

@@ -31,7 +31,7 @@ def validate(s):
         raise ValueError(f"Missing parameter: '{m[1]}'.")
 
 
-def expand_file(root, path_to_template, destination, parameters):
+def expand_file(root, path_to_template, destination, parameters, verbose=False):
     """Expand a single template file. Both path and contents are expanded.
 
     :param Path root: path to parent directory of the filepath to be expanded. The root is
@@ -43,6 +43,8 @@ def expand_file(root, path_to_template, destination, parameters):
         All occurences of '{{tmpl.variable}}' in the template file and its filename are
         replaced with parameters[variable].
     """
+    if verbose:
+        print(f'root={root}, template={path_to_template}')
     # Expand the file contents
     template = path_to_template.read_text()
     template = expand_string(template, parameters)
@@ -59,7 +61,8 @@ def expand_file(root, path_to_template, destination, parameters):
 def expand_folder(path_to_template_folder, destination, parameters):
     """Expand a template folder.
 
-    :param Path path_to_template_folder: location of of the template folder.
+    :param Path path_to_template_folder: location of the template folder. Only the contents
+        of path_to_template_folder are expanded, not the folder itself.
     :param Path destination: path to folder where the template folder is to be expanded.
         The filename of the destination file is the filename of the template, after replacing
         the parameters
@@ -67,7 +70,8 @@ def expand_folder(path_to_template_folder, destination, parameters):
         All occurences of '{{tmpl.variable}}' in the template file and its filename are
         replaced with parameters[variable].
     """
-    root = path_to_template_folder.parent
+    root = path_to_template_folder
     for d, dirs, files in os.walk(path_to_template_folder):
         for f in files:
-            expand_file(root, Path(d) / f, destination, parameters)
+            if f != '.DS_Store':
+               expand_file(root, Path(d) / f, destination, parameters)

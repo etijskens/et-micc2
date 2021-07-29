@@ -41,7 +41,7 @@ def underscore2space(text):
     return text.replace('_', ' ')
 
 _subcmds_supporting_overwrite_preferences = ('setup', 'create')
-_cfg_filename = 'micc2.cfg'
+_cfg_filename = 'micc3.cfg'
 _cfg_dir = Path.home() / '.micc2'
 
 _preferences_setup = { "full_name":
@@ -56,11 +56,11 @@ _preferences_setup = { "full_name":
                      , "sphinx_html_theme":
                            { "default": "sphinx_rtd_theme"
                            , "text": "Html theme for sphinx documentation" }
-                     , "software_license":
-                           { "choices": [ 'MIT license', 'GNU General Public License v3'
-                                        , 'BSD license', 'ISC license'
-                                        , 'Apache Software License 2.0', 'Not open source']
-                           , "text": "the default software license" }
+                     # , "software_license":
+                     #       { "choices": [ 'MIT license', 'GNU General Public License v3'
+                     #                    , 'BSD license', 'ISC license'
+                     #                    , 'Apache Software License 2.0', 'Not open source']
+                     #       , "text": "the default software license" }
                      }
 
 
@@ -99,10 +99,10 @@ _preferences_setup = { "full_name":
     , help=f"Overwrite preference `sphinx_html_theme`. (supporting sub-commands only {_subcmds_supporting_overwrite_preferences})"
     , default=''
 )
-@click.option('--software-license'
-    , help=f"Overwrite preference `software_license`. (supporting sub-commands only {_subcmds_supporting_overwrite_preferences})"
-    , default=''
-)
+# @click.option('--software-license'
+#     , help=f"Overwrite preference `software_license`. (supporting sub-commands only {_subcmds_supporting_overwrite_preferences})"
+#     , default=''
+# )
 @click.option('--git-default-branch'
     , help=f"Overwrite preference `git_default_branch`. (supporting sub-commands only {_subcmds_supporting_overwrite_preferences})"
     , default=''
@@ -152,12 +152,12 @@ def main( ctx, verbosity, project_path, clear_log
         # Remove overwrite_preferences which have not been explicitly set:
         for key,value in overwrite_preferences.items():
             if value:
-                if key == 'software_license':
-                    for lic in _preferences_setup[key]['choices']:
-                        if lic.startswith(value):
-                            value = lic
-                elif key == 'full_name':
+                if key == 'full_name':
                     value = underscore2space(value)
+                # elif key == 'software_license':
+                #     for lic in _preferences_setup[key]['choices']:
+                #         if lic.startswith(value):
+                #             value = lic
 
                 overwrite_preferences_set[key] = value
     else:
@@ -328,17 +328,19 @@ def setup( ctx
            "If the result is False or inconclusive the project is NOT created."
     , default=False, is_flag=True
 )
-@click.option('-p', '--package'
-    , help="Create a Python project with a package structure rather than a module structure:\n\n"
-           "* package structure = ``<module_name>/__init__.py``\n"
-           "* module  structure = ``<module_name>.py`` \n"
-    , default=False, is_flag=True
-)
+# From now on we only support package structure - simplifies the code significantly
+# @click.option('-p', '--package'
+#     , help="Create a Python project with a package structure rather than a module structure:\n\n"
+#            "* package structure = ``<module_name>/__init__.py``\n"
+#            "* module  structure = ``<module_name>.py`` \n"
+#     , default=False, is_flag=True
+# )
 @click.option('-d', '--description'
     , help="Short description of your project."
     , default='<Enter a one-sentence description of this project here.>'
 )
-@click.option('-T', '--template', help=__template_help, default=[])
+# suppressed
+# @click.option('-T', '--template', help=__template_help, default=[])
 @click.option('-n', '--allow-nesting'
     , help="If specified allows to nest a project inside another project."
     , default=False, is_flag=True
@@ -357,17 +359,17 @@ def setup( ctx
 )
 @click.argument('name', type=str, default='')
 @click.pass_context
-def create(ctx
-           , name
-           , package
-           , module_name
-           , description
-           , template
-           , allow_nesting
-           , publish
-           , no_git
-           , remote
-           ):
+def create( ctx
+          , name
+          # , package
+          , module_name
+          , description
+          # , template
+          , allow_nesting
+          , publish
+          , no_git
+          , remote
+          ):
     """Create a new project skeleton.
 
     The project name is taken to be the last directory of the *project_path*.
@@ -401,7 +403,7 @@ def create(ctx
             options.project_path = Path(name).resolve()
             options.default_project_path = False
 
-    options.package_structure = package
+    # options.package_structure = package
     options.publish = publish
     options.module_name = module_name
     if not remote in ['public','private', 'none']:
@@ -418,25 +420,13 @@ def create(ctx
     else:
         options.remote = None if remote=='none' else remote
 
-    if not template:  # default is empty list
-        if options.package_structure:
-            template = [ 'package-base'
-                       , 'package-general'
-                       , 'package-simple-docs'
-                       , 'package-general-docs'
-                       ]
-        else: # module structure
-            template = [ 'package-base'
-                       , 'package-simple'
-                       , 'package-simple-docs'
-                       ]
-        options.templates = template
+    options.templates = ['top-level-package']
 
     options.allow_nesting = allow_nesting
 
     options.preferences.update(options.overwrite_preferences)
 
-    options.template_parameters = {'project_short_description': underscore2space(description)}
+    options.template_parameters = { 'project_short_description': underscore2space(description) }
 
     try:
         project = Project(options)
