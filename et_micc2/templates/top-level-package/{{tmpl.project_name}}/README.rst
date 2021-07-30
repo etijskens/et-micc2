@@ -1,4 +1,6 @@
+********
 {{tmpl.project_name}}
+********
 
 {{tmpl.project_short_description}}
 
