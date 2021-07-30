@@ -25,7 +25,6 @@ import et_micc2.config
 import et_micc2.utils
 import et_micc2.expand
 import et_micc2.logger
-import et_micc2.tmpl
 import pkg_resources
 
 
@@ -50,6 +49,7 @@ def on_vsc_cluster():
 def is_os_tool(path_to_exe):
     """test if path_to_exe was installed as part of the OS."""
     return path_to_exe.startswith('/usr/bin')
+
 
 class PkgInfo:
     mock = [] # list of module names to pretend missing. This is just for testing purposes.
@@ -317,13 +317,11 @@ class Project:
                 self.options.template_parameters = template_parameters
                 
                 self.options.overwrite = False
-                # self.exit_code = et_micc2.expand.expand_templates(self.options)
-                # if self.exit_code:
-                #     self.logger.critical(f"Exiting ({self.exit_code}) ...")
-                #     return
-                for template in self.options.templates:
-                    path_to_template = Path(__FILE__).parent / 'templates' / template
-                    et_micc2.tmpl.expand_folder(path_to_template, self.project_path.parent, self.options.template_parameters.data)
+                msg = et_micc2.expand.expand_templates(self.options)
+                if msg:
+                    self.error(msg,-1)
+                    self.logger.critical(f"Exiting ({self.exit_code}) ...")
+                    return
 
                 proj_cfg = self.project_path / 'micc3.cfg'
                 self.options.template_parameters.save(proj_cfg)
@@ -608,10 +606,10 @@ class Project:
         """
         self.require_project_created()
 
-        if self.structure == 'module':
-            self.error(f"Cannot add to a module project ({self.project_name}).\n"
-                       f"  Run `micc2 convert-to-package` on this project to convert it to a package project."
-                       )
+        # if self.structure == 'module':
+        #     self.error(f"Cannot add to a module project ({self.project_name}).\n"
+        #                f"  Run `micc2 convert-to-package` on this project to convert it to a package project."
+        #                )
 
         # set implied flags:
         if self.options.clisub: # cli with subcommands
@@ -620,11 +618,11 @@ class Project:
         else:
             app_implied = ""
 
-        if self.options.package:
-            py_implied = f" [implied by --package ({int(self.options.package)})]"
-            self.options.py = True
-        else:
-            py_implied = ""
+        # if self.options.package:
+        #     py_implied = f" [implied by --package ({int(self.options.package)})]"
+        #     self.options.py = True
+        # else:
+        #     py_implied = ""
 
         # Verify that one and only one of app/py/f90/cpp flags has been selected:
         if (not (self.options.cli or self.options.py or self.options.f90 or self.options.cpp)
@@ -632,7 +630,7 @@ class Project:
             # Do not log, as the state of the project is not changed.
             self.error(f"Specify one and only one of \n"
                        f"  --cli ({int(self.options.cli)}){app_implied}\n"
-                       f"  --py  ({int(self.options.py )}){py_implied}\n"
+                       f"  --py  ({int(self.options.py )})\n"
                        f"  --f90 ({int(self.options.f90)})\n"
                        f"  --cpp ({int(self.options.cpp)})\n"
                        )
@@ -655,11 +653,9 @@ class Project:
                           )
 
             if self.options.clisub:
-                if not self.options.templates:
-                    self.options.templates = 'app-sub-commands'
+                self.options.templates = ['app-sub-commands']
             else:
-                if not self.options.templates:
-                    self.options.templates = 'app-simple'
+                self.options.templates = ['app-single-command']
 
             self.add_python_cli(db_entry)
 
@@ -668,8 +664,9 @@ class Project:
             module_path, module_name = self.get_parent_name(self.options.add_name)
 
             # Verify that the parent submodule has a package structure:
-            if not (self.project_path / self.package_name / module_path / '__init__.py').is_file():
-                self.error(f'The parent module `{module_path}` does not exists or is not a package (no {module_path}{os.sep}__init__.py).')
+            # no longer needed, always satisfied in micc3
+            # if not (self.project_path / self.package_name / module_path / '__init__.py').is_file():
+            #     self.error(f'The parent module `{module_path}` does not exists or is not a package (no {module_path}{os.sep}__init__.py).')
 
             # Verify that the module_name is not already used:
             existing = self.module_exists(module_path, module_name)
@@ -691,8 +688,7 @@ class Project:
                 # prepare for adding a Python sub-module:
                 # self.options.structure = 'package' if self.options.package else 'module'
                 self.options.module_path = module_path
-                if not self.options.templates:
-                    self.options.templates = 'module-py'
+                self.options.templates = ['sub-module-py', 'sub-module-py-test']
                 self.add_python_module(db_entry)
 
             else: # add a binary extension module
@@ -717,8 +713,7 @@ class Project:
                         self.warning(msg)
 
                     # prepare for adding a Fortran sub-module:
-                    if not self.options.templates:
-                        self.options.templates = 'module-f90'
+                    self.options.templates = ['sub-module-f90', 'sub-module-f90-test']
                     self.add_f90_module(db_entry)
 
                 if self.options.cpp:
@@ -740,8 +735,7 @@ class Project:
                                          )
                     if self.options.cpp:
                         # prepare for adding a C++ sub-module:
-                        if not self.options.templates:
-                            self.options.templates = 'module-cpp'
+                        self.options.templates = ['sub-module-cpp', 'sub-module-cpp-test']
                         self.add_cpp_module(db_entry)
 
         self.deserialize_db()

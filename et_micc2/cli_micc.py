@@ -620,15 +620,16 @@ def tag(ctx):
 )
 @click.option('--py'
     , default=False, is_flag=True
-    , help="Add a Python module (module structure)."
+    , help="Add a Python module (package structure)."
 )
-@click.option('--package'
-    , help="Add a Python module with a package structure rather than a module structure:\n\n"
-           "* module  structure = ``<module_name>.py`` \n"
-           "* package structure = ``<module_name>/__init__.py``\n\n"
-           "Default = module structure."
-    , default=False, is_flag=True
-)
+# in micc3 we only allow module/__init__.py structure
+# @click.option('--package'
+#     , help="Add a Python module with a package structure rather than a module structure:\n\n"
+#            "* module  structure = ``<module_name>.py`` \n"
+#            "* package structure = ``<module_name>/__init__.py``\n\n"
+#            "Default = module structure."
+#     , default=False, is_flag=True
+# )
 @click.option('--f90'
     , default=False, is_flag=True
     , help="Add a f90 binary extionsion module (Fortran)."
@@ -637,7 +638,7 @@ def tag(ctx):
     , default=False, is_flag=True
     , help="Add a cpp binary extionsion module (C++)."
 )
-@click.option('-T', '--templates', default='', help=__template_help)
+# @click.option('-T', '--templates', default='', help=__template_help)
 @click.option('--overwrite', is_flag=True
     , help="Overwrite pre-existing files (without backup)."
     , default=False
@@ -651,10 +652,11 @@ def tag(ctx):
 def add(ctx
         , name
         , cli, clisub
-        , py, package
+        , py
+        # , package
         , f90
         , cpp
-        , templates
+        # , templates
         , overwrite
         , backup
         ):
@@ -670,17 +672,17 @@ def add(ctx
     options.cli = cli
     options.clisub = clisub
     options.py = py
-    options.package = package
+    # options.package = package
     options.f90 = f90
     options.cpp = cpp
         
-    options.templates = templates
+    # options.templates = templates
     options.overwrite = overwrite
     options.backup = backup
     options.template_parameters = options.preferences.data
     try:
         project = Project(options)
-        n_selected = cli+clisub+py+package+f90+cpp # yes, you can add bool variables, they are literally 0|1
+        n_selected = cli+clisub+py+f90+cpp # yes, you can add bool variables, they are literally 0|1
         if n_selected == 0:
             project.error('You must select a component type.')
         if n_selected > 1:
