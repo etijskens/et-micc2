@@ -31,7 +31,7 @@ def validate(s):
         raise ValueError(f"Missing parameter: '{m[1]}'.")
 
 
-def expand_file(root, path_to_template, destination, parameters, verbose=False):
+def expand_file(root, path_to_template, destination, parameters):
     """Expand a single template file. Both path and contents are expanded.
 
     :param Path root: path to parent directory of the filepath to be expanded. The root is
@@ -43,14 +43,21 @@ def expand_file(root, path_to_template, destination, parameters, verbose=False):
         All occurences of '{{tmpl.variable}}' in the template file and its filename are
         replaced with parameters[variable].
     """
-    if verbose:
-        print(f'root={root}, template={path_to_template}')
     # Expand the file contents
     template = path_to_template.read_text()
-    template = expand_string(template, parameters)
+    try:
+        template = expand_string(template, parameters)
+    except ValueError as exc:
+        msg = exc.args[0] + f"\n    while expanding contents of file {path_to_template}."
+        raise ValueError(msg)
+
     # expand the file path
     filepath = str(path_to_template.relative_to(root))
-    filepath = expand_string(filepath, parameters)
+    try:
+        filepath = expand_string(filepath, parameters)
+    except ValueError as exc:
+        msg = exc.args[0] + f"\n    while expanding path of file {path_to_template}."
+        raise ValueError(msg)
 
     # Write the result
     dst = destination / filepath
@@ -74,4 +81,7 @@ def expand_folder(path_to_template_folder, destination, parameters):
     for d, dirs, files in os.walk(path_to_template_folder):
         for f in files:
             if f != '.DS_Store':
-               expand_file(root, Path(d) / f, destination, parameters)
+                try:
+                    expand_file(root, Path(d) / f, destination, parameters)
+                except ValueError as exc:
+                    msg = exc.args[0] + f'\n    while expanding template folder {path_to_template_folder}.'
