@@ -908,7 +908,7 @@ class Project:
             self.logger.info(f"- module documentation in {rst_file} (restructuredText format).")
             self.logger.info(f"- Python test code in     {tst_file}.")
 
-            with et_micc2.utils.in_directory(project_path):
+            with et_micc2.utils.in_directory(self.options.project_path):
                 # docs
                 filename = "API.rst"
                 text = f"\n.. include:: ../{self.options.package_name}/{self.options.module_location_relative}/{module_name}.rst\n"
@@ -967,7 +967,7 @@ class Project:
             self.logger.info(f"- module documentation in {rst_file} (restructuredText format).")
             self.logger.info(f"- Python test code in     {tst_file}.")
 
-            with et_micc2.utils.in_directory(project_path):
+            with et_micc2.utils.in_directory(self.options.project_path):
                 # docs
                 with open("API.rst", "a") as f:
                     filename = "API.rst"
