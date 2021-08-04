@@ -23,8 +23,15 @@ import et_micc2.tmpl
 def expand_templates(options):
     for template in options.templates:
         path_to_template = Path(__FILE__).parent / 'templates' / template
+        if template.startswith('sub-module-'):
+            if template.endswith('-test'):
+                destination = options.project_path / 'tests' / options.package_name / options.module_location_relative
+            else:
+                destination = options.project_path / options.package_name / options.module_location_relative
+        else: # not a sub-module, either top-level package or cli
+            destination = options.project_path.parent
         try:
-            et_micc2.tmpl.expand_folder(path_to_template, options.project_path.parent, options.template_parameters.data)
+            et_micc2.tmpl.expand_folder(path_to_template, destination, options.template_parameters.data)
         except ValueError as exc:
             return exc.args[0]
 

@@ -661,7 +661,13 @@ class Project:
 
         else:
             # Prepare for adding a sub-module
-            module_path, module_name = self.get_parent_name(self.options.add_name)
+            path_to_sub_module = Path(self.options.add_name)
+            self.options.module_location_relative = str(path_to_sub_module.parent)
+            self.options.package_name = self.package_name
+            self.options.module_name = path_to_sub_module.name
+            self.options.template_parameters.update(
+                {'module_name': self.options.module_name}
+            )
 
             # Verify that the parent submodule has a package structure:
             # no longer needed, always satisfied in micc3
@@ -669,25 +675,33 @@ class Project:
             #     self.error(f'The parent module `{module_path}` does not exists or is not a package (no {module_path}{os.sep}__init__.py).')
 
             # Verify that the module_name is not already used:
-            existing = self.module_exists(module_path, module_name)
+            existing = self.module_exists(
+              ( self.project_path / self.package_name / self.options.module_location_relative ).resolve()
+              , self.options.module_name
+            )
             if existing:
                 self.error(f"Project {self.project_name} has already a module named {self.options.add_name}: \n"
                            f"    {existing}"
                           )
 
             # Verify that the name is valid:
-            if (not et_micc2.utils.verify_project_name(module_name)
-                or module_name != et_micc2.utils.pep8_module_name(module_name)
+            if (not et_micc2.utils.verify_project_name(self.options.module_name)
+                or self.options.module_name != et_micc2.utils.pep8_module_name(self.options.module_name)
                ):
                 self.error(f"Not a valid module name ({module_name}). Valid names:\n"
                            f"  * start with a letter [a-zA-Z]\n"
                            f"  * contain only [a-zA-Z], digits, and underscores\n"
                           )
 
+            # Verify the the parent is a python package
+            parent = (self.options.project_path / self.options.package_name / self.options.add_name).parent
+            if not (parent /  '__init__.py').is_file():
+                self.error(f"The parent of a sub-module must be a python package.\n"
+                           f"    {parent} is not a Python package."
+                          )
+
             if self.options.py:
                 # prepare for adding a Python sub-module:
-                # self.options.structure = 'package' if self.options.package else 'module'
-                self.options.module_path = module_path
                 self.options.templates = ['sub-module-py', 'sub-module-py-test']
                 self.add_python_module(db_entry)
 
@@ -825,18 +839,10 @@ class Project:
                 db_entry[os.path.join(self.package_name, '__init__.py')] = line
 
     def add_python_module(self, db_entry):
-        """Add a python sub-module or sub-package to this project."""
-        project_path = self.project_path
-        module_path, module_name = self.get_parent_name(self.options.add_name)
-
-        # if not module_name == et_micc2.utils.pep8_module_name(module_name):
-        #     self.error(f"Not a valid module_name: {module_name}")
-
-        source_file = f"{module_name}{os.sep}__init__.py" if self.options.package else f"{module_name}.py"
+        """Add a python sub-module to this project."""
         with et_micc2.logger.log(self.logger.info,
-                                f"Adding python module {source_file} to project {project_path.name}."
+                                f"Adding python sub-module {self.options.add_name} to package {self.options.package_name}."
                                 ):
-            self.options.template_parameters.update({'module_name': module_name})
 
             # Create the needed folders and files by expanding the templates:
             self.exit_code = et_micc2.expand.expand_templates(self.options)
@@ -846,20 +852,16 @@ class Project:
                 )
                 return
 
-            package_name = self.options.template_parameters['package_name']
-            if self.options.package:
-                self.module_to_package(project_path / package_name / (module_name + '.py'))
-
-            src_file = os.path.join(project_path.name, package_name, source_file)
-            tst_file = os.path.join(project_path.name, 'tests', 'test_' + module_name + '.py')
+            src_file = self.project_path / self.package_name / self.options.add_name / '__init__.py'
+            tst_file = self.project_path / 'tests' / self.package_name / self.options.add_name / f'test_{self.options.module_name}.py'
 
             self.logger.info(f"- python source in    {src_file}.")
             self.logger.info(f"- Python test code in {tst_file}.")
 
-            with et_micc2.utils.in_directory(project_path):
+            with et_micc2.utils.in_directory(self.options.project_path):
                 # docs
                 filename = "API.rst"
-                text = f"\n.. automodule:: {package_name}.{module_name}" \
+                text = f"\n.. automodule:: {self.options.package_name}.{self.options.add_name.replace(os.sep,'.')}" \
                         "\n   :members:\n\n"
                 with open(filename, "a") as f:
                     f.write(text)
@@ -871,7 +873,7 @@ class Project:
         """Add import statement for this python s in :file:`__init__.py` of the package."""
         module_name = self.options.add_name
         text_to_insert = [ ""
-                         , f"import {self.package_name}.{module_name}"
+                         , f"import {self.package_name}.{self.options.add_name.replace(os.sep,'.')}"
                          ]
         file = os.path.join(self.package_name, '__init__.py')
         et_micc2.utils.insert_in_file(
@@ -884,50 +886,32 @@ class Project:
 
     def add_f90_module(self, db_entry):
         """Add a f90 module to this project."""
-        project_path = self.project_path
-        module_name = self.options.add_name
-
         with et_micc2.logger.log(self.logger.info,
-                                f"Adding f90 module {module_name} to project {project_path.name}."
+                                f"Adding f90 sub-module {self.options.add_name} to package {self.options.package_name}."
                                 ):
-            self.options.template_parameters.update({'module_name': module_name})
 
+            # Create the needed folders and files by expanding the templates:
             self.exit_code = et_micc2.expand.expand_templates(self.options)
             if self.exit_code:
                 self.logger.critical(
                     f"Expand failed during Project.add_f90_module for project ({self.project_name})."
                 )
+                return
 
-            package_name = self.options.template_parameters['package_name']
-            src_file = os.path.join(project_path.name
-                                    , package_name
-                                    , 'f90_' + module_name
-                                    , module_name + '.f90'
-                                    )
-            cmk_file = os.path.join(project_path.name
-                                    , package_name
-                                    , 'f90_' + module_name
-                                    , 'CMakeLists.txt'
-                                    )
-            tst_file = os.path.join(project_path.name
-                                    , 'tests'
-                                    , 'test_f90_' + module_name + '.py'
-                                    )
+            src_file = self.project_path / self.package_name / self.options.add_name / self.options.module_name+'.f90'
+            cmk_file = self.project_path / self.package_name / self.options.add_name / 'CMakeLists.txt'
+            rst_file = self.project_path / self.package_name / self.options.add_name / self.options.module_name+'.rst'
+            tst_file = self.project_path / 'tests' / self.package_name / self.options.add_name / f'test_{self.options.module_name}.py'
 
-            rst_file = os.path.join(project_path.name
-                                    , package_name
-                                    , 'f90_' + module_name
-                                    , module_name + '.rst'
-                                    )
             self.logger.info(f"- Fortran source in       {src_file}.")
             self.logger.info(f"- build settings in       {cmk_file}.")
-            self.logger.info(f"- Python test code in     {tst_file}.")
             self.logger.info(f"- module documentation in {rst_file} (restructuredText format).")
+            self.logger.info(f"- Python test code in     {tst_file}.")
 
             with et_micc2.utils.in_directory(project_path):
                 # docs
                 filename = "API.rst"
-                text = f"\n.. include:: ../{package_name}/f90_{module_name}/{module_name}.rst\n"
+                text = f"\n.. include:: ../{self.options.package_name}/{self.options.module_location_relative}/{module_name}.rst\n"
                 with open(filename, "a") as f:
                     f.write(text)
                 db_entry[filename] = text
@@ -937,10 +921,11 @@ class Project:
     def add_auto_build_code(self, db_entry):
         """Add auto build code for binary extension modules in :file:`__init__.py` of the package."""
         module_name = self.options.add_name
+        import_path = f"{self.options.package_name}.{str(self.options.module_location_relative).replace(os.sep,'.')}"
         text_to_insert = [
             "",
             "try:",
-            f"    import {self.package_name}.{module_name}",
+            f"    import {import_path}",
             "except ModuleNotFoundError as e:",
             "    # Try to build this binary extension:",
             "    from pathlib import Path",
@@ -948,7 +933,7 @@ class Project:
             "    from et_micc2.project import auto_build_binary_extension",
             f"    msg = auto_build_binary_extension(Path(__file__).parent, '{module_name}')",
             "    if not msg:",
-            f"        import {self.package_name}.{module_name}",
+            f"        import {import_path}",
             "    else:",
             f"        click.secho(msg, fg='bright_red')",
         ]
@@ -963,14 +948,9 @@ class Project:
 
     def add_cpp_module(self, db_entry):
         """Add a cpp module to this project."""
-        project_path = self.project_path
-        module_name = self.options.add_name
-
         with et_micc2.logger.log(self.logger.info,
-                                f"Adding cpp module cpp_{module_name} to project {project_path.name}."
+                                f"Adding cpp sub-module {self.options.add_name} to package {self.options.package_name}."
                                 ):
-            self.options.template_parameters.update({'module_name': module_name})
-
             self.exit_code = et_micc2.expand.expand_templates(self.options)
             if self.exit_code:
                 self.logger.critical(
@@ -978,37 +958,20 @@ class Project:
                 )
                 return
 
-            package_name = self.options.template_parameters['package_name']
-            src_file = os.path.join(project_path.name
-                                    , package_name
-                                    , 'cpp_' + module_name
-                                    , module_name + '.cpp'
-                                    )
-            cmk_file = os.path.join(project_path.name
-                                    , package_name
-                                    , 'cpp_' + module_name
-                                    , 'CMakeLists.txt'
-                                    )
-            tst_file = os.path.join(project_path.name
-                                    , 'tests'
-                                    , 'test_cpp_' + module_name + '.py'
-                                    )
-
-            rst_file = os.path.join(project_path.name
-                                    , package_name
-                                    , 'cpp_' + module_name
-                                    , module_name + '.rst'
-                                    )
+            src_file = self.project_path /           self.package_name / self.options.add_name / self.options.module_name+'.cpp'
+            cmk_file = self.project_path /           self.package_name / self.options.add_name / 'CMakeLists.txt'
+            rst_file = self.project_path /           self.package_name / self.options.add_name / self.options.module_name+'.rst'
+            tst_file = self.project_path / 'tests' / self.package_name / self.options.add_name / f'test_{self.options.module_name}.py'
             self.logger.info(f"- C++ source in           {src_file}.")
             self.logger.info(f"- build settings in       {cmk_file}.")
-            self.logger.info(f"- Python test code in     {tst_file}.")
             self.logger.info(f"- module documentation in {rst_file} (restructuredText format).")
+            self.logger.info(f"- Python test code in     {tst_file}.")
 
             with et_micc2.utils.in_directory(project_path):
                 # docs
                 with open("API.rst", "a") as f:
                     filename = "API.rst"
-                    text = f"\n.. include:: ../{package_name}/cpp_{module_name}/{module_name}.rst\n"
+                    text = f"\n.. include:: ../{self.options.package_name}/{self.options.module_location_relative}/{module_name}.rst\n"
                     with open(filename, "a") as f:
                         f.write(text)
                     db_entry[filename] = text
@@ -1138,25 +1101,24 @@ class Project:
         :param str module_name: module name
         :returns: bool
         """
-        return (    self.py_module_exists (module_path, module_name)
-                 or self.py_package_exists(module_path, module_name)
+        return (    self. py_module_exists(module_path, module_name)
                  or self.cpp_module_exists(module_path, module_name)
                  or self.f90_module_exists(module_path, module_name)
                )
 
+    # def py_module_exists(self, module_path, module_name):
+    #     """Test if there is already a python module with name :py:obj:`module_name`
+    #     in the project at :file:`project_path`.
+    #
+    #     :param str module_name: module name
+    #     :returns: None or str containing the existing module
+    #     """
+    #     pyfile = module_path / f'{module_name}.py'
+    #     if (self.project_path / self.package_name / pyfile).is_file():
+    #         return pyfile
+
+
     def py_module_exists(self, module_path, module_name):
-        """Test if there is already a python module with name :py:obj:`module_name`
-        in the project at :file:`project_path`.
-
-        :param str module_name: module name
-        :returns: None or str containing the existing module
-        """
-        pyfile = module_path / f'{module_name}.py'
-        if (self.project_path / self.package_name / pyfile).is_file():
-            return pyfile
-
-
-    def py_package_exists(self, module_path, module_name):
         """Test if there is already a python package with name :py:obj:`module_name`
         in the project at :file:`project_path`.
 
