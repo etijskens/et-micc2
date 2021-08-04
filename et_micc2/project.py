@@ -898,9 +898,9 @@ class Project:
                 )
                 return
 
-            src_file = self.project_path / self.package_name / self.options.add_name / self.options.module_name+'.f90'
+            src_file = self.project_path / self.package_name / self.options.add_name / (self.options.module_name+'.f90')
             cmk_file = self.project_path / self.package_name / self.options.add_name / 'CMakeLists.txt'
-            rst_file = self.project_path / self.package_name / self.options.add_name / self.options.module_name+'.rst'
+            rst_file = self.project_path / self.package_name / self.options.add_name / (self.options.module_name+'.rst')
             tst_file = self.project_path / 'tests' / self.package_name / self.options.add_name / f'test_{self.options.module_name}.py'
 
             self.logger.info(f"- Fortran source in       {src_file}.")
@@ -958,9 +958,9 @@ class Project:
                 )
                 return
 
-            src_file = self.project_path /           self.package_name / self.options.add_name / self.options.module_name+'.cpp'
+            src_file = self.project_path /           self.package_name / self.options.add_name / (self.options.module_name+'.cpp')
             cmk_file = self.project_path /           self.package_name / self.options.add_name / 'CMakeLists.txt'
-            rst_file = self.project_path /           self.package_name / self.options.add_name / self.options.module_name+'.rst'
+            rst_file = self.project_path /           self.package_name / self.options.add_name / (self.options.module_name+'.rst')
             tst_file = self.project_path / 'tests' / self.package_name / self.options.add_name / f'test_{self.options.module_name}.py'
             self.logger.info(f"- C++ source in           {src_file}.")
             self.logger.info(f"- build settings in       {cmk_file}.")
