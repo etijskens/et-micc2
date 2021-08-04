@@ -911,7 +911,7 @@ class Project:
             with et_micc2.utils.in_directory(self.options.project_path):
                 # docs
                 filename = "API.rst"
-                text = f"\n.. include:: ../{self.options.package_name}/{self.options.module_location_relative}/{module_name}.rst\n"
+                text = f"\n.. include:: ../{self.options.package_name}/{self.options.module_location_relative}/{self.options.module_name}.rst\n"
                 with open(filename, "a") as f:
                     f.write(text)
                 db_entry[filename] = text
@@ -971,7 +971,7 @@ class Project:
                 # docs
                 with open("API.rst", "a") as f:
                     filename = "API.rst"
-                    text = f"\n.. include:: ../{self.options.package_name}/{self.options.module_location_relative}/{module_name}.rst\n"
+                    text = f"\n.. include:: ../{self.options.package_name}/{self.options.module_location_relative}/{self.options.module_name}.rst\n"
                     with open(filename, "a") as f:
                         f.write(text)
                     db_entry[filename] = text
