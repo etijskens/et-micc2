@@ -7,6 +7,7 @@ Module et_micc2.project
 An OO interface to *micc* projects.
 
 """
+from copy import copy
 import os, sys, site, subprocess, re
 import sysconfig
 import shutil
@@ -460,15 +461,8 @@ class Project:
         return self.pyproject_toml['tool']['poetry']['version']
 
 
-    def require_project_created(self):
-        """Raise a runtime error if this project does not have a project directory."""
-        if self.logger is None:
-            error(f'Not a project directory: {self.context.project_path}')
-
-
     def info_cmd(self):
         """Output info on the project."""
-        self.require_project_created()
 
         # This command does not require any external tools.
 
@@ -477,50 +471,54 @@ class Project:
 
         if self.context.verbosity >= 1:
             click.echo("Project " + click.style(str(self.context.project_path.name), fg='green')
-                       + " located at "
-                       + click.style(str(self.context.project_path), fg='green')
+                       + " located at " + click.style(str(self.context.project_path), fg='green')
                        + "\n  package: " + click.style(str(self.context.package_name), fg='green')
                        + "\n  version: " + click.style(self.version, fg='green')
                        )
 
-        if self.context.verbosity >= 2:
-            click.echo("  structure: " + click.style(self.src_file, fg='green') + f' (Python {self.structure})')
-
-        if self.context.verbosity >= 3 and self.structure == 'package':
-            package_path = self.context.project_path / self.context.package_name
-            files = []
-            files.extend(package_path.glob('**/*.py'))
-            files.extend(package_path.glob('**/cpp_*/'))
-            files.extend(package_path.glob('**/f90_*'))
-            if len(files) > 1:  # __init__.py is always there.
-                click.echo("  contents:")
-                for f in files:
-                    # filters
-                    sf = str(f)
-                    if '_cmake_build' in sf \
-                    or '{' in str(f) \
-                    or 'package-' in sf \
-                    or 'build_' in sf:
-                        continue
-                    if f.name == "__init__.py" and f.parent.samefile(package_path):  # ignore the top-level __init__.py
-                        continue
-
-                    fg = 'green'
-                    extra = ''
-                    if f.name.startswith('cli'):
-                        kind = "application "
-                        fg = 'blue'
-                    elif f.name.startswith('cpp_'):
-                        kind = "C++ module  "
-                        extra = f"{os.sep}{f.name.split('_', 1)[1]}.cpp"
-                    elif f.name.startswith('f90_'):
-                        kind = "f90 module "
-                        extra = f"{os.sep}{f.name.split('_', 1)[1]}.f90"
-                    elif f.name == '__init__.py':
-                        kind = "package     "
+        if self.context.verbosity >= 3:
+            click.echo("  contents:")
+            indent = '    '
+            lines = []
+            top = self.context.project_path / self.context.package_name
+            for d, dirs, files in os.walk(top):
+                if '_cmake_build' in d:
+                    continue
+                pd = Path(d)
+                submodule_type = get_submodule_type(pd)
+                pdr = pd.relative_to(self.context.project_path)
+                if pd == top:
+                    tp = 'top-level package'
+                    src = ''
+                else:
+                    if submodule_type == 'py':
+                        tp = f'Python submodule  (source in '
+                        src = f'{pdr}/__init__.py'
+                    elif submodule_type == 'f90':
+                        tp = f'Fortran submodule (source in '
+                        src = f'{pdr}/{pdr.name}.f90'
+                    elif submodule_type == 'cpp':
+                        tp = f'C++ submodule     (source in '
+                        src = f'{pdr}/{pdr.name}.cpp'
                     else:
-                        kind = "module      "
-                    click.echo("    " + kind + click.style(str(f.relative_to(package_path)) + extra, fg=fg))
+                        continue
+                lines.append((str(pdr), tp, src))
+                if pd == top:
+                    for file in files:
+                        if file.startswith('cli_') and file.endswith('.py'):
+                            lines.append((f'{pd.name}{os.sep}{file}', 'Command Line Interface', ''))
+            w = 0
+            for line in lines:
+               w = max(w, len(line[0]))
+            w += 2
+            for line in lines:
+                s = '    ' + str(line[0]).ljust(w)
+                click.echo(
+                    click.style(s, bold=True) +
+                    click.style(line[1]) +
+                    click.style(line[2], fg='green') +
+                    (')' if line[2] else '')
+                )
 
 
     def version_cmd(self):
@@ -532,7 +530,6 @@ class Project:
         in :file:`<package_name>.py`, :file:`<package_name>/__init__.py`, or in
         :file:`<package_name>/__version__.py`.
         """
-        self.require_project_created()
 
         # This command does not require any external tools.
 
@@ -586,7 +583,7 @@ class Project:
 
     def tag_cmd(self):
         """Create and push a version tag ``v<Major>.<minor>.<patch>`` for the current version."""
-        self.require_project_created()
+        
 
         # Git is required
 
@@ -1032,7 +1029,7 @@ class Project:
     
     def doc_cmd(self):
         """Build documentation."""
-        self.require_project_created()
+        
 
         if on_vsc_cluster():
             error("The cluster is not suited for building documentation. Use a desktop machine instead.")
