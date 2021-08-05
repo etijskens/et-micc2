@@ -1521,7 +1521,7 @@ class Cli:
 
         app_name = self.context.add_name
         cli_app_name = 'cli_' + et_micc2.utils.pep8_module_name(app_name)
-        cli_type = '(cli with subcommands)' if self.context.flag_clisub else '(single command cli)'
+        cli_type = '(CLI with subcommands)' if self.context.flag_clisub else '(single command CLI)'
 
         with et_micc2.logger.log( self.context.logger.info
                                 , f"Adding CLI {app_name} to project {self.context.project_path.name}\n"
