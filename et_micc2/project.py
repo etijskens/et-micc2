@@ -470,15 +470,15 @@ class Project:
             self.context.verbosity = 10
 
         if self.context.verbosity >= 1:
-            click.echo("Project " + click.style(str(self.context.project_path.name), fg='green')
-                       + " located at " + click.style(str(self.context.project_path), fg='green')
-                       + "\n  package: " + click.style(str(self.context.package_name), fg='green')
-                       + "\n  version: " + click.style(self.version, fg='green')
-                       )
+            click.echo(
+                "Project " + click.style(str(self.context.project_path.name), fg='green')
+               + " located at " + click.style(str(self.context.project_path), fg='green')
+               + "\n  package: " + click.style(str(self.context.package_name), fg='green')
+               + "\n  version: " + click.style(self.version, fg='green')
+            )
 
         if self.context.verbosity >= 3:
             click.echo("  contents:")
-            indent = '    '
             lines = []
             top = self.context.project_path / self.context.package_name
             for d, dirs, files in os.walk(top):
@@ -488,17 +488,17 @@ class Project:
                 submodule_type = get_submodule_type(pd)
                 pdr = pd.relative_to(self.context.project_path)
                 if pd == top:
-                    tp = 'top-level package'
-                    src = ''
+                    tp = 'top-level package      (source in '
+                    src = str(pdr / '__init__.py')
                 else:
                     if submodule_type == 'py':
-                        tp = f'Python submodule  (source in '
+                        tp = f'Python submodule       (source in '
                         src = f'{pdr}/__init__.py'
                     elif submodule_type == 'f90':
-                        tp = f'Fortran submodule (source in '
+                        tp = f'Fortran submodule      (source in '
                         src = f'{pdr}/{pdr.name}.f90'
                     elif submodule_type == 'cpp':
-                        tp = f'C++ submodule     (source in '
+                        tp = f'C++ submodule          (source in '
                         src = f'{pdr}/{pdr.name}.cpp'
                     else:
                         continue
@@ -562,17 +562,13 @@ class Project:
                 # update __version__
                 look_for = f'__version__ = "{current_semver}"'
                 replace_with = f'__version__ = "{new_semver}"'
-                if self.structure == 'module':
-                    # update in <package_name>.py
-                    et_micc2.utils.replace_in_file(self.context.project_path / self.src_file, look_for, replace_with)
+                # update in <package_name>/__init__.py
+                p = self.context.project_path / self.context.package_name / "__version__.py"
+                if p.exists():
+                    et_micc2.utils.replace_in_file(p, look_for, replace_with)
                 else:
-                    # update in <package_name>/__init__.py
-                    p = self.context.project_path / self.context.package_name / "__version__.py"
-                    if p.exists():
-                        et_micc2.utils.replace_in_file(p, look_for, replace_with)
-                    else:
-                        p = self.context.project_path / self.context.package_name / '__init__.py'
-                        et_micc2.utils.replace_in_file(p, look_for, replace_with)
+                    p = self.context.project_path / self.context.package_name / '__init__.py'
+                    et_micc2.utils.replace_in_file(p, look_for, replace_with)
 
                 self.logger.info(f"({self.context.project_path.name})> version ({current_semver}) -> ({new_semver})")
             else:
