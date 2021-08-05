@@ -583,7 +583,6 @@ class Project:
 
     def tag_cmd(self):
         """Create and push a version tag ``v<Major>.<minor>.<patch>`` for the current version."""
-        
 
         # Git is required
 
@@ -650,11 +649,6 @@ class Project:
 
         self.deserialize_db()
         self.serialize_db(db_entry)
-
-
-    def get_parent_name(self,module):
-        p = Path(module)
-        return p.parent, p.name
 
 
     def build_cmd(self):
@@ -792,6 +786,7 @@ class Project:
                 self.db = json.load(f)
         else:
             self.db = {}
+
 
     def serialize_db(self, db_entry=None, verbose=False):
         """Write self.db to file ``db.json``.
@@ -1029,7 +1024,6 @@ class Project:
     
     def doc_cmd(self):
         """Build documentation."""
-        
 
         if on_vsc_cluster():
             error("The cluster is not suited for building documentation. Use a desktop machine instead.")
@@ -1047,11 +1041,13 @@ class Project:
             error("The sphinx_click package is missing in your current environment.\n"
                        "You must install it to build documentation.")
 
-        self.exit_code = et_micc2.utils.execute(
+        exit_code = et_micc2.utils.execute(
             ['make', self.context.what],
             cwd=Path(self.context.project_path) / 'docs',
             logfun=self.logger.info
         )
+        if exit_code:
+            error('unexpected error')
 
 
     # def venv_cmd(self):
