@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Build f90 binary extension module {{tmpl.package_name}}.{{tmpl.module_name}}
+# Build f90 binary extension module {{tmpl.import_lib}}
 #   > cd _cmake_build
 # For a clean build:
 #   > rm -rf *

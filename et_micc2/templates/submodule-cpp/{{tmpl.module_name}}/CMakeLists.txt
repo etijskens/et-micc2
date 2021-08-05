@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Build C++ module {{tmpl.package_name}}.{{tmpl.module_name}}
+# Build C++ module {{tmpl.import_lib}}
 #   > cd _cmake_build
 # For a clean build:
 #   > rm -rf *

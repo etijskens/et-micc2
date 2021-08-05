@@ -85,3 +85,4 @@ def expand_folder(path_to_template_folder, destination, parameters):
                     expand_file(root, Path(d) / f, destination, parameters)
                 except ValueError as exc:
                     msg = exc.args[0] + f'\n    while expanding template folder {path_to_template_folder}.'
+                    raise ValueError(msg)

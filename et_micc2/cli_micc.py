@@ -214,21 +214,21 @@ def setup( ctx
 
     This command must be run once before you can use micc to manage your projects.
     """
-    options = ctx.obj
+    context = ctx.obj
 
-    if options.preferences is None:
+    if context.preferences is None:
         pass
     else:
         if modify:
             force = True
         if force:
-            click.secho(f"Overwriting earlier setup: \n    {options.preferences['file_loc']}", fg='bright_red')
+            click.secho(f"Overwriting earlier setup: \n    {context.preferences['file_loc']}", fg='bright_red')
             click.secho("Enter a suffix for the configuration directory if you want to make a backup.")
             while 1:
                 suffix = input(':> ')
 
                 if suffix:  # make backup
-                    p_cfg_dir = Path(options.preferences['file_loc']).parent
+                    p_cfg_dir = Path(context.preferences['file_loc']).parent
                     p_cfg_dir_renamed = p_cfg_dir.parent / (p_cfg_dir.name + suffix)
                     if p_cfg_dir_renamed.exists():
                         click.secho(f'Error: suffix `{suffix}` is already in use, choose another.', fg='bright_red')
@@ -240,21 +240,21 @@ def setup( ctx
 
             # forget the previous preferences.
             if not modify:
-                options.preferences = None
+                context.preferences = None
         else:
             print(f"Micc2 has already been set up:\n"
-                  f"    {options.preferences['file_loc']}\n"
+                  f"    {context.preferences['file_loc']}\n"
                   f"Use '--force' or '-f' to overwrite the existing preferences file.")
             ctx.exit(1)
 
     selected = {}
     for name, description in _preferences_setup.items():
-        if name in options.overwrite_preferences:
-            selected[name] = options.overwrite_preferences[name]
+        if name in context.overwrite_preferences:
+            selected[name] = context.overwrite_preferences[name]
         else:
             if modify: # use the previous setting as default
                 if not 'choices' in description:
-                    description['default'] = options.preferences[name]
+                    description['default'] = context.preferences[name]
             try:
                 selected[name] = et_micc2.config.get_param(name, description)
             except KeyboardInterrupt:
@@ -269,19 +269,19 @@ def setup( ctx
     selected["py"] = "py"
 
     # Transfer the selected preferences to a Config object and save it to disk.
-    options.preferences = et_micc2.config.Config(**selected)
+    context.preferences = et_micc2.config.Config(**selected)
     save_to = _cfg_dir / _cfg_filename
-    print(f'These preferences are saved to {save_to}:\n{options.preferences}')
+    print(f'These preferences are saved to {save_to}:\n{context.preferences}')
     answer = input("Continue? yes/no >:")
     if not answer.lower().startswith('n'):
-        options.preferences.save(save_to, mkdir=True)
+        context.preferences.save(save_to, mkdir=True)
         print(f'Preferences saved to {save_to}.')
         print('Configuring git:')
         if shutil.which('git'):
-            cmd = ['git','config', '--global', 'user.name', options.preferences['github_username']]
+            cmd = ['git','config', '--global', 'user.name', context.preferences['github_username']]
             print(f'  {" ".join(cmd)}')
             subprocess.run(cmd)
-            cmd = ['git','config', '--global', 'user.email', options.preferences['email']]
+            cmd = ['git','config', '--global', 'user.email', context.preferences['email']]
             print(f'  {" ".join(cmd)}')
             subprocess.run(cmd)
             # git personal access token
@@ -289,7 +289,7 @@ def setup( ctx
             pat = input(':> ')
             if pat:
                 p = Path(pat)
-                dst = _cfg_dir/f'{options.preferences["github_username"]}.pat'
+                dst = _cfg_dir/f'{context.preferences["github_username"]}.pat'
                 if p.exists():
                     shutil.copyfile(p, dst)
                 else:
@@ -387,25 +387,25 @@ def create( ctx
     If *project_path* is a subdirectory of a micc project, *micc* refuses to continu,
     unless ``--allow-nesting`` is soecified.
     """
-    options = ctx.obj
+    context = ctx.obj
 
     if name:
-        if not options.default_project_path:
+        if not context.default_project_path:
             # global option -p and argument name were both specified.
             print( "ERROR: you specified both global option -p and argument 'name':"
-                  f"         -p -> {options.project_path}"
+                  f"         -p -> {context.project_path}"
                   f"         name -> {name}"
                    "       You must choose one or the other, not both."
                  )
             ctx.exit(-1)
         else:
             # overwrite the -p global option so the project will be created:
-            options.project_path = Path(name).resolve()
-            options.default_project_path = False
+            context.project_path = Path(name).resolve()
+            context.default_project_path = False
 
-    # options.package_structure = package
-    options.publish = publish
-    options.module_name = module_name
+    # context.package_structure = package
+    context.publish = publish
+    context.module_name = module_name
     if not remote in ['public','private', 'none']:
         print(f"ERROR: --remote={remote} is not recognized. Valid options are:\n"
               f"       --remote=public\n"
@@ -414,22 +414,22 @@ def create( ctx
               )
         ctx.exit(-1)
 
-    options.no_git = no_git
+    context.no_git = no_git
     if no_git:
-        options.remote = 'none'
+        context.remote = 'none'
     else:
-        options.remote = None if remote=='none' else remote
+        context.remote = None if remote=='none' else remote
 
-    options.templates = ['top-level-package']
+    context.templates = ['top-level-package']
 
-    options.allow_nesting = allow_nesting
+    context.allow_nesting = allow_nesting
 
-    options.preferences.update(options.overwrite_preferences)
+    context.preferences.update(context.overwrite_preferences)
 
-    options.template_parameters = { 'project_short_description': underscore2space(description) }
+    context.template_parameters = { 'project_short_description': underscore2space(description) }
 
     try:
-        project = Project(options)
+        project = Project(context)
         project.create_cmd()
     except RuntimeError:
         ctx.exit(2)
@@ -460,19 +460,19 @@ def convert_to_package(ctx, overwrite, backup):
     project, which adds a ``AUTHORS.rst``, ``HISTORY.rst`` and ``installation.rst``
     to the documentation structure.
     """
-    options = ctx.obj
-    options.overwrite = overwrite
-    options.backup = backup
+    context = ctx.obj
+    context.overwrite = overwrite
+    context.backup = backup
 
     try:
-        project = Project(options)
-        with et_micc2.logger.logtime(options):
+        project = Project(context)
+        with et_micc2.logger.logtime(context):
             project.module_to_package_cmd()
     except RuntimeError:
         if project.exit_code == et_micc2.expand.EXIT_OVERWRITE:
-            options.logger.warning(
+            context.logger.warning(
                 f"It is normally ok to overwrite 'index.rst' as you are not supposed\n"
-                f"to edit the '.rst' files in '{options.project_path}{os.sep}docs.'\n"
+                f"to edit the '.rst' files in '{context.project_path}{os.sep}docs.'\n"
                 f"If in doubt: rerun the command with the '--backup' flag,\n"
                 f"  otherwise: rerun the command with the '--overwrite' flag,\n"
             )
@@ -502,10 +502,10 @@ def info(ctx,name,version):
 
     Use verbosity to produce more detailed info.
     """
-    options = ctx.obj
+    context = ctx.obj
 
     try:
-        project = Project(options)
+        project = Project(context)
     except RuntimeError:
         ctx.exit(-2)
 
@@ -558,7 +558,7 @@ def info(ctx,name,version):
 @click.pass_context
 def version(ctx, major, minor, patch, rule, tag, short, dry_run):
     """Modify or show the project's version number."""
-    options = ctx.obj
+    context = ctx.obj
 
     if rule and (major or minor or patch):
         msg = ("Both --rule and --major|--minor|--patc specified.")
@@ -571,12 +571,12 @@ def version(ctx, major, minor, patch, rule, tag, short, dry_run):
     elif patch:
         rule = 'patch'
 
-    options.rule = rule
-    options.short = short
-    options.dry_run = dry_run
+    context.rule = rule
+    context.short = short
+    context.dry_run = dry_run
 
     try:
-        project = Project(options)
+        project = Project(context)
     except RuntimeError:
         ctx.exit(2)
 
@@ -597,10 +597,10 @@ def version(ctx, major, minor, patch, rule, tag, short, dry_run):
 @click.pass_context
 def tag(ctx):
     """Create a git tag for the current version and push it to the remote repo."""
-    options = ctx.obj
+    context = ctx.obj
 
     try:
-        project = Project(options)
+        project = Project(context)
         project.tag_cmd()
     except RuntimeError:
         ctx.exit(2)
@@ -666,22 +666,25 @@ def add(ctx
     :param str name: name of the component. Maybe path-like relative to package directory to
         create sub-sub-modules.
     """
-    options = ctx.obj
-    options.add_name = name
+    context = ctx.obj
+    context.add_name = name
     
-    options.cli = cli
-    options.clisub = clisub
-    options.py = py
-    # options.package = package
-    options.f90 = f90
-    options.cpp = cpp
+    context.flag_cli = cli
+    context.flag_clisub = clisub
+    context.flag_py = py
+    # context.package = package
+    context.flag_f90 = f90
+    context.flag_cpp = cpp
         
-    # options.templates = templates
-    options.overwrite = overwrite
-    options.backup = backup
-    options.template_parameters = options.preferences.data
+    # context.templates = templates
+    context.template_parameters = context.preferences.data
+
+    # TODO: remove overwrite and backup?
+    context.overwrite = overwrite
+    context.backup = backup
+
     try:
-        project = Project(options)
+        project = Project(context)
         n_selected = cli+clisub+py+f90+cpp # yes, you can add bool variables, they are literally 0|1
         if n_selected == 0:
             project.error('You must select a component type.')
@@ -689,8 +692,8 @@ def add(ctx
             project.error(f'You must select just one component type, not {n_selected}.')
         with et_micc2.logger.logtime(project):
             project.add_cmd()
-    except RuntimeError:
-        ctx.exit(2)
+    except RuntimeError as exc:
+        ctx.exit(exc.args[1])
 
 
 ####################################################################################################
@@ -718,18 +721,18 @@ def mv(ctx, cur_name, new_name, silent, entire_package, entire_project):
     :param cur_name: name of component to be removed or renamed.
     :param new_name: new name of the component. If empty, the component will be removed.
     """
-    options = ctx.obj
+    context = ctx.obj
 
-    options.cur_name = cur_name
-    options.new_name = new_name
-    options.silent = silent
+    context.cur_name = cur_name
+    context.new_name = new_name
+    context.silent = silent
     if new_name:
-        options.entire_package, options.entire_project =  entire_package, entire_project
+        context.entire_package, context.entire_project =  entire_package, entire_project
     # else these flags are ignored.
 
     try:
-        project = Project(options)
-        with et_micc2.logger.logtime(options):
+        project = Project(context)
+        with et_micc2.logger.logtime(context):
             project.mv_component()
     except RuntimeError:
         ctx.exit(2)
@@ -775,18 +778,18 @@ def build( ctx
             print('')
             ctx.exit(-1)
 
-    options = ctx.obj
-    options.build_options = SimpleNamespace( module_to_build = module
+    context = ctx.obj
+    context.build_options = SimpleNamespace( module_to_build = module
                                            , clean           = clean
                                            , cleanup         = cleanup
                                            , cmake           = {}
                                            )
     if build_type:
-        options.build_options.cmake['CMAKE_BUILD_TYPE'] = build_type
+        context.build_options.cmake['CMAKE_BUILD_TYPE'] = build_type
 
     try:
-        project = Project(options)
-        with et_micc2.logger.logtime(options):
+        project = Project(context)
+        with et_micc2.logger.logtime(context):
             project.build_cmd()
     except RuntimeError:
         ctx.exit(2)
@@ -839,11 +842,11 @@ def doc(ctx, what):
 
     :param str what: this argument is passed to the make command.
     """
-    options = ctx.obj
-    options.what = what
+    context = ctx.obj
+    context.what = what
     try:
-        project = Project(options)
-        with et_micc2.logger.logtime(options):
+        project = Project(context)
+        with et_micc2.logger.logtime(context):
             project.doc_cmd()
 
     except RuntimeError:
@@ -874,20 +877,20 @@ def doc(ctx, what):
 #
 #     :param str name: name of the virtual environment. default = f'.venv-{project_name}'.
 #     """
-#     options = ctx.obj
+#     context = ctx.obj
 #     if not name:
-#         name = f'.venv-{options.project_path.name}'
-#     options.venv_name = name
+#         name = f'.venv-{context.project_path.name}'
+#     context.venv_name = name
 #
 #     if not python:
 #         python = sys.executable
-#     options.python_executable = python
+#     context.python_executable = python
 #
-#     options.system_site_packages = system_site_packages
+#     context.system_site_packages = system_site_packages
 #
 #     try:
-#         project = Project(options)
-#         with et_micc2.logger.logtime(options):
+#         project = Project(context)
+#         with et_micc2.logger.logtime(context):
 #             project.venv_cmd()
 #
 #     except RuntimeError:

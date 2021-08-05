@@ -23,7 +23,10 @@ import et_micc2.tmpl
 def expand_templates(options):
     for template in options.templates:
         path_to_template = Path(__FILE__).parent / 'templates' / template
-        if template.startswith('sub-module-'):
+        if not path_to_template.exists():
+            raise RuntimeError(f'Template not found: {path_to_template}')
+
+        if template.startswith('submodule-'):
             if template.endswith('-test'):
                 destination = options.project_path / 'tests' / options.package_name / options.module_location_relative
             else:

@@ -1,5 +1,5 @@
 /*
- *  C++ source file for module {{tmpl.package_name}}.{{tmpl.module_name}}
+ *  C++ source file for module {{tmpl.import_lib}}
  */
 
 
