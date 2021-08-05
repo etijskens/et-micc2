@@ -378,11 +378,10 @@ class Project:
                 self.context.overwrite = False
                 msg = et_micc2.expand.expand_templates(self.context)
                 if msg:
-                    error(msg,-1)
+                    self.logger.critical(msg)
                     self.logger.info(f'Cleaning up after failure...')
-                    # Remove the project directory 
+                    # Remove the project directory
                     self.context.project_path.unlink()
-                    self.logger.critical(f"Exiting ({self.exit_code}) ...")
                     return
 
                 proj_cfg = self.context.project_path / 'micc3.cfg'
@@ -465,41 +464,6 @@ class Project:
         """Raise a runtime error if this project does not have a project directory."""
         if self.logger is None:
             error(f'Not a project directory: {self.context.project_path}')
-
-
-    # def module_to_package_cmd(self):
-    #     """Convert a module project (:file:`module.py`) to a package project (:file:`package/__init__.py`)."""
-    #     self.require_project_created()
-    #
-    #     # This command does not require any external tools.
-    #
-    #     if self.structure == 'package':
-    #         warning(f"Project ({self.context.project_path.name}) is already a package ({self.package}).")
-    #         return
-    #
-    #     self.logger.info(
-    #         f"Converting Python module project {self.context.project_path.name} to Python package project."
-    #     )
-    #
-    #     # add documentation files for general Python project
-    #     self.context.templates = "package-general-docs"
-    #     self.context.template_parameters = self.context.preferences
-    #     self.context.template_parameters.update(
-    #         {'project_short_description': self.pyproject_toml['tool']['poetry']['description']}
-    #     )
-    #     self.exit_code = et_micc2.expand.expand_templates(self.context)
-    #     if self.exit_code:
-    #         self.logger.critical(
-    #             f"Expand failed during Project.module_to_package_cmd for project ({self.context.project_path.name})."
-    #         )
-    #         return
-    #
-    #     # move <package_name>.py to <package_name>/__init__.py
-    #     package_path = self.context.project_path / self.context.package_name
-    #     package_path.mkdir(exist_ok=True)
-    #     src = self.context.project_path / (self.context.package_name + '.py')
-    #     dst = self.context.project_path / self.context.package_name / '__init__.py'
-    #     shutil.move(src, dst)
 
 
     def info_cmd(self):
@@ -677,35 +641,15 @@ class Project:
         else:
             app_implied = ""
 
-        db_entry = {'context': self.context}
-
         if self.context.flag_cli:
-            # Prepare for adding a single command cli
-            app_name = self.context.add_name
-            if os.sep in app_name:
-                error("CLIs must be located in the package directory. They cannot be path-like.")
-
-            if self.app_exists(app_name):
-                error(f"Project {self.context.project_path.name} has already an app named {app_name}.")
-
-            if not et_micc2.utils.verify_project_name(app_name):
-                error(
-                    f"Not a valid app name ({app_name}_. Valid names:\n"
-                    f"  * start with a letter [a-zA-Z]\n"
-                    f"  * contain only [a-zA-Z], digits, hyphens, and underscores\n"
-                )
-
-            if self.context.flag_clisub:
-                self.context.templates = ['app-sub-commands']
-            else:
-                self.context.templates = ['app-single-command']
-
-            self.add_python_cli(db_entry)
+            # Prepare for adding a cli component
+            cli = Cli(self.context)
+            db_entry = cli.create()
 
         else:
             # Prepare for adding a submodule
             submodule = Submodule(self)
-            submodule.create()
+            db_entry = submodule.create()
 
         self.deserialize_db()
         self.serialize_db(db_entry)
@@ -715,180 +659,6 @@ class Project:
         p = Path(module)
         return p.parent, p.name
 
-    
-    def add_python_cli(self, db_entry):
-        """Add a console script (app, aka CLI) to the package."""
-        project_path = self.context.project_path
-        app_name = self.context.add_name
-        cli_app_name = 'cli_' + et_micc2.utils.pep8_module_name(app_name)
-        w = 'with' if self.context.flag_clisub else 'without'
-
-        with et_micc2.logger.log(self.logger.info,
-                                f"Adding CLI {app_name} {w} sub-commands to project {project_path.name}."):
-            self.context.template_parameters.update(
-                {'app_name': app_name, 'cli_app_name': cli_app_name}
-            )
-
-            self.exit_code = et_micc2.expand.expand_templates(self.context)
-            if self.exit_code:
-                self.logger.critical(
-                    f"Expand failed during Project.add_python_cli for project ({self.context.project_path.name})."
-                )
-                return
-
-            package_name = self.context.template_parameters['package_name']
-            src_file = os.path.join(project_path.name, package_name, f"cli_{app_name}.py")
-            tst_file = os.path.join(project_path.name, 'tests', f"test_cli_{app_name}.py")
-            self.logger.info(f"- Python source file {src_file}.")
-            self.logger.info(f"- Python test code   {tst_file}.")
-
-            with et_micc2.utils.in_directory(project_path):
-                # docs
-                # Look if this package has already an 'apps' entry in docs/index.rst
-                with open('docs/index.rst', "r") as f:
-                    lines = f.readlines()
-                has_already_apps = False
-                api_line = -1
-                for l, line in enumerate(lines):
-                    has_already_apps = has_already_apps or line.startswith("   apps")
-                    if line.startswith('   api'):
-                        api_line = l
-
-                # if not, create it:
-                if not has_already_apps:
-                    lines.insert(api_line, '   apps\n')
-                    with open('docs/index.rst', "w") as f:
-                        for line in lines:
-                            f.write(line)
-                # Create 'APPS.rst' if it does not exist:
-                txt = ''
-                if not Path('APPS.rst').exists():
-                    # create a title
-                    title = "Command Line Interfaces (apps)"
-                    line = len(title) * '*' + '\n'
-                    txt += (line
-                            + title + '\n'
-                            + line
-                            + '\n'
-                            )
-                # create entry for this apps documentation
-                txt2 = (f".. click:: {package_name}.{cli_app_name}:main\n"
-                        f"   :prog: {app_name}\n"
-                        f"   :show-nested:\n\n"
-                        )
-                file = 'APPS.rst'
-                with open(file, "a") as f:
-                    f.write(txt + txt2)
-                db_entry[file] = txt2
-
-                # pyproject.toml
-                self.add_dependencies({'click': '^7.0.0'})
-                self.pyproject_toml['tool']['poetry']['scripts'][app_name] = f"{package_name}:{cli_app_name}.main"
-                self.pyproject_toml.save()
-                db_entry['pyproject.toml'] = f'{app_name} = "refactoring_dev:cli_{app_name}.main"\n'
-
-                # add 'import <package_name>.cli_<app_name> to __init__.py
-                line = f"import {package_name}.cli_{app_name}\n"
-                file = project_path / self.context.package_name / '__init__.py'
-                et_micc2.utils.insert_in_file(file, [line], before=True, startswith="__version__")
-                db_entry[os.path.join(self.context.package_name, '__init__.py')] = line
-
-
-
-    # def add_f90_module(self, db_entry):
-    #     """Add a f90 module to this project."""
-    #     with et_micc2.logger.log(self.logger.info,
-    #                             f"Adding f90 submodule {self.context.add_name} to package {self.context.package_name}."
-    #                             ):
-    #
-    #         # Create the needed folders and files by expanding the templates:
-    #         self.exit_code = et_micc2.expand.expand_templates(self.context)
-    #         if self.exit_code:
-    #             self.logger.critical(
-    #                 f"Expand failed during Project.add_f90_module for project ({self.context.project_path.name})."
-    #             )
-    #             return
-    #
-    #         src_file = self.context.project_path / self.context.package_name / self.context.add_name / (self.context.module_name+'.f90')
-    #         cmk_file = self.context.project_path / self.context.package_name / self.context.add_name / 'CMakeLists.txt'
-    #         rst_file = self.context.project_path / self.context.package_name / self.context.add_name / (self.context.module_name+'.rst')
-    #         tst_file = self.context.project_path / 'tests' / self.context.package_name / self.context.add_name / f'test_{self.context.module_name}.py'
-    #
-    #         self.logger.info(f"- Fortran source in       {src_file}.")
-    #         self.logger.info(f"- build settings in       {cmk_file}.")
-    #         self.logger.info(f"- module documentation in {rst_file} (restructuredText format).")
-    #         self.logger.info(f"- Python test code in     {tst_file}.")
-    #
-    #         with et_micc2.utils.in_directory(self.context.project_path):
-    #             # docs
-    #             filename = "API.rst"
-    #             text = f"\n.. include:: ../{self.context.package_name}/{self.context.module_location_relative}/{self.context.module_name}.rst\n"
-    #             with open(filename, "a") as f:
-    #                 f.write(text)
-    #             db_entry[filename] = text
-    #
-    #     self.add_auto_build_code(db_entry)
-
-    # def add_auto_build_code(self, db_entry):
-    #     """Add auto build code for binary extension modules in :file:`__init__.py` of the package."""
-    #     module_name = self.context.add_name
-    #     import_path = f"{self.context.package_name}.{str(self.context.module_location_relative).replace(os.sep,'.')}"
-    #     text_to_insert = [
-    #         "",
-    #         "try:",
-    #         f"    import {import_path}",
-    #         "except ModuleNotFoundError as e:",
-    #         "    # Try to build this binary extension:",
-    #         "    from pathlib import Path",
-    #         "    import click",
-    #         "    from et_micc2.project import auto_build_binary_extension",
-    #         f"    msg = auto_build_binary_extension(Path(__file__).parent, '{module_name}')",
-    #         "    if not msg:",
-    #         f"        import {import_path}",
-    #         "    else:",
-    #         f"        click.secho(msg, fg='bright_red')",
-    #     ]
-    #     file = os.path.join(self.context.package_name, '__init__.py')
-    #     et_micc2.utils.insert_in_file(
-    #         self.context.project_path / file,
-    #         text_to_insert,
-    #         startswith="__version__ = ",
-    #     )
-    #     text = '\n'.join(text_to_insert)
-    #     db_entry[file] = text
-
-    # def add_cpp_module(self, db_entry):
-    #     """Add a cpp module to this project."""
-    #     with et_micc2.logger.log(self.logger.info,
-    #                             f"Adding cpp submodule {self.context.add_name} to package {self.context.package_name}."
-    #                             ):
-    #         self.exit_code = et_micc2.expand.expand_templates(self.context)
-    #         if self.exit_code:
-    #             self.logger.critical(
-    #                 f"Expand failed during Project.add_cpp_module for project ({self.context.project_path.name})."
-    #             )
-    #             return
-    #
-    #         src_file = self.context.project_path /           self.context.package_name / self.context.add_name / (self.context.module_name+'.cpp')
-    #         cmk_file = self.context.project_path /           self.context.package_name / self.context.add_name / 'CMakeLists.txt'
-    #         rst_file = self.context.project_path /           self.context.package_name / self.context.add_name / (self.context.module_name+'.rst')
-    #         tst_file = self.context.project_path / 'tests' / self.context.package_name / self.context.add_name / f'test_{self.context.module_name}.py'
-    #         self.logger.info(f"- C++ source in           {src_file}.")
-    #         self.logger.info(f"- build settings in       {cmk_file}.")
-    #         self.logger.info(f"- module documentation in {rst_file} (restructuredText format).")
-    #         self.logger.info(f"- Python test code in     {tst_file}.")
-    #
-    #         with et_micc2.utils.in_directory(self.context.project_path):
-    #             # docs
-    #             with open("API.rst", "a") as f:
-    #                 filename = "API.rst"
-    #                 text = f"\n.. include:: ../{self.context.package_name}/{self.context.module_location_relative}/{self.context.module_name}.rst\n"
-    #                 with open(filename, "a") as f:
-    #                     f.write(text)
-    #                 db_entry[filename] = text
-    #
-    #     self.add_auto_build_code(db_entry)
-    #
 
     def build_cmd(self):
         """Build a binary extension."""
@@ -980,140 +750,6 @@ class Project:
 
         if not succeeded and not failed:
             warning(f"No binary extensions found in package ({self.context.package_name}).")
-
-
-    def app_exists(self, app_name):
-        """Test if there is already an app with name ``app_name`` in this project.
-
-        * :file:`<package_name>/cli_<app_name>.py`
-
-        :param str app_name: app name
-        :returns: bool
-        """
-        return (self.context.project_path / self.context.package_name / f"cli_{app_name}.py").is_file()
-
-
-    # def module_exists(self, module_path, module_name):
-    #     """Test if there is already a module with name py:obj:`module_name` in this project.
-    #
-    #     This can be either a Python module, package, or a binary extension module.
-    #
-    #     :param str module_name: module name
-    #     :returns: bool
-    #     """
-    #     return (    self. py_module_exists(module_path, module_name)
-    #              or self.cpp_module_exists(module_path, module_name)
-    #              or self.f90_module_exists(module_path, module_name)
-    #            )
-
-    # def py_module_exists(self, module_path, module_name):
-    #     """Test if there is already a python module with name :py:obj:`module_name`
-    #     in the project at :file:`project_path`.
-    #
-    #     :param str module_name: module name
-    #     :returns: None or str containing the existing module
-    #     """
-    #     pyfile = module_path / f'{module_name}.py'
-    #     if (self.context.project_path / self.context.package_name / pyfile).is_file():
-    #         return pyfile
-
-
-    # def py_module_exists(self):
-    #     """Test if there is already a python package with name :py:obj:`module_name`
-    #     in the project at :file:`project_path`.
-    #
-    #     :param str module_name: module name
-    #     :returns: None or str containing the existing module
-    #     """
-    #     initfile = self.context.project_path / self.context.package_name / self.context.module_location_relative
-    #     if (self.context.project_path / self.context.package_name / initfile).is_file():
-    #         return initfile
-
-
-    # def f90_module_exists(self, module_path, module_name):
-    #     """Test if there is already a f90 module with name py:obj:`module_name` in this project.
-    #
-    #     :param str module_name: module name
-    #     :returns: None or str containing the existing module
-    #     """
-    #     f90file = module_path / ('f90_' + module_name) / f"{module_name}.f90"
-    #     if (self.context.project_path / self.context.package_name / f90file).is_file():
-    #         return module_path / ('f90_' + module_name)
-
-
-    # def cpp_module_exists(self, module_path, module_name):
-    #     """Test if there is already a cpp module with name py:obj:`module_name` in this project.
-    #
-    #     :param str module_name: module name
-    #     :returns: None or str containing the existing module
-    #     """
-    #     cppfile = module_path / ('cpp_' + module_name) / f"{module_name}.cpp"
-    #     if (self.context.project_path / self.context.package_name / cppfile).is_file():
-    #         return module_path / ('cpp_' + module_name)
-
-
-    def add_dependencies(self, deps):
-        """Add dependencies to the :file:`pyproject.toml` file.
-
-        :param dict deps: (package,version_constraint) pairs.
-        """
-        tool_poetry_dependencies = self.pyproject_toml['tool']['poetry']['dependencies']
-        modified = False
-        for pkg, version_constraint in deps.items():
-            if pkg in tool_poetry_dependencies:
-                # project was already depending on this package
-                range1 = et_micc2.utils.version_range(version_constraint)
-                range2 = et_micc2.utils.version_range(tool_poetry_dependencies[pkg])
-                if range1 == range2:
-                    # nothing to do: new and old version specifcation are the same
-                    continue
-                intersection = et_micc2.utils.intersect(range1, range2)
-                if et_micc2.utils.validate_intersection(intersection):
-                    range = intersection
-                else:
-                    range = et_micc2.utils.most_recent(version_constraint, tool_poetry_dependencies[pkg])
-                tool_poetry_dependencies[pkg] = et_micc2.utils.version_constraint(range)
-                modified = True
-            else:
-                # an entirely new dependency
-                tool_poetry_dependencies[pkg] = version_constraint
-                modified = True
-
-        if modified:
-            self.pyproject_toml.save()
-            # Tell the user how to add the new dependencies
-            msg = 'Dependencies added:\n' \
-                  'If you are using a virtual environment created with poetry, run:\n' \
-                  '    `poetry install` or `poetry update` to install missing dependencies.\n' \
-                  'If you are using a virtual environment not created with poetry, run:\n'
-            for dep,version in deps.items():
-                msg += f'    (.venv) > pip install {dep}\n'
-            msg += 'Otherwise, run:\n'
-            for dep,version in deps.items():
-                msg += f'    > pip install {dep} --user'
-            self.logger.warning(msg)
-
-
-    # def module_to_package(self, module_py):
-    #     """Move file :file:`module.py` to :file:`module/__init__.py`.
-    #
-    #     :param str|Path module_py: path to module.py
-    #     """
-    #     module_py = Path(module_py).resolve()
-    #
-    #     if not module_py.is_file():
-    #         raise FileNotFoundError(module_py)
-    #     src = str(module_py)
-    #
-    #     package_name = str(module_py.name).replace('.py', '')
-    #     package = module_py.parent / package_name
-    #     package.mkdir()
-    #     dst = str(package / '__init__.py')
-    #     shutil.move(src, dst)
-    #
-    #     et_micc2.logger.log(self.logger.debug,
-    #                        f" . Module {module_py} converted to package {package_name}{os.sep}__init__.py."
-    #                        )
 
 
     def get_logger(self, log_file_path=None):
@@ -1700,6 +1336,9 @@ class Submodule:
                 self.context.templates = ['submodule-cpp', 'submodule-cpp-test']
                 self.add_cpp_submodule(db_entry)
 
+        return db_entry
+
+
     def add_python_submodule(self, db_entry):
         """
 
@@ -1710,12 +1349,9 @@ class Submodule:
                                 ):
 
             # Create the needed folders and files by expanding the templates:
-            exit_code = et_micc2.expand.expand_templates(self.context)
-            if exit_code:
-                error(
-                    f"Expand failed during Project.add_python_submodule for project ({self.context.project_path.name}).",
-                    exit_code
-                )
+            msg = et_micc2.expand.expand_templates(self.context)
+            if msg:
+                self.logger.critical(msg)
                 return
 
             src_file = self.context.project_path / self.context.package_name / self.context.add_name / '__init__.py'
@@ -1801,11 +1437,9 @@ class Submodule:
         with et_micc2.logger.log(self.logger.info,
                                 f"Adding cpp submodule {self.context.add_name} to package {self.context.package_name}."
                                 ):
-            self.exit_code = et_micc2.expand.expand_templates(self.context)
-            if self.exit_code:
-                self.logger.critical(
-                    f"Expand failed during Project.add_cpp_module for project ({self.context.project_path.name})."
-                )
+            msg = et_micc2.expand.expand_templates(self.context)
+            if msg:
+                self.logger.critical(msg)
                 return
 
             src_file = self.context.project_path /           self.context.package_name / self.context.add_name / (self.context.module_name+'.cpp')
@@ -1857,4 +1491,154 @@ def get_submodule_type(path):
         return 'f90'
     if (path / (path.name + '.cpp')).is_file():
         return 'cpp'
+
+
+class Cli:
+    def __init__(self,context):
+        self.context = context
+        app_name = self.context.add_name
+        if os.sep in app_name:
+            error("CLIs must be located in the package directory. They cannot be path-like.")
+
+        if (context.project_path / context.package_name / f"cli_{app_name}.py").is_file():
+            error(f"Project {self.context.project_path.name} has already an app named {app_name}.")
+
+        if not et_micc2.utils.verify_project_name(app_name):
+            error(
+                f"Not a valid app name ({app_name}_. Valid names:\n"
+                f"  * start with a letter [a-zA-Z]\n"
+                f"  * contain only [a-zA-Z], digits, hyphens, and underscores\n"
+            )
+
+    def create(self):
+        """Add a console script (app, aka CLI) to the package."""
+        db_entry = {'context': self.context}
+
+        if self.context.flag_clisub:
+            self.context.templates = ['app-sub-commands']
+        else:
+            self.context.templates = ['app-single-command']
+
+        app_name = self.context.add_name
+        cli_app_name = 'cli_' + et_micc2.utils.pep8_module_name(app_name)
+        cli_type = '(cli with subcommands)' if self.context.flag_clisub else '(single command cli)'
+
+        with et_micc2.logger.log( self.context.logger.info
+                                , f"Adding CLI {app_name} to project {self.context.project_path.name}\n"
+                                  f"    {cli_type}."
+                                ):
+            self.context.template_parameters.update(
+                { 'app_name': app_name
+                , 'cli_app_name': cli_app_name
+                }
+            )
+
+            msg = et_micc2.expand.expand_templates(self.context)
+            if msg:
+                self.logger.critical(msg)
+                return
+
+            package_name = self.context.template_parameters['package_name']
+            src_file = os.path.join(self.context.project_path.name, package_name, f"cli_{app_name}.py")
+            tst_file = os.path.join(self.context.project_path.name, 'tests', f"test_cli_{app_name}.py")
+            self.context.logger.info(f"- Python source file {src_file}.")
+            self.context.logger.info(f"- Python test code   {tst_file}.")
+
+            with et_micc2.utils.in_directory(self.context.project_path):
+                # docs
+                # Look if this package has already an 'apps' entry in docs/index.rst
+                with open('docs/index.rst', "r") as f:
+                    lines = f.readlines()
+                has_already_apps = False
+                api_line = -1
+                for l, line in enumerate(lines):
+                    has_already_apps = has_already_apps or line.startswith("   apps")
+                    if line.startswith('   api'):
+                        api_line = l
+
+                # if not, create it:
+                if not has_already_apps:
+                    lines.insert(api_line, '   apps\n')
+                    with open('docs/index.rst', "w") as f:
+                        for line in lines:
+                            f.write(line)
+                # Create 'APPS.rst' if it does not exist:
+                txt = ''
+                if not Path('APPS.rst').exists():
+                    # create a title
+                    title = "Command Line Interfaces (apps)"
+                    line = len(title) * '*' + '\n'
+                    txt += (line
+                            + title + '\n'
+                            + line
+                            + '\n'
+                            )
+                # create entry for this apps documentation
+                txt2 = (f".. click:: {package_name}.{cli_app_name}:main\n"
+                        f"   :prog: {app_name}\n"
+                        f"   :show-nested:\n\n"
+                        )
+                file = 'APPS.rst'
+                with open(file, "a") as f:
+                    f.write(txt + txt2)
+                db_entry[file] = txt2
+
+                # pyproject.toml
+                add_dependencies(self.context, {'click': '^7.0.0'})
+                pyproject_toml = TomlFile(self.context.project_path / 'pyproject.toml')
+                pyproject_toml['tool']['poetry']['scripts'][app_name] = f"{package_name}:{cli_app_name}.main"
+                pyproject_toml.save()
+                db_entry['pyproject.toml'] = f'{app_name} = "refactoring_dev:cli_{app_name}.main"\n'
+
+                # add 'import <package_name>.cli_<app_name> to __init__.py
+                line = f"import {package_name}.cli_{app_name}\n"
+                file = self.context.project_path / self.context.package_name / '__init__.py'
+                et_micc2.utils.insert_in_file(file, [line], before=True, startswith="__version__")
+                db_entry[os.path.join(self.context.package_name, '__init__.py')] = line
+
+        return db_entry
+
+
+def add_dependencies(context, deps):
+    """Add dependencies to the :file:`pyproject.toml` file.
+
+    :param dict deps: (package,version_constraint) pairs.
+    """
+    pyproject_toml = TomlFile(context.project_path / 'pyproject.toml')
+    tool_poetry_dependencies = pyproject_toml['tool']['poetry']['dependencies']
+    modified = False
+    for pkg, version_constraint in deps.items():
+        if pkg in tool_poetry_dependencies:
+            # project was already depending on this package
+            range1 = et_micc2.utils.version_range(version_constraint)
+            range2 = et_micc2.utils.version_range(tool_poetry_dependencies[pkg])
+            if range1 == range2:
+                # nothing to do: new and old version specifcation are the same
+                continue
+            intersection = et_micc2.utils.intersect(range1, range2)
+            if et_micc2.utils.validate_intersection(intersection):
+                range = intersection
+            else:
+                range = et_micc2.utils.most_recent(version_constraint, tool_poetry_dependencies[pkg])
+            tool_poetry_dependencies[pkg] = et_micc2.utils.version_constraint(range)
+            modified = True
+        else:
+            # an entirely new dependency
+            tool_poetry_dependencies[pkg] = version_constraint
+            modified = True
+
+    if modified:
+        pyproject_toml.save()
+        # Tell the user how to add the new dependencies
+        msg = 'Dependencies added:\n' \
+              'If you are using a virtual environment created with poetry, run:\n' \
+              '    `poetry install` or `poetry update` to install missing dependencies.\n' \
+              'If you are using a virtual environment not created with poetry, run:\n'
+        for dep, version in deps.items():
+            msg += f'    (.venv) > pip install {dep}\n'
+        msg += 'Otherwise, run:\n'
+        for dep, version in deps.items():
+            msg += f'    > pip install {dep} --user'
+        context.logger.warning(msg)
+
 # eof
