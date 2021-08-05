@@ -15,7 +15,6 @@ keywords = ['project management']
 [tool.poetry.dependencies]
 python = "^3.6"
 click = "^7.0"
-cookiecutter = "^1.6.0"
 walkdir="^0.4.1"
 tomlkit = "^0.7.0"
 semantic_version = "^2.8.3"

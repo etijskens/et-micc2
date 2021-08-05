@@ -8,6 +8,8 @@ micc2 now allows for (nearly unlimited) levels of submmodules. This becomes real
 when developing modules with submodules that in turn require C++ or f90 implementations (which
 then are sub-submodules.
 
+Cookiecutter is removed as dependency
+
 v2.0.0
 ------
 Prior to v2 micc-build and micc were added as a dependency of every micc project with binary
