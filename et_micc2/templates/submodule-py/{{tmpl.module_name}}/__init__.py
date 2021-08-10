@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 """
-Module {{tmpl.package_name}}.{{tmpl.module_name}} 
-=================================================================
+Module {{tmpl.import_lib}}
+==========================
 
-A module
+A submodule for ...
 
 """
 

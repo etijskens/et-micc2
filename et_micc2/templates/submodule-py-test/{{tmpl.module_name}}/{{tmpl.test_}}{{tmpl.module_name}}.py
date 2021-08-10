@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Tests for `{{tmpl.project_name}}` package."""
+"""Tests for sub-module {{tmpl.import_lib}}."""
 
 import pytest
+import {{tmpl.import_lib}}
 
-import {{tmpl.package_name}}.{{tmpl.module_name}}
 
 def test_greet():
     expected = "Hello John!"

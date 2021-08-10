@@ -198,7 +198,7 @@ def error(msg, exit_code=1, raise_runtimeerror=True):
             raise RuntimeError(msg,exit_code)
 
 
-def warning(self, msg):
+def warning(msg):
     """Print an warning message ``msg``."""
     click.secho("[WARNING]\n" + msg, fg='green')
 
