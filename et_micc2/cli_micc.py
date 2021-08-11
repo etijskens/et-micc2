@@ -687,7 +687,7 @@ def add(ctx
         project = Project(context)
         n_selected = cli+clisub+py+f90+cpp # yes, you can add bool variables, they are literally 0|1
         if n_selected == 0:
-            error('You must select a component type.')
+            error('You must select a component type (--py|--cli|--clisub|--f90|--cpp).')
         if n_selected > 1:
             error(f'You must select just one component type, not {n_selected}.')
         with et_micc2.logger.logtime(project):
