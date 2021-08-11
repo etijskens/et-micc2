@@ -26,7 +26,7 @@ from pathlib import Path
 import click
 
 sys_path_helper()
-from et_micc2.project import Project, micc_version
+from et_micc2.project import Project, micc_version, error
 import et_micc2.logger
 import et_micc2.config
 import pkg_resources
@@ -687,9 +687,9 @@ def add(ctx
         project = Project(context)
         n_selected = cli+clisub+py+f90+cpp # yes, you can add bool variables, they are literally 0|1
         if n_selected == 0:
-            project.error('You must select a component type.')
+            error('You must select a component type.')
         if n_selected > 1:
-            project.error(f'You must select just one component type, not {n_selected}.')
+            error(f'You must select just one component type, not {n_selected}.')
         with et_micc2.logger.logtime(project):
             project.add_cmd()
     except RuntimeError as exc:
