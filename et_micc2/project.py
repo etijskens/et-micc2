@@ -1250,13 +1250,16 @@ class Submodule:
             error(f"Project {self.context.project_path.name} has already a module named {self.context.import_lib}.")
 
         # Verify that the name is valid:
+        pep8_module_name = et_micc2.utils.pep8_module_name(self.context.module_name)
         if (not et_micc2.utils.verify_project_name(self.context.module_name)
-            or self.context.module_name != et_micc2.utils.pep8_module_name(self.context.module_name)
+            or self.context.module_name != pep8_module_name
            ):
+            suggest = f'Suggesting: "{pep8_module_name}".' if et_micc2.utils.verify_project_name(pep8_module_name) else ''
             error(
-                f"Not a valid module name ({module_name}). Valid names:\n"
-                f"  * start with a letter [a-zA-Z]\n"
-                f"  * contain only [a-zA-Z], digits, and underscores\n"
+                f"Not a valid module name ({self.context.module_name}). Valid names:\n"
+                f"  * start with a letter [a-z]\n"
+                f"  * contain only lowercase letters [a-z], digits, and underscores\n"
+                f"{suggest}"
             )
 
         # Verify theat the parent is a python package

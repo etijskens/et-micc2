@@ -2,18 +2,15 @@
 # -*- coding: utf-8 -*-
 
 """
-Tests for C++ module {{tmpl.project_name}}.{{tmpl.module_name}}.
+Tests for C++ module {{tmpl.import_lib}}.
 """
 
-import os
 import sys
+sys.path.insert(0,'.')
 
 import numpy as np
 
-import {{tmpl.package_name}}
-
-# create an alias for the binary extension cpp module
-cpp = {{tmpl.package_name}}.{{tmpl.module_name}}
+import {{tmpl.import_lib}}
 
 
 def test_cpp_add():
@@ -22,7 +19,7 @@ def test_cpp_add():
     y = np.ones (shape,dtype=float)
     z = np.zeros(shape,dtype=float)
     expected_z = x + y
-    result = cpp.add(x,y,z)
+    result = {{tmpl.import_lib}}.add(x,y,z)
     assert (z == expected_z).all()
 
 

@@ -5,6 +5,28 @@ As I keep on learning this list evolves continuously :-)
 "the most dangerous thought you can have as a creative person, is that you know what you
 are doing." `Bret Victor - The Future of Programming <https://vimeo.com/71278954>`_.
 
+"Every great developer you know got there by solving problems they were unqualified to solve until they actually did it." - Patrick McKenzie
+
+It´s better to wait for a productive programmer to become available than it is to wait for the first available programmer to become productive. - Steve McConnell
+
+Debugging is twice as hard as writing the code in the first place.Therfore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it. - Rajanand
+
+Always code as if the guy who ends up maintaning your code will be a violent psychopath who knows where you live. - Rick Osborne
+
+The trouble with programmers is that you can never tell what a programmer is doing until it's too late. - 	Seymour Cray
+
+First, solve the problem. Then write the code. - John Johnson
+
+Code is like humor. When you have to explain it, it’s bad. – Cory House
+
+Simplicity is the soul of efficiency. – Austin Freeman
+
+Most of you are familiar with the virtues of a programmer. There are three, of course: laziness, impatience, and hubris.
+
+C makes it easy to shoot yourself in the foot; C++ makes it harder, but when you do, it blows your whole leg off.
+
+A system administrator has two problems: 1. Dumb users. 2. Smart users.
+
 For Beginners
 -------------
 * `De Programmeursleerling - Pieter Spronck <http://www.spronck.net/pythonbook/dutchindex.xhtml>`_ (in Dutch)
@@ -33,9 +55,12 @@ Software engineering
 * `Clean architecture  <https://github.com/preslavmihaylov/booknotes/tree/master/architecture/clean-architecture>`_
 * `The Grand Unified Theory of Software Architecture <https://danuker.go.ro/the-grand-unified-theory-of-software-architecture.html>`_
 * `best practices for writing code comments <https://stackoverflow.blog/2021/07/05/best-practices-for-writing-code-comments/>`_
+* `Software Engineering's Greatest Hits <https://www.youtube.com/watch?v=HrVtA-ue-x0>`_
+  Very interesting.
 
 Python internals
 ----------------
+* `Boolean short-circuiting <https://mathspp.com/blog/pydonts/boolean-short-circuiting>`_
 * `How to run a python script <https://realpython.com/run-python-scripts/>`_
 * `Cpython source code guide <https://realpython.com/cpython-source-code-guide/>`_
 * `Know thy self - Methods and method binding - PyCon 2017 <https://youtu.be/byff9LhYXOg>`_
@@ -108,6 +133,7 @@ Profiling
 * `Counting FLOPS and other CPU counters in Python <http://www.bnikolic.co.uk/blog/python/flops/2019/09/27/python-counting-events.html>`_
 * `A Comprehensive Guide to Profiling Python Programs <https://medium.com/better-programming/a-comprehensive-guide-to-profiling-python-programs-f8b7db772e6>`_
 * `Yet Another Python Profiler, but this time thread&coroutine&greenlet aware <https://github.com/sumerc/yappi>`_
+* `scalene <https://www.youtube.com/watch?v=nrQPqy3YY5A&list=PL2Uw4_HvXqvYk1Y5P8kryoyd83L_0Uk5K&index=19>`_
 
 Resource monitoring
 -------------------
@@ -407,6 +433,7 @@ Problem solving
 
 Documentation
 -------------
+* `<https://www.youtube.com/watch?v=gWrc4xzm45Y&list=PL2Uw4_HvXqvYk1Y5P8kryoyd83L_0Uk5K&index=74    >`_
 * `Practical Sphinx - PyCon 2018 <https://youtu.be/0ROZRNZkPS8>`_
 * `Write the Docs is a global community of people who care about documentation <https://www.writethedocs.org>`_
 * `How documentation works, and how to make it work for your project - PyCon 2017 <https://youtu.be/azf6yzuJt54>`_
