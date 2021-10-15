@@ -11,7 +11,7 @@ from pathlib import Path
 import json
 
 import click
-from cookiecutter.main import cookiecutter
+# from cookiecutter.main import cookiecutter
 
 import et_micc2.logger
 

@@ -20,6 +20,7 @@ def test_greet():
 if __name__ == "__main__":
     the_test_you_want_to_debug = test_greet
 
+    print("__main__ running", the_test_you_want_to_debug)
     the_test_you_want_to_debug()
     print("-*# finished #*-")
 # ==============================================================================

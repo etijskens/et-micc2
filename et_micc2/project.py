@@ -1102,6 +1102,8 @@ def build_binary_extension(context):
 
             with et_micc2.utils.in_directory(output_dir):
                 cmake_cmd = ['cmake', '-D', f"PYTHON_EXECUTABLE={sys.executable}"]
+                # CAVEAT: using sys.executable implies that we automatically build against the python version used
+                #         by micc2. This is not always what we want.
                 for key,val in context.build_options.cmake.items():
                     cmake_cmd.extend(['-D', f"{key}={val}"])
                 if sys.platform == 'win32':
