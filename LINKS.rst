@@ -57,6 +57,7 @@ Software engineering
 * `best practices for writing code comments <https://stackoverflow.blog/2021/07/05/best-practices-for-writing-code-comments/>`_
 * `Software Engineering's Greatest Hits <https://www.youtube.com/watch?v=HrVtA-ue-x0>`_
   Very interesting.
+* `SOLID principles for software design <https://stackoverflow.blog/2021/11/01/why-solid-principles-are-still-the-foundation-for-modern-software-architecture/>`_i
 
 Python internals
 ----------------
@@ -346,6 +347,7 @@ GUI
 
 Packaging
 ---------
+* `packaging with setuptools (nov 2021) <https://opensource.com/article/21/11/packaging-python-setuptools?utm_medium=Email&utm_campaign=weekly&sc_cid=7013a000002pzFGAAY>`_
 * `Inside the Cheeseshop: How Python Packaging Works - PyCon 2018 <https://youtu.be/AQsZsgJ30AE>`_ historical overview with thorough explanation
 * `Share Your Code! Python Packaging Without Complication - PyCon 2017 <https://youtu.be/qOH-h-EKKac>`_
 * `A Python alternative to Docker <https://www.mattlayman.com/blog/2019/python-alternative-docker/>`_
@@ -397,6 +399,7 @@ Tools
 
 git and other VCS
 
+* `lazygit: A simple terminal UI for git commands <https://github.com/jesseduffield/lazygit?utm_source=tldrnewsletter>`_
 * `Introduction to Git In 16 Minutes <https://vickyikechukwu.hashnode.dev/introduction-to-git-in-16-minutes?utm_source=tldrnewsletter>`_
 * `9 useful tricks of git branch <https://gitbetter.substack.com/p/9-useful-tricks-of-git-branch-you>`_
 * `gitutor <https://github.com/artemisa-mx/gitutor>`_
