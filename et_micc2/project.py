@@ -429,7 +429,7 @@ class Project:
 
                                             cmds = [ ['gh', 'repo', 'create', self.context.project_path.name, f'--{self.context.remote}', '-y']
                                                    # next line is for accessing github via ssh
-                                                   , ['git', 'remote', 'add', 'origin', f'git@github.com:{github_username}/{self.context.project_path.name}.git']
+                                                   # , ['git', 'remote', 'add', 'origin', f'git@github.com:{github_username}/{self.context.project_path.name}.git']
                                                    , ['git', 'remote', 'set-url', 'origin', f'git@github.com:{github_username}/{self.context.project_path.name}.git']
                                                    , ['git', 'push', '-u', 'origin', self.context.template_parameters['git_default_branch']]
                                                    ]
