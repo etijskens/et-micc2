@@ -5,7 +5,7 @@
 
 Debugging is the process of executing a program step by step, in order to discover
 where and why it goes wrong. It is an indispensable step in software development.
-Although tests may tell you what part of your code fails, but the origin of the failure
+Although tests may tell you what part of your code fails, the origin of the failure
 is not always clear. As explained in the tutorials (see :ref:`testing-your-code`)
 unit tests are useful for two reasons:
 
@@ -86,7 +86,7 @@ example code created by micc2_, which defines a function for adding to arrays.
 Make sure that you pass the ``--build-type Debug`` flag, so that the binary
 extensions are built with debug information.
 
-It is recommend to debug small scripts, rather than complete applications. This is,
+It is recommended to debug small scripts, rather than complete applications. This is,
 however, not always possible.
 
 8.1. Mixed Python/C++ debugging with lldb and pdb
