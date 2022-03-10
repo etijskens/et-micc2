@@ -426,11 +426,16 @@ class Project:
                                             completed_process = \
                                                 subprocess.run( ['gh', 'auth', 'login', '--with-token'], stdin=f, text=True )
                                             et_micc2.utils.log_completed_process(completed_process,self.logger.debug)
-
+                                            # TODO: make this worke everywhere
+                                            try os.environ['VSC_HOME']:
+                                                # this works on the cluster
+                                                set_remote_command = ['git', 'remote', 'set-url', 'origin', f'git@github.com:{github_username}/{self.context.project_path.name}.git']
+                                            except:
+                                                # this works on my mac
+                                                set_remote_command = ['git', 'remote', 'add', 'origin', f'git@github.com:{github_username}/{self.context.project_path.name}.git']
                                             cmds = [ ['gh', 'repo', 'create', self.context.project_path.name, f'--{self.context.remote}', '-y']
                                                    # next line is for accessing github via ssh
-                                                   , ['git', 'remote', 'add', 'origin', f'git@github.com:{github_username}/{self.context.project_path.name}.git']
-                                                   # , ['git', 'remote', 'set-url', 'origin', f'git@github.com:{github_username}/{self.context.project_path.name}.git']
+                                                   , set_remote_command
                                                    , ['git', 'push', '-u', 'origin', self.context.template_parameters['git_default_branch']]
                                                    ]
                                             et_micc2.utils.execute(cmds, self.logger.debug, stop_on_error=True)
