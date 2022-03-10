@@ -426,23 +426,11 @@ class Project:
                                             completed_process = \
                                                 subprocess.run( ['gh', 'auth', 'login', '--with-token'], stdin=f, text=True )
                                             et_micc2.utils.log_completed_process(completed_process,self.logger.debug)
-                                            # # TODO: make this worke everywhere
-                                            # try :
-                                            #     os.environ['VSC_HOME']
-                                            #     # this works on the cluster
-                                            #     set_remote_command = ['git', 'remote', 'set-url', 'origin', f'git@github.com:{github_username}/{self.context.project_path.name}.git']
-                                            # except:
-                                            #     # this works on my mac
-                                            #     set_remote_command = ['git', 'remote', 'add', 'origin', f'git@github.com:{github_username}/{self.context.project_path.name}.git']
                                             cmd = ['gh', 'repo', 'create'
                                                   , '--source', str(self.context.project_path)
                                                   , f'--{self.context.remote_access}'       # --private or --public
                                                   , '--push'                                # push the contents
                                                   ]
-                                                   # # next line is for accessing github via ssh
-                                                   # , set_remote_command
-                                                   # , ['git', 'push', '-u', 'origin', self.context.template_parameters['git_default_branch']]
-                                                   # ]
                                             et_micc2.utils.execute(cmd, self.logger.debug, stop_on_error=True)
                                     else:
                                         self.logger.error(
