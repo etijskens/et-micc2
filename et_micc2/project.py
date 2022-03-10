@@ -427,7 +427,8 @@ class Project:
                                                 subprocess.run( ['gh', 'auth', 'login', '--with-token'], stdin=f, text=True )
                                             et_micc2.utils.log_completed_process(completed_process,self.logger.debug)
                                             # TODO: make this worke everywhere
-                                            try os.environ['VSC_HOME']:
+                                            try :
+                                                os.environ['VSC_HOME']
                                                 # this works on the cluster
                                                 set_remote_command = ['git', 'remote', 'set-url', 'origin', f'git@github.com:{github_username}/{self.context.project_path.name}.git']
                                             except:
