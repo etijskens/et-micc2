@@ -443,6 +443,7 @@ Documentation
 * `How to document Python code with Sphinx <https://opensource.com/article/19/11/document-python-sphinx>`_
     interesting section about tox
 * `Scott Meyers' advise on writing <https://scottmeyers.blogspot.com/2013/01/effective-effective-books.html>`_
+* `A “How to” Guide for Sphinx + ReadTheDocs <https://sphinx-rtd-tutorial.readthedocs.io>`_
 
 Django
 ------
