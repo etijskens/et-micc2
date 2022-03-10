@@ -283,7 +283,7 @@ class Project:
 
             self.ask_user_to_continue_or_not(stop_message='Project not created.')
 
-        if self.context.remote != 'none':
+        if self.context.remote_access != 'none':
             # Check that we have github username
             github_username = self.context.template_parameters['github_username']
             if not github_username:
@@ -292,7 +292,7 @@ class Project:
                     'Project is not created.'
                 )
             # Check availability of gh command:
-            if not ToolInfo('gh').is_available() and self.context.remote:
+            if not ToolInfo('gh').is_available() and self.context.remote_access:
                 warning(
                     'The gh command is not available in your environment.\n'
                     'If you continue this project a remote repository will not be created.'
@@ -410,13 +410,13 @@ class Project:
                             cmds.extend(
                                     [ ['git', 'add', '*']
                                     , ['git', 'add', '.gitignore']
-                                    , ['git', 'commit', '-m', '"And so this begun..."']
+                                    , ['git', 'commit', '-m', f'"Initial commit from `micc2 create {self.context.project_path.name}`"']
                                     ]
                             )
 
                             returncode = et_micc2.utils.execute(cmds, self.logger.debug, stop_on_error=True)
                     if not returncode:
-                        if self.context.remote:
+                        if self.context.remote_access:
                             # todo this context manager does not print correctly
                             with et_micc2.logger.log(self.logger.info, f"Creating remote git repository at git://github.com/{github_username}/{self.context.project_path.name}"):
                                 with et_micc2.utils.in_directory(self.context.project_path):
@@ -426,20 +426,24 @@ class Project:
                                             completed_process = \
                                                 subprocess.run( ['gh', 'auth', 'login', '--with-token'], stdin=f, text=True )
                                             et_micc2.utils.log_completed_process(completed_process,self.logger.debug)
-                                            # TODO: make this worke everywhere
-                                            try :
-                                                os.environ['VSC_HOME']
-                                                # this works on the cluster
-                                                set_remote_command = ['git', 'remote', 'set-url', 'origin', f'git@github.com:{github_username}/{self.context.project_path.name}.git']
-                                            except:
-                                                # this works on my mac
-                                                set_remote_command = ['git', 'remote', 'add', 'origin', f'git@github.com:{github_username}/{self.context.project_path.name}.git']
-                                            cmds = [ ['gh', 'repo', 'create', self.context.project_path.name, f'--{self.context.remote}', '-y']
-                                                   # next line is for accessing github via ssh
-                                                   , set_remote_command
-                                                   , ['git', 'push', '-u', 'origin', self.context.template_parameters['git_default_branch']]
-                                                   ]
-                                            et_micc2.utils.execute(cmds, self.logger.debug, stop_on_error=True)
+                                            # # TODO: make this worke everywhere
+                                            # try :
+                                            #     os.environ['VSC_HOME']
+                                            #     # this works on the cluster
+                                            #     set_remote_command = ['git', 'remote', 'set-url', 'origin', f'git@github.com:{github_username}/{self.context.project_path.name}.git']
+                                            # except:
+                                            #     # this works on my mac
+                                            #     set_remote_command = ['git', 'remote', 'add', 'origin', f'git@github.com:{github_username}/{self.context.project_path.name}.git']
+                                            cmd = ['gh', 'repo', 'create'
+                                                  , '--source', str(self.context.project_path)
+                                                  , f'--{self.context.remote_access}'       # --private or --public
+                                                  , '--push'                                # push the contents
+                                                  ]
+                                                   # # next line is for accessing github via ssh
+                                                   # , set_remote_command
+                                                   # , ['git', 'push', '-u', 'origin', self.context.template_parameters['git_default_branch']]
+                                                   # ]
+                                            et_micc2.utils.execute(cmd, self.logger.debug, stop_on_error=True)
                                     else:
                                         self.logger.error(
                                             f"Unable to access your GitHub account: \n"

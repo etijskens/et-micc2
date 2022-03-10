@@ -416,9 +416,9 @@ def create( ctx
 
     context.no_git = no_git
     if no_git:
-        context.remote = 'none'
+        context.remote_access = 'none'
     else:
-        context.remote = None if remote=='none' else remote
+        context.remote_access = None if remote=='none' else remote
 
     context.templates = ['top-level-package']
 
