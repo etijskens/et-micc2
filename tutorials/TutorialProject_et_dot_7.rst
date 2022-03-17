@@ -8,7 +8,7 @@
 For Python modules the documentation is automatically extracted from the
 doc-strings in the module. However, when it comes to documenting binary extension
 modules, this does not seem a good option. Ideally, the source files
-:file:`ET-dot/et_dot/f90_dotf/dotf.f90` and
+:file:`ET-dot/et_dot/dotf/dotf.f90` and
 :file:`ET-dot/et_dot/cpp_dotc/dotc.cpp` should document the Fortran functions
 and subroutines, and C++ functions, respectively, rather than the Python
 interface. Yet, from the perspective of ET-dot being a Python project, the user is
@@ -16,12 +16,11 @@ only interested in the documentation of the Python interface to those functions 
 subroutines. Therefore, Micc2_ requires you to document the Python interface in
 separate :file:`.rst` files:
 
-* :file:`ET-dot/et_dot/f90_dotf/dotf.rst`
+* :file:`ET-dot/et_dot/dotf/dotf.rst`
 
 * :file:`ET-dot/et_dot/cpp_dotc/dotc.rst`
 
-their contents could look like this: for
-:file:`ET-dot/et_dot/f90_dotf/dotf.rst`:
+their contents could look like this: for :file:`ET-dot/et_dot/dotf/dotf.rst`:
 
 .. code-block:: rst
 
@@ -80,11 +79,9 @@ The (html) documentation is build as always:
                             reading sources... [ 85%] installation
                             reading sources... [100%] readme
                             
-                            /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/changelog.rst:1: WARNING: Problems with "include" directive path:
-                            InputError: [Errno 2] No such file or directory: '../HISTORY.rst'.
                             looking for now-outdated files... none found
                             pickling environment... done
-                            checking consistency... /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/apps.rst: WARNING: document isn't included in any toctree
+                            checking consistency... /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/docs/apps.rst: WARNING: document isn't included in any toctree
                             done
                             preparing documents... done
                             writing output... [ 14%] api
@@ -95,29 +92,15 @@ The (html) documentation is build as always:
                             writing output... [ 85%] installation
                             writing output... [100%] readme
                             
-                            /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
-                            /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
-                            /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
-                            /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
-                            /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
-                            /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
-                            /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
-                            /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
-                            generating indices... genindex /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
-                            py-modindex /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
-                            done
-                            highlighting module code... [ 50%] et_dot
-                            /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
-                            highlighting module code... [100%] et_dot.dotc
+                            generating indices... genindex py-modindex done
+                            highlighting module code... [100%] et_dot
                             
-                            /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
-                            writing additional pages... search /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/docs/index.rst:5: WARNING: toctree contains reference to document 'changelog' that doesn't have a title: no link will be generated
-                            done
+                            writing additional pages... search done
                             copying static files... done
                             copying extra files... done
                             dumping search index in English (code: en)... done
                             dumping object inventory... done
-                            build succeeded, 16 warnings.
+                            build succeeded, 2 warnings.
                             
                             The HTML pages are in _build/html.
     [INFO]           ] done.

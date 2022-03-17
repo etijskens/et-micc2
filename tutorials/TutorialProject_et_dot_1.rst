@@ -71,7 +71,7 @@ implementation to the local git repository:
 .. code-block:: bash
 
     > git commit -a -m 'implemented dot()'
-    [main 2fcf5a2] implemented dot()
+    [main d452a13] implemented dot()
      1 file changed, 23 insertions(+), 22 deletions(-)
      rewrite et_dot/__init__.py (71%)
     
@@ -160,7 +160,7 @@ test. Here is the result:
     
     tests/et_dot/test_et_dot.py .                                            [100%]
     
-    ============================== 1 passed in 0.01s ===============================
+    ============================== 1 passed in 0.02s ===============================
     
 
 Great, our test succeeds. If you want some more detail you can add the ``-v`` flag.
@@ -173,7 +173,7 @@ good practise to commit this to our local git repository:
 .. code-block:: bash
 
     > git commit -a -m 'added test_dot_aa()'
-    [main 023191a] added test_dot_aa()
+    [main 406f097] added test_dot_aa()
      1 file changed, 9 insertions(+), 36 deletions(-)
      rewrite tests/et_dot/test_et_dot.py (98%)
     
@@ -268,7 +268,7 @@ setting the seed of the random number generator:
     tests/test_et_dot.py::test_dot_commutative PASSED                        [ 50%]
     tests/et_dot/test_et_dot.py::test_dot_aa PASSED                          [100%]
     
-    ============================== 2 passed in 0.03s ===============================
+    ============================== 2 passed in 0.02s ===============================
     
 
 The 1000 tests all pass. If, say test 315 would fail, it would fail every time we run it
@@ -488,7 +488,7 @@ well:
     > git add tests   #hide#
     
     > git commit -a -m 'dot() tests added'
-    [main 1c3b3e7] dot() tests added
+    [main ff3d8ae] dot() tests added
      1 file changed, 73 insertions(+)
      create mode 100644 tests/test_et_dot.py
     
@@ -496,7 +496,7 @@ well:
     [INFO]           (ET-dot)> version (0.0.0) -> (0.0.1)
     
     > git commit -a -m 'v0.0.1'
-    [main b24f89f] v0.0.1
+    [main 370795b] v0.0.1
      2 files changed, 2 insertions(+), 2 deletions(-)
     
 
@@ -575,7 +575,7 @@ Executing this script yields:
 .. code-block:: bash
 
     > python ./prof/run1.py
-    238.328918524926
+    247.78383180344838
     -*# done #*-
     
 
@@ -634,9 +634,9 @@ and execute it again:
 .. code-block:: bash
 
     > python ./prof/run1.py
-    init : 0.000262 s
-    dot  : 9.4e-05 s
-    254.0056419584084
+    init : 0.000558 s
+    dot  : 0.000182 s
+    240.2698949846254
     -*# done #*-
     
 
@@ -681,10 +681,10 @@ Its execution yields:
 .. code-block:: bash
 
     > python ./prof/run1.py
-    et init : 0.000282 s
-    et dot  : 9.4e-05 s
-    np init : 0.000436 s
-    np dot  : 8e-06 s
+    et init : 0.000295 s
+    et dot  : 0.000132 s
+    np init : 7.3e-05 s
+    np dot  : 9e-06 s
     -*# done #*-
     
 
@@ -1154,7 +1154,7 @@ Then run the test (we only run the test for the dotf module, as we did not touch
     
     tests/et_dot/dotf/test_dotf.py .                                         [100%]
     
-    ============================== 1 passed in 0.42s ===============================
+    ============================== 1 passed in 0.43s ===============================
     
 
 The astute reader will notice the magic that is happening here: ``a`` is a numpy array,

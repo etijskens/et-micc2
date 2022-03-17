@@ -554,7 +554,7 @@ automatically found and executed by running ``pytest`` in the project directory:
     tests/my_first_project/test_my_first_project.py::test_hello_noargs PASSED [ 50%]
     tests/my_first_project/test_my_first_project.py::test_hello_me PASSED    [100%]
     
-    ============================== 2 passed in 0.02s ===============================
+    ============================== 2 passed in 0.03s ===============================
     
 
 Specifying the :file:`tests` directory ensures that Pytest_ looks for tests only in

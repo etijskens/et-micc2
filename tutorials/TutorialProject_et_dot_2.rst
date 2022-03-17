@@ -322,6 +322,6 @@ created for the Python implementation.
     
     tests/et_dot/dotc/test_dotc.py .                                         [100%]
     
-    ============================== 1 passed in 0.78s ===============================
+    ============================== 1 passed in 0.32s ===============================
     
 

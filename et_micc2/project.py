@@ -1036,12 +1036,12 @@ class Project:
             error("The sphinx_click package is missing in your current environment.\n"
                        "You must install it to build documentation.")
 
-        exit_code = et_micc2.utils.execute(
+        self.exit_code = et_micc2.utils.execute(
             ['make', self.context.what],
             cwd=Path(self.context.project_path) / 'docs',
             logfun=self.logger.info
         )
-        if exit_code:
+        if self.exit_code:
             error('unexpected error')
 
 
@@ -1390,7 +1390,7 @@ class Submodule:
             with et_micc2.utils.in_directory(self.context.project_path):
                 # docs
                 filename = "API.rst"
-                text = f"\n.. include:: ../{self.context.package_name}/{self.context.module_location_relative}/{self.context.module_name}.rst\n"
+                text = f"\n.. include:: ../{self.context.package_name}/{self.context.module_location_relative}/{self.context.module_name}/{self.context.module_name}.rst\n"
                 with open(filename, "a") as f:
                     f.write(text)
                 db_entry[filename] = text
@@ -1448,7 +1448,7 @@ class Submodule:
                 # docs
                 with open("API.rst", "a") as f:
                     filename = "API.rst"
-                    text = f"\n.. include:: ../{self.context.package_name}/{self.context.module_location_relative}/{self.context.module_name}.rst\n"
+                    text = f"\n.. include:: ../{self.context.package_name}/{self.context.module_location_relative}/{self.context.module_name}/{self.context.module_name}.rst\n"
                     with open(filename, "a") as f:
                         f.write(text)
                     db_entry[filename] = text
