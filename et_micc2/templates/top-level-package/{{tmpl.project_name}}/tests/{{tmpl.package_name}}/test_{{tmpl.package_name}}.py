@@ -2,6 +2,9 @@
 
 """Tests for {{tmpl.package_name}} package."""
 
+import sys
+sys.path.insert(0,'.')
+
 import {{tmpl.package_name}}
 
 

@@ -18,19 +18,14 @@ First, we set up a new project for this *dot* project, with the name :file:`ET-d
 
 .. code-block:: bash
 
-    > micc2 create ET-dot --package --remote=none
+    > micc2 create ET-dot --remote=none
     [INFO]           [ Creating project directory (ET-dot):
-    [INFO]               Python package (et_dot): structure = (ET-dot/et_dot/__init__.py)
+    [INFO]               Python top-level package (et_dot):
     [INFO]               [ Creating local git repository
     [INFO]               ] done.
     [WARNING]            Creation of remote GitHub repository not requested.
     [INFO]           ] done.
     
-
-We already create a package project, rather than the default module project, just to
-avoid having to ``micc2 convert-to-package`` later, and to be prepared for having to
-add other components (See the :ref:`modules-and-packages` sectionfor details on
-the difference between projects with a module structure and a package structure).
 
 We ``cd`` into the project directory, so Micc2_ knows is as the current project.
 
@@ -76,7 +71,7 @@ implementation to the local git repository:
 .. code-block:: bash
 
     > git commit -a -m 'implemented dot()'
-    [main 60e873e] implemented dot()
+    [main 2fcf5a2] implemented dot()
      1 file changed, 23 insertions(+), 22 deletions(-)
      rewrite et_dot/__init__.py (71%)
     
@@ -135,8 +130,8 @@ Or we might execute these lines at the Python prompt:
 ---------------------
 
 In order to prove that our implementation of the dot product is correct, we write some
-tests. Open the file :file:`tests/test_et_dot.py`, remove the original tests put
-in by micc2_, and add a new one like below:
+tests. Open the file :file:`tests/et_dot/test_et_dot.py`, remove the original
+tests put in by micc2_, and add a new one like below:
 
 .. code-block:: python
 
@@ -159,11 +154,11 @@ test. Here is the result:
 
     > pytest tests
     ============================= test session starts ==============================
-    platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.10.0, pluggy-0.13.1
-    rootdir: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot
+    platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.11.0, pluggy-0.13.1
+    rootdir: /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot
     collected 1 item
     
-    tests/test_et_dot.py .                                                   [100%]
+    tests/et_dot/test_et_dot.py .                                            [100%]
     
     ============================== 1 passed in 0.01s ===============================
     
@@ -178,9 +173,9 @@ good practise to commit this to our local git repository:
 .. code-block:: bash
 
     > git commit -a -m 'added test_dot_aa()'
-    [main a7af306] added test_dot_aa()
-     1 file changed, 7 insertions(+), 33 deletions(-)
-     rewrite tests/test_et_dot.py (98%)
+    [main 023191a] added test_dot_aa()
+     1 file changed, 9 insertions(+), 36 deletions(-)
+     rewrite tests/et_dot/test_et_dot.py (98%)
     
 
 Obviously, our test tests only one particular case, and, perhaps, other cases might
@@ -190,6 +185,7 @@ the dot product is commutative. Let's add a test for that. Open
 
 .. code-block:: python
 
+    import et_dot
     import random
     
     def test_dot_commutative():
@@ -216,15 +212,15 @@ the dot product is commutative. Let's add a test for that. Open
 
     > pytest tests -v
     ============================= test session starts ==============================
-    platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.10.0, pluggy-0.13.1 -- /Users/etijskens/.pyenv/versions/3.8.5/bin/python
+    platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.11.0, pluggy-0.13.1 -- /Users/etijskens/.pyenv/versions/3.8.5/bin/python
     cachedir: .pytest_cache
-    rootdir: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot
+    rootdir: /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot
     collecting ... collected 2 items
     
-    tests/test_et_dot.py::test_dot_aa PASSED                                 [ 50%]
-    tests/test_et_dot.py::test_dot_commutative PASSED                        [100%]
+    tests/test_et_dot.py::test_dot_commutative PASSED                        [ 50%]
+    tests/et_dot/test_et_dot.py::test_dot_aa PASSED                          [100%]
     
-    ============================== 2 passed in 0.01s ===============================
+    ============================== 2 passed in 0.02s ===============================
     
 
 The new test passes as well.
@@ -264,15 +260,15 @@ setting the seed of the random number generator:
 
     > pytest tests -v
     ============================= test session starts ==============================
-    platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.10.0, pluggy-0.13.1 -- /Users/etijskens/.pyenv/versions/3.8.5/bin/python
+    platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.11.0, pluggy-0.13.1 -- /Users/etijskens/.pyenv/versions/3.8.5/bin/python
     cachedir: .pytest_cache
-    rootdir: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot
+    rootdir: /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot
     collecting ... collected 2 items
     
-    tests/test_et_dot.py::test_dot_aa PASSED                                 [ 50%]
-    tests/test_et_dot.py::test_dot_commutative PASSED                        [100%]
+    tests/test_et_dot.py::test_dot_commutative PASSED                        [ 50%]
+    tests/et_dot/test_et_dot.py::test_dot_aa PASSED                          [100%]
     
-    ============================== 2 passed in 0.02s ===============================
+    ============================== 2 passed in 0.03s ===============================
     
 
 The 1000 tests all pass. If, say test 315 would fail, it would fail every time we run it
@@ -304,14 +300,14 @@ sum of the elements of the other array. Let us add another test for that:
 
     > pytest tests -v
     ============================= test session starts ==============================
-    platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.10.0, pluggy-0.13.1 -- /Users/etijskens/.pyenv/versions/3.8.5/bin/python
+    platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.11.0, pluggy-0.13.1 -- /Users/etijskens/.pyenv/versions/3.8.5/bin/python
     cachedir: .pytest_cache
-    rootdir: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot
+    rootdir: /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot
     collecting ... collected 3 items
     
-    tests/test_et_dot.py::test_dot_aa PASSED                                 [ 33%]
-    tests/test_et_dot.py::test_dot_commutative PASSED                        [ 66%]
-    tests/test_et_dot.py::test_dot_one PASSED                                [100%]
+    tests/test_et_dot.py::test_dot_commutative PASSED                        [ 33%]
+    tests/test_et_dot.py::test_dot_one PASSED                                [ 66%]
+    tests/et_dot/test_et_dot.py::test_dot_aa PASSED                          [100%]
     
     ============================== 3 passed in 0.02s ===============================
     
@@ -338,15 +334,15 @@ pytest_ produces a readable report about the failure:
 
     > pytest tests -v
     ============================= test session starts ==============================
-    platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.10.0, pluggy-0.13.1 -- /Users/etijskens/.pyenv/versions/3.8.5/bin/python
+    platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.11.0, pluggy-0.13.1 -- /Users/etijskens/.pyenv/versions/3.8.5/bin/python
     cachedir: .pytest_cache
-    rootdir: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot
+    rootdir: /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot
     collecting ... collected 4 items
     
-    tests/test_et_dot.py::test_dot_aa PASSED                                 [ 25%]
-    tests/test_et_dot.py::test_dot_commutative PASSED                        [ 50%]
-    tests/test_et_dot.py::test_dot_one PASSED                                [ 75%]
-    tests/test_et_dot.py::test_dot_one_2 FAILED                              [100%]
+    tests/test_et_dot.py::test_dot_commutative PASSED                        [ 25%]
+    tests/test_et_dot.py::test_dot_one PASSED                                [ 50%]
+    tests/test_et_dot.py::test_dot_one_2 FAILED                              [ 75%]
+    tests/et_dot/test_et_dot.py::test_dot_aa PASSED                          [100%]
     
     =================================== FAILURES ===================================
     ________________________________ test_dot_one_2 ________________________________
@@ -363,10 +359,10 @@ pytest_ produces a readable report about the failure:
     E         +0.0
     E         -1.0
     
-    tests/test_et_dot.py:61: AssertionError
+    tests/test_et_dot.py:57: AssertionError
     =========================== short test summary info ============================
     FAILED tests/test_et_dot.py::test_dot_one_2 - assert 0.0 == 1.0
-    ========================= 1 failed, 3 passed in 0.07s ==========================
+    ========================= 1 failed, 3 passed in 0.04s ==========================
     
 
 Mathematically, our expectations about the outcome of the test are certainly
@@ -489,15 +485,18 @@ well:
 
 .. code-block:: bash
 
+    > git add tests   #hide#
+    
     > git commit -a -m 'dot() tests added'
-    [main 6c18e60] dot() tests added
-     1 file changed, 70 insertions(+)
+    [main 1c3b3e7] dot() tests added
+     1 file changed, 73 insertions(+)
+     create mode 100644 tests/test_et_dot.py
     
     > micc2 version -p
     [INFO]           (ET-dot)> version (0.0.0) -> (0.0.1)
     
     > git commit -a -m 'v0.0.1'
-    [main ce5b139] v0.0.1
+    [main b24f89f] v0.0.1
      2 files changed, 2 insertions(+), 2 deletions(-)
     
 
@@ -576,7 +575,7 @@ Executing this script yields:
 .. code-block:: bash
 
     > python ./prof/run1.py
-    231.0084237109499
+    238.328918524926
     -*# done #*-
     
 
@@ -598,8 +597,6 @@ with ``pip``:
 
     > python -m pip install et-stopwatch
     Requirement already satisfied: et-stopwatch in /Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages (1.0.5)
-    WARNING: You are using pip version 21.0.1; however, version 21.1.2 is available.
-    You should consider upgrading via the '/Users/etijskens/.pyenv/versions/3.8.5/bin/python -m pip install --upgrade pip' command.
     
 
 Although ``pip`` is complaining a bit about not being up to date, the installation is
@@ -637,9 +634,9 @@ and execute it again:
 .. code-block:: bash
 
     > python ./prof/run1.py
-    init : 0.00036 s
-    dot  : 0.000122 s
-    248.40894110825718
+    init : 0.000262 s
+    dot  : 9.4e-05 s
+    254.0056419584084
     -*# done #*-
     
 
@@ -684,10 +681,10 @@ Its execution yields:
 .. code-block:: bash
 
     > python ./prof/run1.py
-    et init : 0.000293 s
-    et dot  : 9.5e-05 s
-    np init : 5.8e-05 s
-    np dot  : 1e-05 s
+    et init : 0.000282 s
+    et dot  : 9.4e-05 s
+    np init : 0.000436 s
+    np dot  : 8e-06 s
     -*# done #*-
     
 
@@ -868,9 +865,7 @@ binary extension module, ``--cpp`` for a C++ binary extension module. Other
 components are a Python sub-module with module structure (``--module``), or
 package structure ``--package``, and a CLI script (`--cli` and `--clisub`). 
 
-You can add as many components to your code as you want. However, the project must have a
-*package* structure (see :ref:`modules-and-packages` for how to convert a project
-with a *module* structure).
+You can add as many components to your project as you want. 
 
 The binary modules are build with the ``micc2 build`` command. :
 
@@ -940,24 +935,24 @@ extension module with name ``dotf``:
 .. code-block:: bash
 
     > micc2 add dotf --f90
-    [INFO]           [ Adding f90 module dotf to project ET-dot.
-    [INFO]               - Fortran source in       ET-dot/et_dot/f90_dotf/dotf.f90.
-    [INFO]               - build settings in       ET-dot/et_dot/f90_dotf/CMakeLists.txt.
-    [INFO]               - Python test code in     ET-dot/tests/test_f90_dotf.py.
-    [INFO]               - module documentation in ET-dot/et_dot/f90_dotf/dotf.rst (restructuredText format).
+    [INFO]           [ Adding f90 submodule dotf to package et_dot.
+    [INFO]               - Fortran source in       /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/dotf.f90.
+    [INFO]               - build settings in       /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/CMakeLists.txt.
+    [INFO]               - module documentation in /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/dotf.rst (restructuredText format).
+    [INFO]               - Python test code in     /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/tests/et_dot/dotf/test_dotf.py.
     [INFO]           ] done.
     
 
 The command now runs successfully, and the output tells us where to enter the Fortran
 source code, the build settings, the test code and the documentation of the added
 module. Everything related to the :file:`dotf` sub-module is in subdirectory
-:file:`ET-dot/et_dot/f90_dotf`. That directory has a ``f90_`` prefix indicating
-that it relates to a Fortran binary extension module. As useal, these files contain
+:file:`ET-dot/et_dot/dotf`. That directory has a ``f90_`` prefix indicating that
+it relates to a Fortran binary extension module. As useal, these files contain
 already working example code that you an inspect to learn how things work.
 
 Let's continue our development of a Fortran version of the dot product. Open file
-:file:`ET-dot/et_dot/f90_dotf/dotf.f90` in your favorite editor or IDE and
-replace the existing example code in the Fortran source file with:
+:file:`ET-dot/et_dot/dotf/dotf.f90` in your favorite editor or IDE and replace
+the existing example code in the Fortran source file with:
 
 .. code-block:: fortran
 
@@ -984,10 +979,10 @@ The binary extension module can now be built:
 .. code-block:: bash
 
     > micc2 build dotf
-    [INFO] [ Building f90 module 'dotf':
+    [INFO] [ Building f90 module 'et_dot/dotf':
     [DEBUG]          [ > cmake -D PYTHON_EXECUTABLE=/Users/etijskens/.pyenv/versions/3.8.5/bin/python ..
     [DEBUG]              (stdout)
-                           -- The Fortran compiler identification is GNU 11.1.0
+                           -- The Fortran compiler identification is GNU 11.2.0
                            -- Checking whether Fortran compiler has -isysroot
                            -- Checking whether Fortran compiler has -isysroot - yes
                            -- Checking whether Fortran compiler supports OSX deployment target flag
@@ -1010,25 +1005,25 @@ The binary extension module can now be built:
                            F2PY_linkdirs         : 
                            F2PY_linklibs         : 
                            module name           : dotf.cpython-38-darwin.so
-                           module filepath       : /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/dotf.cpython-38-darwin.so
-                           source                : /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/dotf.f90
+                           module filepath       : /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/dotf.cpython-38-darwin.so
+                           source                : /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/dotf.f90
                            python executable     : /Users/etijskens/.pyenv/versions/3.8.5/bin/python [version=Python 3.8.5]
                              f2py executable     : /Users/etijskens/.pyenv/versions/3.8.5/bin/f2py [version=2]
                            ####################################################################################################
                            -- Configuring done
                            -- Generating done
-                           -- Build files have been written to: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build
+                           -- Build files have been written to: /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build
     [DEBUG]          ] done.
     [DEBUG]          [ > make VERBOSE=1
     [DEBUG]              (stdout)
-                           /usr/local/Cellar/cmake/3.20.1/bin/cmake -S/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf -B/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build --check-build-system CMakeFiles/Makefile.cmake 0
-                           /usr/local/Cellar/cmake/3.20.1/bin/cmake -E cmake_progress_start /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/CMakeFiles /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build//CMakeFiles/progress.marks
+                           /usr/local/Cellar/cmake/3.21.2/bin/cmake -S/Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf -B/Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build --check-build-system CMakeFiles/Makefile.cmake 0
+                           /usr/local/Cellar/cmake/3.21.2/bin/cmake -E cmake_progress_start /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/CMakeFiles /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build//CMakeFiles/progress.marks
                            /Library/Developer/CommandLineTools/usr/bin/make  -f CMakeFiles/Makefile2 all
                            /Library/Developer/CommandLineTools/usr/bin/make  -f CMakeFiles/dotf.dir/build.make CMakeFiles/dotf.dir/depend
-                           cd /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build && /usr/local/Cellar/cmake/3.20.1/bin/cmake -E cmake_depends "Unix Makefiles" /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/CMakeFiles/dotf.dir/DependInfo.cmake --color=
+                           cd /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build && /usr/local/Cellar/cmake/3.21.2/bin/cmake -E cmake_depends "Unix Makefiles" /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/CMakeFiles/dotf.dir/DependInfo.cmake --color=
                            /Library/Developer/CommandLineTools/usr/bin/make  -f CMakeFiles/dotf.dir/build.make CMakeFiles/dotf.dir/build
                            [100%] Generating dotf.cpython-38-darwin.so
-                           /Users/etijskens/.pyenv/versions/3.8.5/bin/f2py -m dotf -c --f90exec=/usr/local/bin/gfortran /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/dotf.f90 -DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION -DF2PY_REPORT_ON_ARRAY_COPY=1 -DNDEBUG --opt='-O3' --build-dir /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build
+                           /Users/etijskens/.pyenv/versions/3.8.5/bin/f2py -m dotf -c --f90exec=/usr/local/bin/gfortran /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/dotf.f90 -DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION -DF2PY_REPORT_ON_ARRAY_COPY=1 -DNDEBUG --opt='-O3' --build-dir /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build
                            running build
                            running config_cc
                            unifing config_cc, config, build_clib, build_ext, build commands --compiler options
@@ -1038,10 +1033,10 @@ The binary extension module can now be built:
                            build_src
                            building extension "dotf" sources
                            f2py options: []
-                           f2py:> /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotfmodule.c
-                           creating /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8
+                           f2py:> /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotfmodule.c
+                           creating /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/src.macosx-10.15-x86_64-3.8
                            Reading fortran codes...
-                           	Reading file '/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/dotf.f90' (format:free)
+                           	Reading file '/Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/dotf.f90' (format:free)
                            Post-processing...
                            	Block: dotf
                            			Block: dot
@@ -1051,13 +1046,13 @@ The binary extension module can now be built:
                            		Creating wrapper for Fortran function "dot"("dot")...
                            		Constructing wrapper function "dot"...
                            		  dot = dot(a,b,[n])
-                           	Wrote C/API module "dotf" to file "/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotfmodule.c"
-                           	Fortran 77 wrappers are saved to "/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotf-f2pywrappers.f"
-                             adding '/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/fortranobject.c' to sources.
-                             adding '/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8' to include_dirs.
-                           copying /Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages/numpy/f2py/src/fortranobject.c -> /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8
-                           copying /Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages/numpy/f2py/src/fortranobject.h -> /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8
-                             adding '/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotf-f2pywrappers.f' to sources.
+                           	Wrote C/API module "dotf" to file "/Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotfmodule.c"
+                           	Fortran 77 wrappers are saved to "/Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotf-f2pywrappers.f"
+                             adding '/Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/fortranobject.c' to sources.
+                             adding '/Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/src.macosx-10.15-x86_64-3.8' to include_dirs.
+                           copying /Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages/numpy/f2py/src/fortranobject.c -> /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/src.macosx-10.15-x86_64-3.8
+                           copying /Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages/numpy/f2py/src/fortranobject.h -> /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/src.macosx-10.15-x86_64-3.8
+                             adding '/Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotf-f2pywrappers.f' to sources.
                            build_src: building npy-pkg config files
                            running build_ext
                            customize UnixCCompiler
@@ -1072,21 +1067,21 @@ The binary extension module can now be built:
                            compiling C sources
                            C compiler: clang -Wno-unused-result -Wsign-compare -Wunreachable-code -DNDEBUG -g -fwrapv -O3 -Wall -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include
                            
-                           creating /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/Users
-                           creating /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens
-                           creating /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software
-                           creating /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev
-                           creating /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace
-                           creating /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp
-                           creating /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot
-                           creating /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot
-                           creating /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf
-                           creating /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build
-                           creating /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8
-                           compile options: '-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION -DF2PY_REPORT_ON_ARRAY_COPY=1 -DNDEBUG -DNPY_DISABLE_OPTIMIZATION=1 -I/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8 -I/Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages/numpy/core/include -I/Users/etijskens/.pyenv/versions/3.8.5/include/python3.8 -c'
-                           clang: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/fortranobject.c
-                           clang: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotfmodule.c
-                           /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotfmodule.c:144:12: warning: unused function 'f2py_size' [-Wunused-function]
+                           creating /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/Users
+                           creating /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/Users/etijskens
+                           creating /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/Users/etijskens/software
+                           creating /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/Users/etijskens/software/dev
+                           creating /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/Users/etijskens/software/dev/workspace
+                           creating /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp
+                           creating /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot
+                           creating /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot
+                           creating /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf
+                           creating /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build
+                           creating /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/src.macosx-10.15-x86_64-3.8
+                           compile options: '-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION -DF2PY_REPORT_ON_ARRAY_COPY=1 -DNDEBUG -DNPY_DISABLE_OPTIMIZATION=1 -I/Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/src.macosx-10.15-x86_64-3.8 -I/Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages/numpy/core/include -I/Users/etijskens/.pyenv/versions/3.8.5/include/python3.8 -c'
+                           clang: /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotfmodule.c
+                           clang: /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/fortranobject.c
+                           /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotfmodule.c:144:12: warning: unused function 'f2py_size' [-Wunused-function]
                            static int f2py_size(PyArrayObject* var, ...)
                                       ^
                            1 warning generated.
@@ -1094,25 +1089,25 @@ The binary extension module can now be built:
                            Fortran f77 compiler: /usr/local/bin/gfortran -Wall -g -ffixed-form -fno-second-underscore -fPIC -O3
                            Fortran f90 compiler: /usr/local/bin/gfortran -Wall -g -fno-second-underscore -fPIC -O3
                            Fortran fix compiler: /usr/local/bin/gfortran -Wall -g -ffixed-form -fno-second-underscore -Wall -g -fno-second-underscore -fPIC -O3
-                           compile options: '-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION -DF2PY_REPORT_ON_ARRAY_COPY=1 -DNDEBUG -I/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8 -I/Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages/numpy/core/include -I/Users/etijskens/.pyenv/versions/3.8.5/include/python3.8 -c'
-                           gfortran:f90: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/dotf.f90
-                           gfortran:f77: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotf-f2pywrappers.f
-                           /usr/local/bin/gfortran -Wall -g -Wall -g -undefined dynamic_lookup -bundle /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotfmodule.o /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/fortranobject.o /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/dotf.o /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotf-f2pywrappers.o -L/usr/local/Cellar/gcc/11.1.0_1/lib/gcc/11/gcc/x86_64-apple-darwin20/11.1.0 -L/usr/local/Cellar/gcc/11.1.0_1/lib/gcc/11/gcc/x86_64-apple-darwin20/11.1.0/../../.. -L/usr/local/Cellar/gcc/11.1.0_1/lib/gcc/11/gcc/x86_64-apple-darwin20/11.1.0/../../.. -lgfortran -o ./dotf.cpython-38-darwin.so
-                           ld: warning: dylib (/usr/local/Cellar/gcc/11.1.0_1/lib/gcc/11/libgfortran.dylib) was built for newer macOS version (11.3) than being linked (10.15)
-                           ld: warning: dylib (/usr/local/Cellar/gcc/11.1.0_1/lib/gcc/11/libquadmath.dylib) was built for newer macOS version (11.3) than being linked (10.15)
+                           compile options: '-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION -DF2PY_REPORT_ON_ARRAY_COPY=1 -DNDEBUG -I/Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/src.macosx-10.15-x86_64-3.8 -I/Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages/numpy/core/include -I/Users/etijskens/.pyenv/versions/3.8.5/include/python3.8 -c'
+                           gfortran:f90: /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/dotf.f90
+                           gfortran:f77: /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotf-f2pywrappers.f
+                           /usr/local/bin/gfortran -Wall -g -Wall -g -undefined dynamic_lookup -bundle /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotfmodule.o /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/fortranobject.o /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/dotf.o /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/src.macosx-10.15-x86_64-3.8/dotf-f2pywrappers.o -L/usr/local/Cellar/gcc/11.2.0/lib/gcc/11/gcc/x86_64-apple-darwin20/11.2.0 -L/usr/local/Cellar/gcc/11.2.0/lib/gcc/11/gcc/x86_64-apple-darwin20/11.2.0/../../.. -L/usr/local/Cellar/gcc/11.2.0/lib/gcc/11/gcc/x86_64-apple-darwin20/11.2.0/../../.. -lgfortran -o ./dotf.cpython-38-darwin.so
+                           ld: warning: dylib (/usr/local/Cellar/gcc/11.2.0/lib/gcc/11/libgfortran.dylib) was built for newer macOS version (11.3) than being linked (10.15)
+                           ld: warning: dylib (/usr/local/Cellar/gcc/11.2.0/lib/gcc/11/libquadmath.dylib) was built for newer macOS version (11.3) than being linked (10.15)
                            [100%] Built target dotf
-                           /usr/local/Cellar/cmake/3.20.1/bin/cmake -E cmake_progress_start /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/_cmake_build/CMakeFiles 0
+                           /usr/local/Cellar/cmake/3.21.2/bin/cmake -E cmake_progress_start /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/_cmake_build/CMakeFiles 0
     [DEBUG]          ] done.
     [DEBUG]          [ > make install
     [DEBUG]              (stdout)
                            [100%] Built target dotf
                            Install the project...
                            -- Install configuration: "Release"
-                           -- Installing: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/f90_dotf/../dotf.cpython-38-darwin.so
+                           -- Installing: /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf/../dotf.cpython-38-darwin.so
     [DEBUG]          ] done.
     [INFO] ] done.
     [INFO]           Binary extensions built successfully:
-    [INFO]           - /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/dotf.cpython-38-darwin.so
+    [INFO]           - /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotf.cpython-38-darwin.so
     
 
 The command produces a lot of output, which comes from CMake, f2py, thecompilation of
@@ -1128,7 +1123,7 @@ working (``<module 'os' from
 extension indicating a shared library on this OS (``.so``). This file can be imported
 in a Python script, by using the filename without the extension, i.e. ``dotf``. As the
 module was built successfully, we can test it. Here is some test code. Enter it in file
-:file:`ET-dot/tests/test_f90_dotf.py`:
+:file:`ET-dot/tests/test_dotf.py`:
 
 .. code-block:: Python
 
@@ -1151,15 +1146,15 @@ Then run the test (we only run the test for the dotf module, as we did not touch
 
 .. code-block:: bash
 
-    > pytest tests/test_f90_dotf.py
+    > pytest tests/et_dot/dotf/test_dotf.py
     ============================= test session starts ==============================
-    platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.10.0, pluggy-0.13.1
-    rootdir: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot
+    platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.11.0, pluggy-0.13.1
+    rootdir: /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot
     collected 1 item
     
-    tests/test_f90_dotf.py .                                                 [100%]
+    tests/et_dot/dotf/test_dotf.py .                                         [100%]
     
-    ============================== 1 passed in 0.34s ===============================
+    ============================== 1 passed in 0.42s ===============================
     
 
 The astute reader will notice the magic that is happening here: ``a`` is a numpy array,
@@ -1177,7 +1172,7 @@ and the wrapper will convert it into a float array. In fact the wrapper consider
 implicit type conversions allowed by Python. However practical this feature may be,
 type conversion requires copying the entire array and converting each element. For
 long arrays this may be prohibitively expensive. For this reason the
-:file:`et_dot/f90_dotf/CMakeLists.txt` file specifies the
+:file:`et_dot/dotf/CMakeLists.txt` file specifies the
 ``F2PY_REPORT_ON_ARRAY_COPY=1`` flag which makes the wrappers issue a warning to
 tell you that you should modify the client program to pass types to the wrapper which to
 not require conversion.

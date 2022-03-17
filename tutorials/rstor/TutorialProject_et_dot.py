@@ -8,7 +8,6 @@ project_name = 'ET-dot'
 project_path = workspace / project_name
 
 
-
 def TutorialProject_et_dot_1():
     if workspace.exists():
         shutil.rmtree(workspace)
@@ -35,11 +34,9 @@ def TutorialProject_et_dot_1():
     Paragraph(
         "First, we set up a new project for this *dot* project, with the name "
         ":file:`ET-dot`, ``ET`` being my initials (check out :ref:`project-and-module-naming`). "
-        # "Not knowing beforehand how involved this project will become, "
-        # "we create a simple *module* project without a remote Github_ repository:"
     )
     CodeBlock(
-        f'micc2 create {project_name} --package --remote=none'
+        f'micc2 create {project_name} --remote=none'
         , language='bash', execute=True, cwd=workspace
     )
     # --------------------------------------------------------------------------------
@@ -49,13 +46,6 @@ def TutorialProject_et_dot_1():
     # package from the beginning: otherwise we would not be able to execute the
     # et_dot's code inside the tutorial.
     # --------------------------------------------------------------------------------
-    Paragraph(
-        "We already create a package project, rather than the default module project, "
-        "just to avoid having to ``micc2 convert-to-package`` later, and to be prepared "
-        "for having to add other components (See the :ref:`modules-and-packages` section"
-        "for details on the difference between projects with a module structure and a "
-        "package structure)."
-    )
     Paragraph(
         "We ``cd`` into the project directory, so Micc2_ knows is as the current project."
     )
@@ -165,19 +155,21 @@ def TutorialProject_et_dot_1():
 
     Paragraph(
         "In order to prove that our implementation of the dot product is correct, we write "
-        "some tests. Open the file :file:`tests/test_et_dot.py`, remove the original "
+        "some tests. Open the file :file:`tests/et_dot/test_et_dot.py`, remove the original "
         "tests put in by micc2_, and add a new one like below:"
     )
     CodeBlock(
-        ['import et_dot'
-            , ''
-            , 'def test_dot_aa():'
-            , '    a = [1,2,3]'
-            , '    expected = 14'
-            , '    result = et_dot.dot(a,a)'
-            , '    assert result==expected'
+        [ 'import sys                #hide#'
+        , 'sys.path.insert(0,".")    #hide#'
+        , 'import et_dot'
+        , ''
+        , 'def test_dot_aa():'
+        , '    a = [1,2,3]'
+        , '    expected = 14'
+        , '    result = et_dot.dot(a,a)'
+        , '    assert result==expected'
          ]
-        , language='python', copyto=project_path / 'tests/test_et_dot.py'
+        , language='python', copyto=project_path / 'tests/et_dot/test_et_dot.py'
     )
     Paragraph(
         'The test :py:meth:`test_dot_aa` defines an array with 3 ``int`` '
@@ -213,19 +205,22 @@ def TutorialProject_et_dot_1():
         "test for that. Open :file:`test_et_dot.py` again and add this code:"
     )
     CodeBlock(
-        ['import random'
-            , ''
-            , 'def test_dot_commutative():'
-            , '    # create two arrays of length 10 with random float numbers:'
-            , '    a = []'
-            , '    b = []'
-            , '    for _ in range(10):'
-            , '        a.append(random.random())'
-            , '        b.append(random.random())'
-            , '    # test commutativity:'
-            , '    ab = et_dot.dot(a,b)'
-            , '    ba = et_dot.dot(b,a)'
-            , '    assert ab==ba'
+        [ 'import sys              #hide#'
+        , 'sys.path.insert(0,".")  #hide#'
+        , 'import et_dot'
+        , 'import random'
+        , ''
+        , 'def test_dot_commutative():'
+        , '    # create two arrays of length 10 with random float numbers:'
+        , '    a = []'
+        , '    b = []'
+        , '    for _ in range(10):'
+        , '        a.append(random.random())'
+        , '        b.append(random.random())'
+        , '    # test commutativity:'
+        , '    ab = et_dot.dot(a,b)'
+        , '    ba = et_dot.dot(b,a)'
+        , '    assert ab==ba'
          ]
         , language='python', copyto=project_path / 'tests/test_et_dot.py', append=True
     )
@@ -258,24 +253,24 @@ def TutorialProject_et_dot_1():
         "by setting the seed of the random number generator:"
     )
     CodeBlock(
-        ['def test_dot_commutative():'
-            , '    # Fix the seed for the random number generator of module random.'
-            , '    random.seed(0)'
-            , '    # choose array size'
-            , '    n = 10'
-            , '    # create two arrays of length 10 with zeroes:'
-            , '    a = n*[0]'
-            , '    b = n*[0]'
-            , '    # repeat the test 1000 times:'
-            , '    for _ in range(1000):'
-            , '        for i in range(10):'
-            , '             a[i] = random.random()'
-            , '             b[i] = random.random()'
-            , '    # test commutativity:'
-            , '    ab = et_dot.dot(a,b)'
-            , '    ba = et_dot.dot(b,a)'
-            , '    assert ab==ba'
-         ]
+        [ 'def test_dot_commutative():'
+        , '    # Fix the seed for the random number generator of module random.'
+        , '    random.seed(0)'
+        , '    # choose array size'
+        , '    n = 10'
+        , '    # create two arrays of length 10 with zeroes:'
+        , '    a = n*[0]'
+        , '    b = n*[0]'
+        , '    # repeat the test 1000 times:'
+        , '    for _ in range(1000):'
+        , '        for i in range(10):'
+        , '             a[i] = random.random()'
+        , '             b[i] = random.random()'
+        , '    # test commutativity:'
+        , '    ab = et_dot.dot(a,b)'
+        , '    ba = et_dot.dot(b,a)'
+        , '    assert ab==ba'
+        ]
         , language='python', copyto=project_path / 'tests/test_et_dot.py', append=True
     )
     CodeBlock(
@@ -291,23 +286,23 @@ def TutorialProject_et_dot_1():
         "is the sum of the elements of the other array. Let us add another test for that:"
     )
     CodeBlock(
-        ['def test_dot_one():'
-            , '    # Fix the seed for the random number generator of module random.'
-            , '    random.seed(0)'
-            , '    # choose array size'
-            , '    n = 10'
-            , '    # create two arrays of length 10 with zeroes, resp. ones:'
-            , '    a = n*[0]'
-            , '    one = n*[1]'
-            , '    # repeat the test 1000 times:'
-            , '    for _ in range(1000):'
-            , '        for i in range(10):'
-            , '             a[i] = random.random()'
-            , '    # test:'
-            , '    aone = et_dot.dot(a,one)'
-            , '    expected = sum(a)'
-            , '    assert aone==expected'
-         ]
+        [ 'def test_dot_one():'
+        , '    # Fix the seed for the random number generator of module random.'
+        , '    random.seed(0)'
+        , '    # choose array size'
+        , '    n = 10'
+        , '    # create two arrays of length 10 with zeroes, resp. ones:'
+        , '    a = n*[0]'
+        , '    one = n*[1]'
+        , '    # repeat the test 1000 times:'
+        , '    for _ in range(1000):'
+        , '        for i in range(10):'
+        , '             a[i] = random.random()'
+        , '    # test:'
+        , '    aone = et_dot.dot(a,one)'
+        , '    expected = sum(a)'
+        , '    assert aone==expected'
+        ]
         , language='python', copyto=project_path / 'tests/test_et_dot.py', append=True
     )
     CodeBlock(
@@ -319,15 +314,15 @@ def TutorialProject_et_dot_1():
         "Here is yet another test:"
     )
     CodeBlock(
-        ['def test_dot_one_2():'
-            , '    a1 = 1.0e16'
-            , '    a   = [a1 , 1.0, -a1]'
-            , '    one = [1.0, 1.0, 1.0]'
-            , '    # test:'
-            , '    aone = et_dot.dot(a,one)'
-            , '    expected = 1.0'
-            , '    assert aone == expected'
-         ]
+        [ 'def test_dot_one_2():'
+        , '    a1 = 1.0e16'
+        , '    a   = [a1 , 1.0, -a1]'
+        , '    one = [1.0, 1.0, 1.0]'
+        , '    # test:'
+        , '    aone = et_dot.dot(a,one)'
+        , '    expected = 1.0'
+        , '    assert aone == expected'
+        ]
         , language='python', copyto=project_path / 'tests/test_et_dot.py', append=True
     )
     Paragraph(
@@ -350,9 +345,9 @@ def TutorialProject_et_dot_1():
         "Observe the consequences of this in the Python statements below:"
     )
     CodeBlock(
-        ["print( 1.0 + 1e16 )"
-            , "print( 1e16 + 1.0 )"
-         ]
+        [ "print( 1.0 + 1e16 )"
+        , "print( 1e16 + 1.0 )"
+        ]
         , language='pycon', execute=True
     )
     Paragraph(
@@ -361,10 +356,10 @@ def TutorialProject_et_dot_1():
         "returned, namely ``1e16``, which is of by a relative error of only 1e-16."
     )
     CodeBlock(
-        ["print( 1e16 + 1.0 - 1e16 )"
-            , "print( 1e16 - 1e16 + 1.0 )"
-            , "print( 1.0 + 1e16 - 1e16 )"
-         ]
+        [ "print( 1e16 + 1.0 - 1e16 )"
+        , "print( 1e16 - 1e16 + 1.0 )"
+        , "print( 1.0 + 1e16 - 1e16 )"
+        ]
         , language='pycon', execute=True
     )
     Paragraph(
@@ -373,10 +368,10 @@ def TutorialProject_et_dot_1():
         "from left to right, so they are equivalent to: "
     )
     CodeBlock(
-        ["1e16 + 1.0 - 1e16 = ( 1e16 + 1.0 ) - 1e16 = 1e16 - 1e16 = 0.0"
-            , "1e16 - 1e16 + 1.0 = ( 1e16 - 1e16 ) + 1.0 = 0.0  + 1.0  = 1.0"
-            , "1.0 + 1e16 - 1e16 = ( 1.0 + 1e16 ) - 1e16 = 1e16 - 1e16 = 0.0"
-         ]
+        [ "1e16 + 1.0 - 1e16 = ( 1e16 + 1.0 ) - 1e16 = 1e16 - 1e16 = 0.0"
+        , "1e16 - 1e16 + 1.0 = ( 1e16 - 1e16 ) + 1.0 = 0.0  + 1.0  = 1.0"
+        , "1.0 + 1e16 - 1e16 = ( 1.0 + 1e16 ) - 1e16 = 1e16 - 1e16 = 0.0"
+        ]
         , language='pycon'
     )
     Paragraph(
@@ -401,16 +396,16 @@ def TutorialProject_et_dot_1():
         "original test:"
     )
     CodeBlock(
-        ['def test_dot_one_2():'
-            , '    a1 = 1.0e16'
-            , '    a   = [a1 , 1.0, -a1]'
-            , '    one = [1.0, 1.0, 1.0]'
-            , '    # test:'
-            , '    aone = et_dot.dot(a,one)'
-            , '    expected = 1.0'
-            , '    assert aone != expected'
-            , '    assert math.isclose(result, expected, rel_tol=1e-15)'
-         ]
+        [ 'def test_dot_one_2():'
+        , '    a1 = 1.0e16'
+        , '    a   = [a1 , 1.0, -a1]'
+        , '    one = [1.0, 1.0, 1.0]'
+        , '    # test:'
+        , '    aone = et_dot.dot(a,one)'
+        , '    expected = 1.0'
+        , '    assert aone != expected'
+        , '    assert math.isclose(result, expected, rel_tol=1e-15)'
+        ]
         , language='python', copyto=project_path / 'tests/test_et_dot.py', append=True
     )
     Paragraph(
@@ -419,14 +414,14 @@ def TutorialProject_et_dot_1():
         "are not of the same length?"
     )
     CodeBlock(
-        ["import pytest"
-            , ""
-            , "def test_dot_unequal_length():"
-            , "    a = [1,2]"
-            , "    b = [1,2,3]"
-            , "    with pytest.raises(ArithmeticError):"
-            , "        et_dot.dot(a,b)"
-         ]
+        [ "import pytest"
+        , ""
+        , "def test_dot_unequal_length():"
+        , "    a = [1,2]"
+        , "    b = [1,2,3]"
+        , "    with pytest.raises(ArithmeticError):"
+        , "        et_dot.dot(a,b)"
+        ]
         , language='python', copyto=project_path / 'tests/test_et_dot.py', append=True
     )
     Paragraph(
@@ -440,10 +435,12 @@ def TutorialProject_et_dot_1():
         ":exc:`TypeError` by passing in arrays of non-numeric types:"
     )
     CodeBlock(
-        ["import et_dot"
-            , "et_dot.dot([1,2],[1,'two'])"
-            , "del et_dot #hide#"
-         ]
+        [ 'import sys                #hide#'
+        , 'sys.path.insert(0,".")    #hide#'
+        , "import et_dot"
+        , "et_dot.dot([1,2],[1,'two'])"
+        , "del et_dot                #hide#"
+        ]
         , language='pycon', execute=True, cwd=project_path, error_ok=True
     )
     Paragraph(
@@ -461,10 +458,11 @@ def TutorialProject_et_dot_1():
         "version bumb as well:"
     )
     CodeBlock(
-        ["git commit -a -m 'dot() tests added'"
-            , "micc2 version -p"
-            , "git commit -a -m 'v0.0.1'"
-         ]
+        [ "git add tests   #hide#"
+        , "git commit -a -m 'dot() tests added'"
+        , "micc2 version -p"
+        , "git commit -a -m 'v0.0.1'"
+        ]
         , language='bash', execute=True, cwd=project_path
     )
     Paragraph(
@@ -523,25 +521,25 @@ def TutorialProject_et_dot_1():
         "that computes the dot product of two long arrays of random numbers."
     )
     CodeBlock(
-        ['"""File prof/run1.py"""'
-            , 'import sys              #hide#'
-            , 'sys.path.insert(0,".")  #hide#'
-            , 'import random'
-            , 'from et_dot import dot # the dot method is all we need from et_dot'
-            , ''
-            , 'def random_array(n=1000):'
-            , '    """Create an array with n random numbers in [0,1[."""'
-            , '    # Below we use a list comprehension (a Python idiom for '
-            , '    # creating a list from an iterable object).'
-            , '    a = [random.random() for i in range(n)]'
-            , '    return a'
-            , ''
-            , 'if __name__==\'__main__\':'
-            , '    a = random_array()'
-            , '    b = random_array()'
-            , '    print(dot(a, b))'
-            , '    print("-*# done #*-")'
-         ]
+        [ '"""File prof/run1.py"""'
+        , 'import sys              #hide#'
+        , 'sys.path.insert(0,".")  #hide#'
+        , 'import random'
+        , 'from et_dot import dot # the dot method is all we need from et_dot'
+        , ''
+        , 'def random_array(n=1000):'
+        , '    """Create an array with n random numbers in [0,1[."""'
+        , '    # Below we use a list comprehension (a Python idiom for '
+        , '    # creating a list from an iterable object).'
+        , '    a = [random.random() for i in range(n)]'
+        , '    return a'
+        , ''
+        , 'if __name__==\'__main__\':'
+        , '    a = random_array()'
+        , '    b = random_array()'
+        , '    print(dot(a, b))'
+        , '    print("-*# done #*-")'
+        ]
         , language='python', copyto=project_path / 'prof/run1.py'
     )
     Paragraph(
@@ -844,9 +842,7 @@ def TutorialProject_et_dot_1():
         "or package structure ``--package``, and a CLI script (`--cli` and `--clisub`). "
     )
     Paragraph(
-        "You can add as many components to your code as you want. However, the project "
-        "must have a *package* structure (see :ref:`modules-and-packages` for how to "
-        "convert a project with a *module* structure)."
+        "You can add as many components to your project as you want. "
     )
     Paragraph(
         "The binary modules are build with the ``micc2 build`` command. :"
@@ -924,7 +920,7 @@ def TutorialProject_et_dot_1():
         "The command now runs successfully, and the output tells us where to "
         "enter the Fortran source code, the build settings, the test code and "
         "the documentation of the added module. Everything related to the "
-        ":file:`dotf` sub-module is in subdirectory :file:`ET-dot/et_dot/f90_dotf`. "
+        ":file:`dotf` sub-module is in subdirectory :file:`ET-dot/et_dot/dotf`. "
         "That directory has a ``f90_`` prefix indicating that it relates to a "
         "Fortran binary extension module. As useal, these files contain "
         "already working example code that you an inspect to learn how things "
@@ -932,13 +928,13 @@ def TutorialProject_et_dot_1():
     )
     Paragraph(
         "Let's continue our development of a Fortran version of the dot product. "
-        "Open file :file:`ET-dot/et_dot/f90_dotf/dotf.f90` in your favorite editor "
+        "Open file :file:`ET-dot/et_dot/dotf/dotf.f90` in your favorite editor "
         "or IDE and replace the existing example code in the Fortran source file with:"
     )
     CodeBlock(
         language='fortran'
         , copyfrom=snippets / 'dotf.f90'
-        , copyto=project_path / 'et_dot/f90_dotf/dotf.f90'
+        , copyto=project_path / 'et_dot/dotf/dotf.f90'
     )
     Paragraph(
         "The binary extension module can now be built:"
@@ -963,31 +959,33 @@ def TutorialProject_et_dot_1():
         f"a shared library on this OS (``.{soext}``). This file can be imported "
         f"in a Python script, by using the filename without the extension, i.e. "
         f"``dotf``. As the module was built successfully, we can test it. Here is "
-        f"some test code. Enter it in file :file:`ET-dot/tests/test_f90_dotf.py`:"
+        f"some test code. Enter it in file :file:`ET-dot/tests/test_dotf.py`:"
     )
     CodeBlock(
-        ['import numpy as np'
-            , 'import et_dot'
-            , '# create an alias for the dotf binary extension module'
-            , 'f90 = et_dot.dotf'
-            , ''
-            , 'def test_dot_aa():'
-            , '    # create an numpy array of floats:'
-            , '    a = np.array([0,1,2,3,4],dtype=float)'
-            , '    # use the original dot implementation to compute the expected result:'
-            , '    expected = et_dot.dot(a,a)'
-            , '    # call the dot function in the binary extension module with the same arguments:'
-            , '    a_dot_a = f90.dot(a,a)'
-            , '    assert a_dot_a == expected'
+        [ 'import sys                #hide#'
+        , 'sys.path.insert(0,".")    #hide#'
+        , 'import numpy as np'
+        , 'import et_dot'
+        , '# create an alias for the dotf binary extension module'
+        , 'f90 = et_dot.dotf'
+        , ''
+        , 'def test_dot_aa():'
+        , '    # create an numpy array of floats:'
+        , '    a = np.array([0,1,2,3,4],dtype=float)'
+        , '    # use the original dot implementation to compute the expected result:'
+        , '    expected = et_dot.dot(a,a)'
+        , '    # call the dot function in the binary extension module with the same arguments:'
+        , '    a_dot_a = f90.dot(a,a)'
+        , '    assert a_dot_a == expected'
          ]
-        , language='Python', copyto=project_path / 'tests/test_f90_dotf.py'
+        , language='Python', copyto=project_path / 'tests/et_dot/dotf/test_dotf.py'
     )
     Paragraph(
         "Then run the test (we only run the test for the dotf module, as "
         "we did not touch the :py:meth:`et_dot.dot` implementation):"
     )
     CodeBlock(
-        "pytest tests/test_f90_dotf.py"
+        "pytest tests/et_dot/dotf/test_dotf.py"
         , language='bash', execute=True, cwd=project_path
     )
     Paragraph(
@@ -1010,22 +1008,24 @@ def TutorialProject_et_dot_1():
         "However practical this feature may be, type conversion requires "
         "copying the entire array and converting each element. For long "
         "arrays this may be prohibitively expensive. For this reason the "
-        ":file:`et_dot/f90_dotf/CMakeLists.txt` file specifies the "
+        ":file:`et_dot/dotf/CMakeLists.txt` file specifies the "
         "``F2PY_REPORT_ON_ARRAY_COPY=1`` flag which makes the wrappers issue a "
         "warning to tell you that you should modify the client program to pass "
         "types to the wrapper which to not require conversion."
     )
     CodeBlock(
-        ['import et_dot'
-            , 'from importlib import reload                             #hide#'
-            , 'et_dot = reload(et_dot)                                  #hide#'
-            , 'a = [1,2,3]'
-            , 'b = [2,2,2]'
-            , 'print(et_dot.dot(a,b))'
-            , 'print(et_dot.dotf.dot(a,b))'
-            , 'print("created an array from object",file=sys.stderr)    #hide#'
-            , 'print("created an array from object",file=sys.stderr)    #hide#'
-         ]
+        [ 'import sys                #hide#'
+        , 'sys.path.insert(0,".")    #hide#'
+        , 'import et_dot'
+        , 'from importlib import reload                             #hide#'
+        , 'et_dot = reload(et_dot)                                  #hide#'
+        , 'a = [1,2,3]'
+        , 'b = [2,2,2]'
+        , 'print(et_dot.dot(a,b))'
+        , 'print(et_dot.dotf.dot(a,b))'
+        , 'print("created an array from object",file=sys.stderr)    #hide#'
+        , 'print("created an array from object",file=sys.stderr)    #hide#'
+        ]
         , language='pycon', execute=True, cwd=project_path
     )
     # For some reason the error message 'created an array from object' is not
@@ -1046,17 +1046,19 @@ def TutorialProject_et_dot_1():
         "warn that it *copied* the array to make the conversion:"
     )
     CodeBlock(
-        ['import et_dot'
-            , 'import numpy as np'
-            , 'from importlib import reload                                 #hide#'
-            , 'et_dot = reload(et_dot)                                      #hide#'
-            , 'a = np.array([1,2,3])'
-            , 'b = np.array([2,2,2])'
-            , 'print(et_dot.dot(a,b))'
-            , 'print(et_dot.dotf.dot(a,b))'
-            , 'print("copied an array: size=3, elsize=8", file=sys.stderr)  #hide#'
-            , 'print("copied an array: size=3, elsize=8", file=sys.stderr)  #hide#'
-         ]
+        [ 'import sys                #hide#'
+        , 'sys.path.insert(0,".")    #hide#'
+        , 'import et_dot'
+        , 'import numpy as np'
+        , 'from importlib import reload                                 #hide#'
+        , 'et_dot = reload(et_dot)                                      #hide#'
+        , 'a = np.array([1,2,3])'
+        , 'b = np.array([2,2,2])'
+        , 'print(et_dot.dot(a,b))'
+        , 'print(et_dot.dotf.dot(a,b))'
+        , 'print("copied an array: size=3, elsize=8", file=sys.stderr)  #hide#'
+        , 'print("copied an array: size=3, elsize=8", file=sys.stderr)  #hide#'
+        ]
         , language='pycon', execute=True, cwd=project_path
     )
     # For some reason the error message 'copied an array: size=3, elsize=8' is
@@ -1077,9 +1079,11 @@ def TutorialProject_et_dot_1():
         "to the project:"
     )
     CodeBlock(
-        ['# in file et_dot/__init__.py'
-            , 'import et_dot.dotf'
-         ]
+        ['import sys                #hide#'
+        , 'sys.path.insert(0,".")    #hide#'
+        , '# in file et_dot/__init__.py'
+        , 'import et_dot.dotf'
+        ]
         , language='python'
     )
     Paragraph(
@@ -1089,19 +1093,19 @@ def TutorialProject_et_dot_1():
         "module automatically in that case:"
     )
     CodeBlock(
-        ['# in file et_dot/__init__.py'
-            , 'try:'
-            , '    import et_dot.dotf'
-            , 'except ModuleNotFoundError as e:'
-            , '    # Try to build this binary extension:'
-            , '    from pathlib import Path'
-            , '    import click'
-            , '    from et_micc2.project import auto_build_binary_extension'
-            , '    msg = auto_build_binary_extension(Path(__file__).parent, "dotf")'
-            , '    if not msg:'
-            , '        import et_dot.dotf'
-            , '    else:'
-            , '        click.secho(msg, fg="bright_red")'
+        [ '# in file et_dot/__init__.py'
+        , 'try:'
+        , '    import et_dot.dotf'
+        , 'except ModuleNotFoundError as e:'
+        , '    # Try to build this binary extension:'
+        , '    from pathlib import Path'
+        , '    import click'
+        , '    from et_micc2.project import auto_build_binary_extension'
+        , '    msg = auto_build_binary_extension(Path(__file__).parent, "dotf")'
+        , '    if not msg:'
+        , '        import et_dot.dotf'
+        , '    else:'
+        , '        click.secho(msg, fg="bright_red")'
          ]
         , language='python'
     )
@@ -1177,7 +1181,7 @@ def TutorialProject_et_dot_2():
             , '  end function dot'
             , 'END MODULE my_f90_module'
          ]
-        , language='fortran', copyto=project_path / 'et_dot/f90_dotf/dotf.f90'
+        , language='fortran', copyto=project_path / 'et_dot/dotf/dotf.f90'
     )
     CodeBlock(
         "micc2 build --clean"
@@ -1190,17 +1194,19 @@ def TutorialProject_et_dot_2():
         "instead of in ``et_dot.dotf``."
     )
     CodeBlock(
-        ['import numpy as np'
-            , 'import et_dot'
-            , 'from importlib import reload                                 #hide#'
-            , 'et_dot.dotf = reload(et_dot.dotf)                            #hide#'
-            , 'a = np.array([1.,2.,3.])'
-            , 'b = np.array([2.,2.,2.])'
-            , 'print(et_dot.dotf.my_f90_module.dot(a,b))'
-            , '# If typing this much annoys you, you can create an alias to the `Fortran module`:'
-            , 'f90 = et_dot.dotf.my_f90_module'
-            , 'print(f90.dot(a,b))'
-         ]
+        [ 'import sys                #hide#'
+        , 'sys.path.insert(0,".")    #hide#'
+        , 'import numpy as np'
+        , 'import et_dot'
+        , 'from importlib import reload                                 #hide#'
+        , 'et_dot.dotf = reload(et_dot.dotf)                            #hide#'
+        , 'a = np.array([1.,2.,3.])'
+        , 'b = np.array([2.,2.,2.])'
+        , 'print(et_dot.dotf.my_f90_module.dot(a,b))'
+        , '# If typing this much annoys you, you can create an alias to the `Fortran module`:'
+        , 'f90 = et_dot.dotf.my_f90_module'
+        , 'print(f90.dot(a,b))'
+        ]
         , language='pycon', execute=True, cwd=project_path
     )
     Paragraph(
@@ -1213,7 +1219,7 @@ def TutorialProject_et_dot_2():
 
     Paragraph(
         "The build parameters for our Fortran binary extension module are "
-        "detailed in the file :file:`et_dot/f90_dotf/CMakeLists.txt`. This "
+        "detailed in the file :file:`et_dot/dotf/CMakeLists.txt`. This "
         "is a rather lengthy file, but most of it is boilerplate code which "
         "you should not need to touch. The boilerplate sections are clearly "
         "marked. By default this file specifies that a release version is to "
@@ -1246,7 +1252,7 @@ def TutorialProject_et_dot_2():
     CodeBlock(
         []
         ,
-        copyfrom=workspace / '../et-micc2/' / 'et_micc2/templates/module-f90/{{cookiecutter.project_name}}/{{cookiecutter.package_name}}/f90_{{cookiecutter.module_name}}/CMakeLists.txt'
+        copyfrom=workspace / '../et-micc2/et_micc2/templates/submodule-f90/{{tmpl.module_name}}/CMakeLists.txt'
         , filter=FilterCMakeLists
         (startline=['# Set the build type:', '##########']
          , stopline=['#<< begin boilerplate code', '# only boilerplate code below']
@@ -1286,13 +1292,13 @@ def TutorialProject_et_dot_2():
         "to use."
     )
     Paragraph(
-        "Enter this code in the C++ source file :file:`ET-dot/et_dot/cpp_dotc/dotc.cpp`. "
+        "Enter this code in the C++ source file :file:`ET-dot/et_dot/dotc/dotc.cpp`. "
         "(you may also remove the example code in that file.)"
     )
     CodeBlock(
         []
         , copyfrom=snippets / 'dotc.cpp'
-        , language='c++', copyto=project_path / 'et_dot/cpp_dotc/dotc.cpp'
+        , language='c++', copyto=project_path / 'et_dot/dotc/dotc.cpp'
     )
     Paragraph(
         "Obviously the C++ source code is more involved than its Fortran equivalent "
@@ -1319,20 +1325,20 @@ def TutorialProject_et_dot_2():
     Paragraph(
         "Here is some test code. It is almost exactly the same as that for the f90 "
         "module :py:mod:`dotf`, except for the module name. Enter the test code in "
-        ":file:`ET-dot/tests/test_cpp_dotc.py`:"
+        ":file:`ET-dot/tests/et_dot/dotc/test_dotc.py`:"
     )
     CodeBlock(
         []
         , language='python'
-        , copyfrom=snippets / 'test_cpp_dotc.py'
-        , copyto=project_path / 'tests/test_cpp_dotc.py'
+        , copyfrom=snippets / 'test_dotc.py'
+        , copyto=project_path / 'tests/et_dot/dotc/test_dotc.py'
     )
     Paragraph(
         "The test passes successfully. Obviously, you should also add the other "
         "tests we created for the Python implementation. "
     )
     CodeBlock(
-        "pytest tests/test_cpp_dotc.py"
+        "pytest tests/et_dot/dotc/test_dotc.py"
         , execute=True, cwd=project_path
     )
     process(doc)
@@ -1353,9 +1359,11 @@ def TutorialProject_et_dot_3():
         "to C++'s ``double``) and returns a ``float``:"
     )
     CodeBlock(
-        ['import et_dot'
-            , 'print(et_dot.dotc.dot([1,2],[3,4]))'
-         ]
+        [ 'import sys                #hide#'
+        , 'sys.path.insert(0,".")    #hide#'
+        , 'import et_dot'
+        , 'print(et_dot.dotc.dot([1,2],[3,4]))'
+        ]
         , language='pycon', execute=True, cwd=project_path
     )
     Paragraph(
@@ -1381,7 +1389,7 @@ def TutorialProject_et_dot_3():
     CodeBlock(
         []
         ,
-        copyfrom=workspace / '../et-micc2/' / 'et_micc2/templates/module-cpp/{{cookiecutter.project_name}}/{{cookiecutter.package_name}}/cpp_{{cookiecutter.module_name}}/CMakeLists.txt'
+        copyfrom=workspace / '../et-micc2/et_micc2/templates/submodule-cpp/{{tmpl.module_name}}/CMakeLists.txt'
         , filter=FilterCMakeLists
         (startline=('##########')
          , stopline=('#<< begin boilerplate code')
@@ -1442,7 +1450,7 @@ def TutorialProject_et_dot_4():
         []
         , language='fortran'
         , copyfrom=snippets / 'dotf-add.f90'
-        , copyto=project_path / 'et_dot/f90_dotf/dotf.f90'
+        , copyto=project_path / 'et_dot/dotf/dotf.f90'
     )
     CodeBlock(
         "micc2 build dotf --clean"
@@ -1461,14 +1469,16 @@ def TutorialProject_et_dot_4():
     )
 
     CodeBlock(
-        ['import numpy as np'
-            , 'import et_dot'
-            , 'a = np.array([1.,2.])'
-            , 'b = np.array([3.,4.])'
-            , 'sum = np.empty(len(a),dtype=float)'
-            , 'et_dot.dotf.add(a,b, sum)'
-            , 'print(sum)'
-         ]
+        [ 'import sys                #hide#'
+        , 'sys.path.insert(0,".")    #hide#'
+        , 'import numpy as np'
+        , 'import et_dot'
+        , 'a = np.array([1.,2.])'
+        , 'b = np.array([3.,4.])'
+        , 'sum = np.empty(len(a),dtype=float)'
+        , 'et_dot.dotf.add(a,b, sum)'
+        , 'print(sum)'
+        ]
         , language='pycon', execute=True, cwd=project_path
     )
     Paragraph(
@@ -1510,7 +1520,7 @@ def TutorialProject_et_dot_5():
         "is computed in a parameter with ``intent(inout)``, as below:"
     )
     CodeBlock(copyfrom=snippets / 'dotf-add2.f90'
-              , copyto=project_path / 'et_dot/f90_dotf/dotf.f90'
+              , copyto=project_path / 'et_dot/dotf/dotf.f90'
               , language='fortran'
               )
     CodeBlock(
@@ -1523,15 +1533,17 @@ def TutorialProject_et_dot_5():
         "The above ``add`` function might be called as:"
     )
     CodeBlock(
-        ['import numpy as np'
-            , 'import et_dot'
-            , 'a = np.array([1.,2.])'
-            , 'b = np.array([3.,4.])'
-            , 'sum = np.empty(len(a),dtype=float)'
-            , 'cputime = et_dot.dotf.add(a,b, sum)'
-            , 'print(cputime)'
-            , 'print(sum)'
-         ]
+        [ 'import sys                #hide#'
+        , 'sys.path.insert(0,".")    #hide#'
+        , 'import numpy as np'
+        , 'import et_dot'
+        , 'a = np.array([1.,2.])'
+        , 'b = np.array([3.,4.])'
+        , 'sum = np.empty(len(a),dtype=float)'
+        , 'cputime = et_dot.dotf.add(a,b, sum)'
+        , 'print(cputime)'
+        , 'print(sum)'
+        ]
         , language='pycon', execute=True, cwd=project_path
     )
 
@@ -1582,7 +1594,7 @@ def TutorialProject_et_dot_7():
         "For Python modules the documentation is automatically extracted from "
         "the doc-strings in the module. However, when it comes to documenting "
         "binary extension modules, this does not seem a good option. Ideally, "
-        "the source files :file:`ET-dot/et_dot/f90_dotf/dotf.f90` and "
+        "the source files :file:`ET-dot/et_dot/dotf/dotf.f90` and "
         ":file:`ET-dot/et_dot/cpp_dotc/dotc.cpp` should document the Fortran "
         "functions and subroutines, and C++ functions, respectively, rather "
         "than the Python interface. Yet, from the perspective of ET-dot being a "
@@ -1592,12 +1604,12 @@ def TutorialProject_et_dot_7():
         "files:"
     )
     List(
-        [':file:`ET-dot/et_dot/f90_dotf/dotf.rst`'
+        [':file:`ET-dot/et_dot/dotf/dotf.rst`'
             , ':file:`ET-dot/et_dot/cpp_dotc/dotc.rst`'
          ]
     )
     Paragraph(
-        "their contents could look like this: for :file:`ET-dot/et_dot/f90_dotf/dotf.rst`:"
+        "their contents could look like this: for :file:`ET-dot/et_dot/dotf/dotf.rst`:"
     )
     CodeBlock(
         ['Module et_dot.dotf'
@@ -1621,21 +1633,21 @@ def TutorialProject_et_dot_7():
         "and for :file:`ET-dot/et_dot/cpp_dotc/dotc.rst`:"
     )
     CodeBlock(
-        ['Module et_dot.dotc'
-            , '******************'
-            , ''
-            , 'Module (binary extension) :py:mod:`dotc`, built from C++ source.'
-            , ''
-            , '.. function:: dot(a,b)'
-            , '   :module: et_dot.dotc'
-            , ''
-            , '   Compute the dot product of ``a`` and ``b``.'
-            , ''
-            , '   :param a: 1D Numpy array with ``dtype=float``'
-            , '   :param b: 1D Numpy array with ``dtype=float``'
-            , '   :returns: the dot product of ``a`` and ``b``'
-            , '   :rtype: ``float``'
-         ]
+        [ 'Module et_dot.dotc'
+        , '******************'
+        , ''
+        , 'Module (binary extension) :py:mod:`dotc`, built from C++ source.'
+        , ''
+        , '.. function:: dot(a,b)'
+        , '   :module: et_dot.dotc'
+        , ''
+        , '   Compute the dot product of ``a`` and ``b``.'
+        , ''
+        , '   :param a: 1D Numpy array with ``dtype=float``'
+        , '   :param b: 1D Numpy array with ``dtype=float``'
+        , '   :returns: the dot product of ``a`` and ``b``'
+        , '   :rtype: ``float``'
+        ]
         , language='rst'
     )
     Paragraph(
@@ -1654,7 +1666,7 @@ def TutorialProject_et_dot_7():
     CodeBlock(
         hide=True
         , copyfrom=snippets / 'dotf.f90'
-        , copyto=project_path / 'et_dot/f90_dotf/dotf.f90'
+        , copyto=project_path / 'et_dot/dotf/dotf.f90'
     )
     CodeBlock(
         hide=True
@@ -1679,13 +1691,14 @@ def TutorialProject_et_dot_8():
     Heading('Adding Python submodules', level=2, crosslink='python-submodules')
 
     Paragraph(
-        "Adding binary extension (sub)module is important for adding "
+        "Adding binary extension (sub)modules is important for adding "
         "implementations in Fortran or C++ for performance reasons. "
         "For larger projects it is sometimes practical to be able to "
         "organize your Python code in different files, e.g. one file "
         "for each Python class. Micc2_ allows your to add Python "
-        "submodules to your project. These can have a module or a "
-        "package stucture. This command adds a module :file:`foo.py` "
+        "submodules to your project. Just as the default top level "
+        "package, these Python submodules have a package structure too. "
+        "This command adds a module :file:`foo.py` "
         "to your project:"
     )
     CodeBlock(
@@ -1693,67 +1706,23 @@ def TutorialProject_et_dot_8():
         , execute=True, cwd=project_path
     )
     Paragraph(
-        "As the output shows, it creates a file :file:`foo.py` in the package "
-        "directory :file:`et_dot` of our :file:`ET-dot` project. In this file "
-        "you can add all your `foo` related code. Micc2_ ensures that this "
-        "submodule is automatically imported in :file:`et_dot`. As usual, Micc2_ "
-        "adds working example code, in this case a *hello world* method, named "
-        ":py:meth:`greet`:"
+        "We can add sub-submodules too. E.g to add a ``bar`` sub-module to "
+        "the ``foo`` sub-module:"
     )
     CodeBlock(
-        ['import et_dot'
-            , 'print(et_dot.foo.greet("from foo"))'
-         ]
-        , language='pycon', execute=True, cwd=project_path
-    )
-    CodeBlock(
-        "micc2 mv foo"
-        , execute=True, cwd=project_path
-        , hide=True
-    )
-    Paragraph(
-        "Alternatively, we can add a Python submodule with a package structure:"
-    )
-    CodeBlock(
-        "micc2 add foo --package"
+        "micc2 add foo/bar --py"
         , execute=True, cwd=project_path
     )
     Paragraph(
-        "As the output shows, this creates a directory :file:`foo` containing "
-        "the file :file:`__init__.py` in the package directory :file:`et_dot` "
-        "of our :file:`ET-dot` project, for all your `foo` related code. Again, "
-        "Micc2_ ensures that this submodule is automatically imported in "
-        ":file:`et_dot` and added working example code, with the same "
-        ":py:meth:`greet` meethod as above, which works in exactly the same way:"
+        "In fact this sub-sub-module ``bar`` can even be a C++ of Fortran "
+        "binary extension module. One only needs to replace the ``--py`` flag"
+        "with ``--cpp`` or ``--f90``. The binary extension modules themselves, "
+        "however, cannot contain submodules."
     )
-    CodeBlock(
-        ['import et_dot'
-            , 'from importlib import reload     #hide#'
-            , 'et_dot = reload(et_dot)          #hide#'
-            , 'print(et_dot.foo.greet("from foo"))'
-         ]
-        , language='pycon', execute=True, cwd=project_path
-    )
+
     Paragraph(
-        "Micc2_ also added test code for this submodule in file "
-        ":file:`tests/test_foo.py` (irrespective of whether :file:`foo` has a module "
-        "or package structure. The test passes, of course:"
-    )
-    CodeBlock(
-        "pytest tests/test_foo.py -s -v"
-        , execute=True, cwd=project_path
-    )
-    CodeBlock(
-        "micc2 mv foo"
-        , execute=True, cwd=project_path
-        , hide=True
-    )
-    Paragraph(
-        "Furthermore. Micc2_ automatically adds documentation entries for submodule "
-        ":file:`foo` in :file:`API.rst`. Calling ``micc2 doc`` will automatically "
-        "extract documentation from the doc-strings in :file:`foo`. So, writing "
-        "doc-strings in :file:`foo.py` or :file:`foo/__init__.py` is all you need "
-        "to do."
+        "As usual, Micc2_ added example code and example test code for the added components. "
+        "as well as documentation entries for the submodule."
     )
 
     Heading('Adding a Python Command Line Interface', level=3, crosslink='clis')
@@ -1868,9 +1837,25 @@ def TutorialProject_et_dot_8():
     process(doc)
 
 
+def run_tut(i):
+    stut = f'TutorialProject_et_dot_{i}'
+    try:
+        tut = eval(stut)
+        tut()
+        print(f'-*# finished {stut} #*-')
+        return True
+    except NameError as e:
+        if f'TutorialProject_et_dot_{i}' in str(e):
+            return False
+        else:
+            raise
+
 if __name__=='__main__':
-    i = sys.argv[1]
-    tut = f'TutorialProject_et_dot_{i}'
-    tut = eval(tut)
-    tut()
+    i = int(sys.argv[1])
+    the_range = range(1,1000) if i == 0 else range(i,i+1)
+    for i in the_range:
+        ok = run_tut(i)
+        if not ok:
+            break
+            
     print('-*# finished #*-')

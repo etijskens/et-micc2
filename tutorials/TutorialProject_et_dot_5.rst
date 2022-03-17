@@ -47,7 +47,7 @@ Note that Python does not require you to store the return value of a function. T
     >>> sum = np.empty(len(a),dtype=float)
     >>> cputime = et_dot.dotf.add(a,b, sum)
     >>> print(cputime)
-    4.000000000004e-06
+    4.499999999996174e-05
     >>> print(sum)
     [4. 6.]
     

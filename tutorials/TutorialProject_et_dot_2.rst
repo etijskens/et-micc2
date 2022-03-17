@@ -62,11 +62,10 @@ needed.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The build parameters for our Fortran binary extension module are detailed in the file
-:file:`et_dot/f90_dotf/CMakeLists.txt`. This is a rather lengthy file, but most
-of it is boilerplate code which you should not need to touch. The boilerplate sections
-are clearly marked. By default this file specifies that a release version is to be
-built. The file documents a set of CMake variables that can be used to control the build
-type:
+:file:`et_dot/dotf/CMakeLists.txt`. This is a rather lengthy file, but most of it
+is boilerplate code which you should not need to touch. The boilerplate sections are
+clearly marked. By default this file specifies that a release version is to be built.
+The file documents a set of CMake variables that can be used to control the build type:
 
 * CMAKE_BUILD_TYPE : DEBUG | MINSIZEREL | RELEASE* | RELWITHDEBINFO
 
@@ -153,11 +152,11 @@ Use the ``micc2 add`` command to add a cpp module:
 .. code-block:: bash
 
     > micc2 add dotc --cpp
-    [INFO]           [ Adding cpp module cpp_dotc to project ET-dot.
-    [INFO]               - C++ source in           ET-dot/et_dot/cpp_dotc/dotc.cpp.
-    [INFO]               - build settings in       ET-dot/et_dot/cpp_dotc/CMakeLists.txt.
-    [INFO]               - Python test code in     ET-dot/tests/test_cpp_dotc.py.
-    [INFO]               - module documentation in ET-dot/et_dot/cpp_dotc/dotc.rst (restructuredText format).
+    [INFO]           [ Adding cpp submodule dotc to package et_dot.
+    [INFO]               - C++ source in           /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotc/dotc.cpp.
+    [INFO]               - build settings in       /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotc/CMakeLists.txt.
+    [INFO]               - module documentation in /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotc/dotc.rst (restructuredText format).
+    [INFO]               - Python test code in     /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/tests/et_dot/dotc/test_dotc.py.
     [INFO]           ] done.
     
 
@@ -175,8 +174,8 @@ which offers very similar features, but is not header-only and additionally depe
 on the python version you want to use. Consequently, you need a build a
 :file:`Boost.Python` library for every Python version you want to use.
 
-Enter this code in the C++ source file :file:`ET-dot/et_dot/cpp_dotc/dotc.cpp`.
-(you may also remove the example code in that file.)
+Enter this code in the C++ source file :file:`ET-dot/et_dot/dotc/dotc.cpp`. (you
+may also remove the example code in that file.)
 
 .. code-block:: c++
 
@@ -233,7 +232,7 @@ We can now build the module:
 .. code-block:: 
 
     micc2 build dotc
-    [INFO] [ Building cpp module 'dotc':
+    [INFO] [ Building cpp module 'et_dot/dotc':
     [DEBUG]          [ > cmake -D PYTHON_EXECUTABLE=/Users/etijskens/.pyenv/versions/3.8.5/bin/python -D pybind11_DIR=/Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages/pybind11/share/cmake/pybind11 ..
     [DEBUG]              (stdout)
                            -- The CXX compiler identification is AppleClang 12.0.5.12050022
@@ -252,23 +251,23 @@ We can now build the module:
                            -- Found pybind11: /Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages/pybind11/include (found version "2.6.2" )
                            -- Configuring done
                            -- Generating done
-                           -- Build files have been written to: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc/_cmake_build
+                           -- Build files have been written to: /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotc/_cmake_build
     [DEBUG]          ] done.
     [DEBUG]          [ > make VERBOSE=1
     [DEBUG]              (stdout)
-                           /usr/local/Cellar/cmake/3.20.1/bin/cmake -S/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc -B/Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc/_cmake_build --check-build-system CMakeFiles/Makefile.cmake 0
-                           /usr/local/Cellar/cmake/3.20.1/bin/cmake -E cmake_progress_start /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc/_cmake_build/CMakeFiles /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc/_cmake_build//CMakeFiles/progress.marks
+                           /usr/local/Cellar/cmake/3.21.2/bin/cmake -S/Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotc -B/Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotc/_cmake_build --check-build-system CMakeFiles/Makefile.cmake 0
+                           /usr/local/Cellar/cmake/3.21.2/bin/cmake -E cmake_progress_start /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotc/_cmake_build/CMakeFiles /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotc/_cmake_build//CMakeFiles/progress.marks
                            /Library/Developer/CommandLineTools/usr/bin/make  -f CMakeFiles/Makefile2 all
                            /Library/Developer/CommandLineTools/usr/bin/make  -f CMakeFiles/dotc.dir/build.make CMakeFiles/dotc.dir/depend
-                           cd /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc/_cmake_build && /usr/local/Cellar/cmake/3.20.1/bin/cmake -E cmake_depends "Unix Makefiles" /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc/_cmake_build /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc/_cmake_build /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc/_cmake_build/CMakeFiles/dotc.dir/DependInfo.cmake --color=
+                           cd /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotc/_cmake_build && /usr/local/Cellar/cmake/3.21.2/bin/cmake -E cmake_depends "Unix Makefiles" /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotc /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotc /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotc/_cmake_build /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotc/_cmake_build /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotc/_cmake_build/CMakeFiles/dotc.dir/DependInfo.cmake --color=
                            /Library/Developer/CommandLineTools/usr/bin/make  -f CMakeFiles/dotc.dir/build.make CMakeFiles/dotc.dir/build
                            [ 50%] Building CXX object CMakeFiles/dotc.dir/dotc.cpp.o
-                           /Library/Developer/CommandLineTools/usr/bin/c++ -Ddotc_EXPORTS -isystem /Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages/pybind11/include -isystem /Users/etijskens/.pyenv/versions/3.8.5/include/python3.8 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk -fPIC -fvisibility=hidden -flto -std=gnu++11 -MD -MT CMakeFiles/dotc.dir/dotc.cpp.o -MF CMakeFiles/dotc.dir/dotc.cpp.o.d -o CMakeFiles/dotc.dir/dotc.cpp.o -c /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc/dotc.cpp
+                           /Library/Developer/CommandLineTools/usr/bin/c++ -Ddotc_EXPORTS -isystem /Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages/pybind11/include -isystem /Users/etijskens/.pyenv/versions/3.8.5/include/python3.8 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk -fPIC -fvisibility=hidden -flto -std=gnu++11 -MD -MT CMakeFiles/dotc.dir/dotc.cpp.o -MF CMakeFiles/dotc.dir/dotc.cpp.o.d -o CMakeFiles/dotc.dir/dotc.cpp.o -c /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotc/dotc.cpp
                            [100%] Linking CXX shared module dotc.cpython-38-darwin.so
-                           /usr/local/Cellar/cmake/3.20.1/bin/cmake -E cmake_link_script CMakeFiles/dotc.dir/link.txt --verbose=1
+                           /usr/local/Cellar/cmake/3.21.2/bin/cmake -E cmake_link_script CMakeFiles/dotc.dir/link.txt --verbose=1
                            /Library/Developer/CommandLineTools/usr/bin/c++  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk -bundle -Wl,-headerpad_max_install_names -Xlinker -undefined -Xlinker dynamic_lookup -flto -o dotc.cpython-38-darwin.so CMakeFiles/dotc.dir/dotc.cpp.o 
                            [100%] Built target dotc
-                           /usr/local/Cellar/cmake/3.20.1/bin/cmake -E cmake_progress_start /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc/_cmake_build/CMakeFiles 0
+                           /usr/local/Cellar/cmake/3.21.2/bin/cmake -E cmake_progress_start /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotc/_cmake_build/CMakeFiles 0
     [DEBUG]          ] done.
     [DEBUG]          [ > make install
     [DEBUG]              (stdout)
@@ -276,11 +275,11 @@ We can now build the module:
                            [100%] Built target dotc
                            Install the project...
                            -- Install configuration: ""
-                           -- Installing: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/cpp_dotc/../dotc.cpython-38-darwin.so
+                           -- Installing: /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotc/../dotc.cpython-38-darwin.so
     [DEBUG]          ] done.
     [INFO] ] done.
     [INFO]           Binary extensions built successfully:
-    [INFO]           - /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot/et_dot/dotc.cpython-38-darwin.so
+    [INFO]           - /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/dotc.cpython-38-darwin.so
     ['/Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages', '/Users/etijskens/.local/lib/python3.8/site-packages']
     path_to_cmake_tools=/Users/etijskens/.pyenv/versions/3.8.5/lib/python3.8/site-packages/pybind11/share/cmake/pybind11
     
@@ -293,7 +292,7 @@ with the previously built :file:`dotf.cpython-38-darwin.so`.
 
 Here is some test code. It is almost exactly the same as that for the f90 module
 :py:mod:`dotf`, except for the module name. Enter the test code in
-:file:`ET-dot/tests/test_cpp_dotc.py`:
+:file:`ET-dot/tests/et_dot/dotc/test_dotc.py`:
 
 .. code-block:: python
 
@@ -315,14 +314,14 @@ created for the Python implementation.
 
 .. code-block:: 
 
-    pytest tests/test_cpp_dotc.py
+    pytest tests/et_dot/dotc/test_dotc.py
     ============================= test session starts ==============================
-    platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.10.0, pluggy-0.13.1
-    rootdir: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot
+    platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.11.0, pluggy-0.13.1
+    rootdir: /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot
     collected 1 item
     
-    tests/test_cpp_dotc.py .                                                 [100%]
+    tests/et_dot/dotc/test_dotc.py .                                         [100%]
     
-    ============================== 1 passed in 0.35s ===============================
+    ============================== 1 passed in 0.78s ===============================
     
 

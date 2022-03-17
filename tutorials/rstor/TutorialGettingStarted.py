@@ -16,19 +16,19 @@ def TutorialGettingStarted():
 
     Note(
         "These tutorials focus not just on how to use micc2_. Rather they describe a workflow "
-        "for how you might set up a python project and develop it using best practises, with "
+        "for how you cac set up a python project and develop it using best practises, with "
         "the help of Micc2_. "
     )
     Paragraph(
-        "Micc2_ wants to provide a practical interface to the many aspects of managing a "
+        "Micc2_ aims at providing a practical interface to the many aspects of managing a "
         "Python project: setting up a new project in a standardized way, adding documentation, "
         "version control, publishing the code to PyPI_, building binary extension modules in C++ "
         "or Fortran, dependency management, ... For all these aspects there are tools available, "
-        "yet I found myself struggling to get everything right and looking up the details each "
-        "time I needed them. "
+        "yet, with each new project, I found myself struggling to get everything right and "
+        "looking up the details. "
         "Micc2_ is an attempt to wrap all the details by providing the user with a standardized "
         "yet flexible workflow for managing a Python project. Standardizing is a great way to "
-        "increase productivity. For many aspects the tools used by Micc2_ are completely hidden "
+        "increase productivity. For many aspects, the tools used by Micc2_ are completely hidden "
         "from the user, e.g. project setup, adding components, building binary extensions, ... "
         "For other aspects Micc2_ provides just the necessary setup for you to use other tools "
         "as you need them. Learning to use the following tools is certainly beneficial:"
@@ -53,7 +53,7 @@ def TutorialGettingStarted():
     package_name = package_name_of(project_name)
 
     CodeBlock(
-        f'> micc create path/to/{project_name}'
+        f'micc2 create path/to/{project_name}'
         , language='bash'
     )
     Paragraph(
@@ -63,7 +63,7 @@ def TutorialGettingStarted():
     )
     Paragraph(
         "Typically, you will create a new project in the current working directory, say: "
-        "your workspace, so first ``cd`` into it:"
+        "your workspace, so first ``cd`` into your workspace directory:"
     )
     CodeBlock(
         "cd path/to/workspace"
@@ -75,20 +75,41 @@ def TutorialGettingStarted():
     )
     Paragraph(
         f"As the output tells, micc2_ has created a new project in directory "
-        f":file:`{project_name}` containing a python module :file:`{package_name}.py`. "
-        f"Note that the module name differs a bit from the project name. Dashes are "
+        f":file:`{project_name}` containing a python package :file:`{package_name}`. "
+        f"This is a directory with an :file:`__init__.py` file, containing the Python"
+        f"variables, classes and meethods it needs to expose. This directory and its "
+        f"contents represent the Python module."
+    )
+    CodeBlock(
+        f"{project_name}          # the project directory"
+        f"└── {package_name}      # the package directory"
+        f"    └── __init__.py       # the file where your Python code goes"
+        , language='bash'
+    )
+    Note(f"Next to the *package* structure - a directory with an :file:`__init__.py` file"
+         f"Python also allows for *module* structure - a mere :file:`{package_name}.py file - "
+         f"containing the Python variables, classes and meethods it needs to expose. The"
+         f"*module* structure is essentially a single file and Python-only approach, which "
+         f"often turns out to be too restrictive. As of v3.0 micc2_ only supports the "
+         f"creation of modules with a *packages* structure, which allows for adding "
+         f"submodules, command line interfaces (CLIs), and binary extension modules built"
+         f"from other languages as C++ and Fortran. Micc2_ greatly facilitates adding such"
+         f"components."
+    )
+    Paragraph(
+        f"Note that the module name differs slightly from the project name. Dashes are "
         f"been replaced with underscores and uppercase with lowercase in order to yield a "
         f"`PEP 8 <https://www.python.org/dev/peps/pep-0008/#package-and-module-names>`_ "
         f"compliant module name. If you want your module name to be unrelated to your "
         f"project name, check out the :ref:`project-and-module-naming` section."
     )
     Paragraph(
-        "Micc2_ also automatically creates a local git_ repository for our project "
+        "Micc2_ automatically creates a local git_ repository for our project "
         "(provided the ``git`` command is available) and it commits all the project files "
         "that it generated with commit message 'And so this begun...'. The ``--remote=none`` "
         "flag prevents Micc2_ from also creating a remote repository on GitHub_. Without that "
-        "flag Micc2_ would have created a public remote repository on GitHub_ and pushed "
-        "that first commit. This, of course, requires that we have set up Micc2_ with a "
+        "flag, Micc2_ would have created a public remote repository on GitHub_ and pushed "
+        "that first commit (tht requires that we have set up Micc2_ with a "
         "GitHub_ username and a personal access token for it as described in "
         ":ref:`micc2-setup`. You can also request the remote repository to be private by "
         "specifying ``--remote=private``."
@@ -120,106 +141,7 @@ def TutorialGettingStarted():
         "which appear in front of the subcommand, and lists the subcommands, and "
         "``micc2 subcommand --help``, prints detailed help for a subcommand."
     )
-    Paragraph(
-        f"Above we have created a project for a simple Python *module*, that is, the "
-        f"project directory contains a file :file:`{package_name}.py` which represents "
-        f"the Python module:"
-    )
-    CodeBlock(
-        [f"{project_name}          # the project directory"
-        ,f"└── {package_name}.py   # the Python module, this is where your code goes"
-        ]
-        , language='bash'
-    )
-    Paragraph(
-        "The module project type above is suited for problems that can be solved with "
-        "a single Python file, here :file:`my_first_project.py`. For more complex problems "
-        "a *package* structure is more appropriate. To learn more about the use of Python "
-        "modules vs packages, check out the :ref:`modules-and-packages` section below."
-    )
 
-    Heading( "Modules and packages", level=4, crosslink='modules-and-packages')
-
-    Paragraph(
-        "A *Python module* is the simplest Python project we can create. It is meant for rather "
-        "small projects that conveniently fit in a single (Python) file. More complex projects "
-        "require a *package* structure. You create them by adding the ``--package`` flag on the "
-        "command line:"
-    )
-
-    project_name = 'my-package-project'
-    package_name = package_name_of(project_name)
-
-    CodeBlock(
-        f"micc2 create {project_name} --package --remote=none"
-        , language='bash', execute=True, cwd=workspace
-    )
-    Paragraph(
-        f"The output shows a different file structure of the project than for a module project "
-        f"we created earlier. Instead of a file :file:`{package_name}.py` there is a now a "
-        f"directory :file:`{package_name}`, containing a :file:`__init__.py` file:"
-    )
-    CodeBlock(
-        f"{project_name}          # the project directory"
-        f"└── {package_name}      # the package directory"
-        f"    └── __init__.py       # the file where your code goes"
-        , language='bash'
-    )
-    Paragraph(
-        "The :file:`__init__.py` in the package directory is the equivalent of the "
-        ":file:`my_first_project.py` in our module structure project."
-    )
-    Paragraph(
-        "With Micc2_ you can add additional components to your package:"
-    )
-    List(
-        [ "Python sub-modules and sub-packages,"
-        , "Command line interfaces (CLIs),"
-        , "Binary extension modules written in C++ or Fortran."
-        ]
-    )
-    Paragraph(
-        "The distinction between a module structure and a package structure is also important "
-        "when you publish the module. When installing a Python package with a module structure, "
-        "The distinction between a module structure and a package structure is also important "
-        "only the module file :file:`my_first_project.py` will be installed, while with the "
-        "package structure the entire directory :file:`my_package_project` will be installed. "
-        "This may also include other files needed by your project."
-    )
-    Paragraph(
-        "If you created a project with a module structure and discover over time that its "
-        "complexity has grown beyond the limits of a single module file, you can easily "
-        "convert it to a *package* structure project at any time running (in the project "
-        "directory):"
-    )
-    CodeBlock(
-        "micc2 convert-to-package"
-        , language='bash', execute=True, cwd=workspace/'my-first-project'
-    )
-    Paragraph(
-        "Because we do not want to replace existing files inadvertently, this command will "
-        "always fail, and tell you which files the command would need to overwrite. "
-        "Check the list of file for files that you might have changed, and if there aren't "
-        "any, rerun the command with the ``--overwrite`` flag:"
-    )
-    CodeBlock(
-        "micc2 convert-to-package --overwrite"
-        , language='bash', execute=True, cwd=workspace / 'my-first-project'
-    )
-    Paragraph(
-        "If there are some files in the list you did change (this is rarely the case), "
-        "rerun the command with the ``--backup`` flag instead of the ``--overwrite`` "
-        "flag, to make a backup of the listed files, and manually copy the changes "
-        "from the :file:`.bak` files to the new files."
-    )
-    Paragraph(
-        "Now run the ``info`` command to verify that the project has indeed a package "
-        "structure:"
-    )
-    CodeBlock(
-        "micc2 info"
-        , language='bash', execute=True, cwd=workspace / 'my-first-project'
-    )
 
     Heading("What's in a name", level=4, crosslink='project-and-module-naming')
 

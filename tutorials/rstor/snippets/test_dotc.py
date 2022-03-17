@@ -1,3 +1,5 @@
+import sys                  #hide#
+sys.path.insert(0,'.')      #hide#
 import numpy as np
 import et_dot
 

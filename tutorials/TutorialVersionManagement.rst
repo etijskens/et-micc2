@@ -43,10 +43,11 @@ Suppose we are the project director of package :file:`foo`:
 .. code-block:: 
 
     micc2 info
-    Project foo located at /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/foo
+    Project foo located at /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/foo
       package: foo
       version: 0.0.0
-      structure: foo.py (Python module)
+      contents:
+        foo  top-level package      (source in foo/__init__.py)
     
     micc2 version
     Project (foo) version (0.0.0) 

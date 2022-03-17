@@ -8,21 +8,21 @@
 .. note::
 
    These tutorials focus not just on how to use micc2_. Rather they describe a workflow
-   for how you might set up a python project and develop it using best practises, with the
+   for how you cac set up a python project and develop it using best practises, with the
    help of Micc2_. 
 
-Micc2_ wants to provide a practical interface to the many aspects of managing a Python
-project: setting up a new project in a standardized way, adding documentation,
-version control, publishing the code to PyPI_, building binary extension modules in
-C++ or Fortran, dependency management, ... For all these aspects there are tools
-available, yet I found myself struggling to get everything right and looking up the
-details each time I needed them. Micc2_ is an attempt to wrap all the details by
-providing the user with a standardized yet flexible workflow for managing a Python
-project. Standardizing is a great way to increase productivity. For many aspects the
-tools used by Micc2_ are completely hidden from the user, e.g. project setup, adding
-components, building binary extensions, ... For other aspects Micc2_ provides just
-the necessary setup for you to use other tools as you need them. Learning to use the
-following tools is certainly beneficial:
+Micc2_ aims at providing a practical interface to the many aspects of managing a
+Python project: setting up a new project in a standardized way, adding
+documentation, version control, publishing the code to PyPI_, building binary
+extension modules in C++ or Fortran, dependency management, ... For all these
+aspects there are tools available, yet, with each new project, I found myself
+struggling to get everything right and looking up the details. Micc2_ is an attempt to
+wrap all the details by providing the user with a standardized yet flexible workflow
+for managing a Python project. Standardizing is a great way to increase
+productivity. For many aspects, the tools used by Micc2_ are completely hidden from
+the user, e.g. project setup, adding components, building binary extensions, ...
+For other aspects Micc2_ provides just the necessary setup for you to use other tools
+as you need them. Learning to use the following tools is certainly beneficial:
 
 * Git_: for version control. Its use is optional but highly recommended. See
   :ref:`version-control-management` for some basic git_ coverage.
@@ -40,13 +40,13 @@ Creating a new project with micc2_ is simple:
 
 .. code-block:: bash
 
-    > > micc create path/to/my-first-project
+    > micc2 create path/to/my-first-project
 
 This creates a new project *my-first-project* in folder ``path/to``. Note that the
 directory ``path/to/my-first-project`` must either not exist, or be empty.
 
 Typically, you will create a new project in the current working directory, say: your
-workspace, so first ``cd`` into it:
+workspace, so first ``cd`` into your workspace directory:
 
 .. code-block:: bash
 
@@ -56,7 +56,7 @@ workspace, so first ``cd`` into it:
 
     > micc2 create my-first-project --remote=none
     [INFO]           [ Creating project directory (my-first-project):
-    [INFO]               Python module (my_first_project): structure = (my-first-project/my_first_project.py)
+    [INFO]               Python top-level package (my_first_project):
     [INFO]               [ Creating local git repository
     [INFO]               ] done.
     [WARNING]            Creation of remote GitHub repository not requested.
@@ -64,22 +64,40 @@ workspace, so first ``cd`` into it:
     
 
 As the output tells, micc2_ has created a new project in directory
-:file:`my-first-project` containing a python module
-:file:`my_first_project.py`. Note that the module name differs a bit from the
-project name. Dashes are been replaced with underscores and uppercase with
-lowercase in order to yield a
+:file:`my-first-project` containing a python package
+:file:`my_first_project`. This is a directory with an :file:`__init__.py` file,
+containing the Pythonvariables, classes and meethods it needs to expose. This
+directory and its contents represent the Python module.
+
+.. code-block:: bash
+
+    > my-first-project          # the project directory└── my_first_project      # the package directory    └── __init__.py       # the file where your Python code goes
+
+.. note::
+
+   Next to the *package* structure - a directory with an :file:`__init__.py`
+   filePython also allows for *module* structure - a mere :file:`my_first_project.py
+   file - containing the Python variables, classes and meethods it needs to expose.
+   The*module* structure is essentially a single file and Python-only approach, which
+   often turns out to be too restrictive. As of v3.0 micc2_ only supports the creation of
+   modules with a *packages* structure, which allows for adding submodules, command
+   line interfaces (CLIs), and binary extension modules builtfrom other languages as
+   C++ and Fortran. Micc2_ greatly facilitates adding suchcomponents.
+
+Note that the module name differs slightly from the project name. Dashes are been
+replaced with underscores and uppercase with lowercase in order to yield a
 `PEP 8 <https://www.python.org/dev/peps/pep-0008/#package-and-module-names>`_
 compliant module name. If you want your module name to be unrelated to your project
 name, check out the :ref:`project-and-module-naming` section.
 
-Micc2_ also automatically creates a local git_ repository for our project (provided
-the ``git`` command is available) and it commits all the project files that it
-generated with commit message 'And so this begun...'. The ``--remote=none`` flag
-prevents Micc2_ from also creating a remote repository on GitHub_. Without that flag
-Micc2_ would have created a public remote repository on GitHub_ and pushed that first
-commit. This, of course, requires that we have set up Micc2_ with a GitHub_ username
-and a personal access token for it as described in :ref:`micc2-setup`. You can also
-request the remote repository to be private by specifying ``--remote=private``.
+Micc2_ automatically creates a local git_ repository for our project (provided the
+``git`` command is available) and it commits all the project files that it generated
+with commit message 'And so this begun...'. The ``--remote=none`` flag prevents
+Micc2_ from also creating a remote repository on GitHub_. Without that flag, Micc2_
+would have created a public remote repository on GitHub_ and pushed that first commit
+(tht requires that we have set up Micc2_ with a GitHub_ username and a personal access
+token for it as described in :ref:`micc2-setup`. You can also request the remote
+repository to be private by specifying ``--remote=private``.
 
 After creating the project, we ``cd`` into the project directory. All Micc2_
 commands detect automatically that they are run from a project directory and
@@ -92,10 +110,11 @@ consequently act on the project in the current working directory. E.g.:
 .. code-block:: bash
 
     > micc2 info
-    Project my-first-project located at /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/my-first-project
+    Project my-first-project located at /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/my-first-project
       package: my_first_project
       version: 0.0.0
-      structure: my_first_project.py (Python module)
+      contents:
+        my_first_project  top-level package      (source in my_first_project/__init__.py)
     
 
 As the ``info`` subcommand, shows info on a project, is running inside the
@@ -111,118 +130,9 @@ To apply a Micc2_ command to a project that is not in the current working direct
    appear in front of the subcommand, and lists the subcommands, and ``micc2 subcommand
    --help``, prints detailed help for a subcommand.
 
-Above we have created a project for a simple Python *module*, that is, the project
-directory contains a file :file:`my_first_project.py` which represents the
-Python module:
-
-.. code-block:: bash
-
-    > my-first-project          # the project directory
-    > └── my_first_project.py   # the Python module, this is where your code goes
-
-The module project type above is suited for problems that can be solved with a single
-Python file, here :file:`my_first_project.py`. For more complex problems a
-*package* structure is more appropriate. To learn more about the use of Python
-modules vs packages, check out the :ref:`modules-and-packages` section below.
-
-.. _modules-and-packages:
-
-1.1.1. Modules and packages
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-A *Python module* is the simplest Python project we can create. It is meant for rather
-small projects that conveniently fit in a single (Python) file. More complex
-projects require a *package* structure. You create them by adding the ``--package``
-flag on the command line:
-
-.. code-block:: bash
-
-    > micc2 create my-package-project --package --remote=none
-    [INFO]           [ Creating project directory (my-package-project):
-    [INFO]               Python package (my_package_project): structure = (my-package-project/my_package_project/__init__.py)
-    [INFO]               [ Creating local git repository
-    [INFO]               ] done.
-    [WARNING]            Creation of remote GitHub repository not requested.
-    [INFO]           ] done.
-    
-
-The output shows a different file structure of the project than for a module project we
-created earlier. Instead of a file :file:`my_package_project.py` there is a now a
-directory :file:`my_package_project`, containing a :file:`__init__.py` file:
-
-.. code-block:: bash
-
-    > my-package-project          # the project directory└── my_package_project      # the package directory    └── __init__.py       # the file where your code goes
-
-The :file:`__init__.py` in the package directory is the equivalent of the
-:file:`my_first_project.py` in our module structure project.
-
-With Micc2_ you can add additional components to your package:
-
-* Python sub-modules and sub-packages,
-
-* Command line interfaces (CLIs),
-
-* Binary extension modules written in C++ or Fortran.
-
-The distinction between a module structure and a package structure is also important
-when you publish the module. When installing a Python package with a module
-structure, The distinction between a module structure and a package structure is
-also important only the module file :file:`my_first_project.py` will be
-installed, while with the package structure the entire directory
-:file:`my_package_project` will be installed. This may also include other files
-needed by your project.
-
-If you created a project with a module structure and discover over time that its
-complexity has grown beyond the limits of a single module file, you can easily convert
-it to a *package* structure project at any time running (in the project directory):
-
-.. code-block:: bash
-
-    > micc2 convert-to-package
-    [INFO]           Converting Python module project my-first-project to Python package project.
-    [WARNING]        Pre-existing files that would be overwritten:
-    [WARNING]          /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/my-first-project/docs/index.rst
-    Aborting because 'overwrite==False'.
-      Rerun the command with the '--backup' flag to first backup these files (*.bak).
-      Rerun the command with the '--overwrite' flag to overwrite these files without backup.
-    Aborting.
-    [CRITICAL]       Expand failed during Project.module_to_package_cmd for project (my-first-project).
-    
-
-Because we do not want to replace existing files inadvertently, this command will
-always fail, and tell you which files the command would need to overwrite. Check the
-list of file for files that you might have changed, and if there aren't any, rerun the
-command with the ``--overwrite`` flag:
-
-.. code-block:: bash
-
-    > micc2 convert-to-package --overwrite
-    [INFO]           Converting Python module project my-first-project to Python package project.
-    [WARNING]        '--overwrite' specified: pre-existing files will be overwritten WITHOUT backup:
-    [WARNING]        overwriting /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/my-first-project/docs/index.rst
-    
-
-If there are some files in the list you did change (this is rarely the case), rerun the
-command with the ``--backup`` flag instead of the ``--overwrite`` flag, to make a
-backup of the listed files, and manually copy the changes from the :file:`.bak` files
-to the new files.
-
-Now run the ``info`` command to verify that the project has indeed a package
-structure:
-
-.. code-block:: bash
-
-    > micc2 info
-    Project my-first-project located at /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/my-first-project
-      package: my_first_project
-      version: 0.0.0
-      structure: my_first_project/__init__.py (Python package)
-    
-
 .. _project-and-module-naming:
 
-1.1.2. What's in a name
+1.1.1. What's in a name
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 The name you choose for your project is not without consequences. Ideally, a project
@@ -292,7 +202,7 @@ message:
 .. code-block:: bash
 
     > micc create 1proj
-    /bin/sh: /Users/etijskens/.local/bin/micc: /Users/etijskens/.local/pipx/venvs/et-micc/bin/python: bad interpreter: No such file or directory
+    /bin/sh: micc: command not found
     
 
 The last line indicates that you can specify an explicit module name, unrelated to the
@@ -636,15 +546,15 @@ automatically found and executed by running ``pytest`` in the project directory:
 
     > pytest tests -v
     ============================= test session starts ==============================
-    platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.10.0, pluggy-0.13.1 -- /Users/etijskens/.pyenv/versions/3.8.5/bin/python
+    platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.11.0, pluggy-0.13.1 -- /Users/etijskens/.pyenv/versions/3.8.5/bin/python
     cachedir: .pytest_cache
-    rootdir: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/my-first-project
+    rootdir: /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/my-first-project
     collecting ... collected 2 items
     
-    tests/test_my_first_project.py::test_hello_noargs PASSED                 [ 50%]
-    tests/test_my_first_project.py::test_hello_me PASSED                     [100%]
+    tests/my_first_project/test_my_first_project.py::test_hello_noargs PASSED [ 50%]
+    tests/my_first_project/test_my_first_project.py::test_hello_me PASSED    [100%]
     
-    ============================== 2 passed in 0.01s ===============================
+    ============================== 2 passed in 0.02s ===============================
     
 
 Specifying the :file:`tests` directory ensures that Pytest_ looks for tests only in

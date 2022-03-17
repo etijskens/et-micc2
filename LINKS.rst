@@ -57,7 +57,7 @@ Software engineering
 * `best practices for writing code comments <https://stackoverflow.blog/2021/07/05/best-practices-for-writing-code-comments/>`_
 * `Software Engineering's Greatest Hits <https://www.youtube.com/watch?v=HrVtA-ue-x0>`_
   Very interesting.
-* `SOLID principles for software design <https://stackoverflow.blog/2021/11/01/why-solid-principles-are-still-the-foundation-for-modern-software-architecture/>`_i
+* `SOLID principles for software design <https://stackoverflow.blog/2021/11/01/why-solid-principles-are-still-the-foundation-for-modern-software-architecture/>`_
 
 Python internals
 ----------------
@@ -412,7 +412,8 @@ git and other VCS
 * `Git is my buddy: Effective Git as a solo developer <https://mikkel.ca/blog/git-is-my-buddy-effective-solo-developer/?utm_source=tldrnewsletter>`_
 * `A practical guide to using the git stash command <https://opensource.com/article/21/4/git-stash?utm_medium=Email&utm_campaign=weekly&sc_cid=7013a000002w0CEAAY>`_
 * `gitlab <https://learn.gitlab.com/>`_
-* `git flight rules <https://github.com/k88hudson/git-flight-rules?utm_source=tldrnewsletter>`
+* `git flight rules <https://github.com/k88hudson/git-flight-rules>`_
+* `HUBFS · File System for GitHub <https://github.com/winfsp/hubfs>`_
 
 Development environment, developement workflow
 ----------------------------------------------
@@ -436,7 +437,7 @@ Problem solving
 
 Documentation
 -------------
-* `<https://www.youtube.com/watch?v=gWrc4xzm45Y&list=PL2Uw4_HvXqvYk1Y5P8kryoyd83L_0Uk5K&index=74    >`_
+* `Writing Documentation with Sphinx and reStructuredText <https://www.youtube.com/watch?v=gWrc4xzm45Y&list=PL2Uw4_HvXqvYk1Y5P8kryoyd83L_0Uk5K&index=74>`_
 * `Practical Sphinx - PyCon 2018 <https://youtu.be/0ROZRNZkPS8>`_
 * `Write the Docs is a global community of people who care about documentation <https://www.writethedocs.org>`_
 * `How documentation works, and how to make it work for your project - PyCon 2017 <https://youtu.be/azf6yzuJt54>`_

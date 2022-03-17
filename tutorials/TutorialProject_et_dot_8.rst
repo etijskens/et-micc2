@@ -5,82 +5,40 @@
 4. Adding Python submodules
 ===========================
 
-Adding binary extension (sub)module is important for adding implementations in
+Adding binary extension (sub)modules is important for adding implementations in
 Fortran or C++ for performance reasons. For larger projects it is sometimes
 practical to be able to organize your Python code in different files, e.g. one file for
-each Python class. Micc2_ allows your to add Python submodules to your project. These
-can have a module or a package stucture. This command adds a module :file:`foo.py` to
-your project:
+each Python class. Micc2_ allows your to add Python submodules to your project. Just
+as the default top level package, these Python submodules have a package structure
+too. This command adds a module :file:`foo.py` to your project:
 
 .. code-block:: 
 
     micc2 add foo --py
-    [INFO]           [ Adding python module foo.py to project ET-dot.
-    [INFO]               - python source in    ET-dot/et_dot/foo.py.
-    [INFO]               - Python test code in ET-dot/tests/test_foo.py.
+    [INFO]           [ Adding python submodule foo to package et_dot.
+    [INFO]               - python source in    /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/foo/__init__.py.
+    [INFO]               - Python test code in /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/tests/et_dot/foo/test_foo.py.
     [INFO]           ] done.
     
 
-As the output shows, it creates a file :file:`foo.py` in the package directory
-:file:`et_dot` of our :file:`ET-dot` project. In this file you can add all your `foo`
-related code. Micc2_ ensures that this submodule is automatically imported in
-:file:`et_dot`. As usual, Micc2_ adds working example code, in this case a
-*hello world* method, named :py:meth:`greet`:
-
-.. code-block:: pycon
-
-    >>> import et_dot
-    >>> print(et_dot.foo.greet("from foo"))
-    Hello from foo!
-    
-
-Alternatively, we can add a Python submodule with a package structure:
+We can add sub-submodules too. E.g to add a ``bar`` sub-module to the ``foo``
+sub-module:
 
 .. code-block:: 
 
-    micc2 add foo --package
-    [INFO]           [ Adding python module foo/__init__.py to project ET-dot.
-    [INFO]               - python source in    ET-dot/et_dot/foo/__init__.py.
-    [INFO]               - Python test code in ET-dot/tests/test_foo.py.
+    micc2 add foo/bar --py
+    [INFO]           [ Adding python submodule foo/bar to package et_dot.
+    [INFO]               - python source in    /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/et_dot/foo/bar/__init__.py.
+    [INFO]               - Python test code in /Users/etijskens/software/dev/workspace/et-micc2-tutorials-workspace-tmp/ET-dot/tests/et_dot/foo/bar/test_bar.py.
     [INFO]           ] done.
     
 
-As the output shows, this creates a directory :file:`foo` containing the file
-:file:`__init__.py` in the package directory :file:`et_dot` of our
-:file:`ET-dot` project, for all your `foo` related code. Again, Micc2_ ensures that
-this submodule is automatically imported in :file:`et_dot` and added working
-example code, with the same :py:meth:`greet` meethod as above, which works in
-exactly the same way:
+In fact this sub-sub-module ``bar`` can even be a C++ of Fortran binary extension
+module. One only needs to replace the ``--py`` flagwith ``--cpp`` or ``--f90``. The
+binary extension modules themselves, however, cannot contain submodules.
 
-.. code-block:: pycon
-
-    >>> import et_dot
-    >>> print(et_dot.foo.greet("from foo"))
-    Hello from foo!
-    
-Micc2_ also added test code for this submodule in file :file:`tests/test_foo.py`
-(irrespective of whether :file:`foo` has a module or package structure. The test
-passes, of course:
-
-.. code-block:: 
-
-    pytest tests/test_foo.py -s -v
-    ============================= test session starts ==============================
-    platform darwin -- Python 3.8.5, pytest-6.2.2, py-1.10.0, pluggy-0.13.1 -- /Users/etijskens/.pyenv/versions/3.8.5/bin/python
-    cachedir: .pytest_cache
-    rootdir: /Users/etijskens/software/dev/workspace/tutorials-workspace-tmp/ET-dot
-    collecting ... collected 1 item
-    
-    tests/test_foo.py::test_greet PASSED
-    
-    ============================== 1 passed in 0.12s ===============================
-    
-
-
-Furthermore. Micc2_ automatically adds documentation entries for submodule
-:file:`foo` in :file:`API.rst`. Calling ``micc2 doc`` will automatically
-extract documentation from the doc-strings in :file:`foo`. So, writing
-doc-strings in :file:`foo.py` or :file:`foo/__init__.py` is all you need to do.
+As usual, Micc2_ added example code and example test code for the added components. as
+well as documentation entries for the submodule.
 
 .. _clis:
 
@@ -133,7 +91,8 @@ the ``--cli`` flag:
 .. code-block:: 
 
     micc2 add dotfiles --cli
-    [INFO]           [ Adding CLI dotfiles without sub-commands to project ET-dot.
+    [INFO]           [ Adding CLI dotfiles to project ET-dot
+                            (single command CLI).
     [INFO]               - Python source file ET-dot/et_dot/cli_dotfiles.py.
     [INFO]               - Python test code   ET-dot/tests/test_cli_dotfiles.py.
     [WARNING]            Dependencies added:
