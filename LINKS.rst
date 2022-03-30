@@ -36,6 +36,7 @@ For Beginners
 * `Learn Python Programming <https://www.programiz.com/python-programming>`_
 * `Python cheat sheet <https://websitesetup.org/wp-content/uploads/2020/04/Python-Cheat-Sheet.pdf>`_
 * `Getting started with Python <https://stackoverflow.blog/2021/07/14/getting-started-with-python/>`_
+* `The full Python tutoria/ <https://www.youtube.com/watch?v=FggJNXN68fs&list=PLkdGijFCNuVnGxo-1fSNcdHh5gZc17oRM>`_
 
 Python as a language
 --------------------
@@ -78,7 +79,15 @@ Python internals
 * `RealPython podcasts <https://realpython.com/podcasts/rpp/>`_
 * `Syntactic sugar <https://snarky.ca/tag/syntactic-sugar/>`_
 * `Python Pitfalls - Expecting The Unexpected <https://towardsdatascience.com/python-pitfalls-expecting-the-unexpected-2e595dd1306c>`_
-
+* `Unravelling Python classes <https://snarky.ca/unravelling-pythons-classes/>`_
+* `Python range <https://python.land/deep-dives/python-range>`_
+* `Python Lambda functions <https://www.dataquest.io/blog/tutorial-lambda-functions-in-python/>`_
+* `Modify Iterables While Iterating in Python <https://rednafi.github.io/reflections/modify-iterables-while-iterating-in-python.html>`_
+* `Understanding Attributes, Dicts and Slots in Python <https://bas.codes/posts/python-dict-slots>`_
+* `Strict Python function parameters <https://sethmlarson.dev/blog/strict-python-function-parameters>`_
+* `sockets for dummies <https://mathspp.com/blog/sockets-for-dummies>`_
+* `Python bytecode explained <https://github.com/MoserMichael/pyasmtool/blob/master/bytecode_disasm.md>`_
+* `A tour of Python's itertools library <https://www.blog.pythonlibrary.org/2021/12/07/a-tour-of-pythons-itertools-library/>`_
 
 Python for HPC
 --------------
@@ -93,6 +102,11 @@ rely on automatic code transformation from Python, so there is no need to write 
 * `Python Bindings: Calling C or C++ From Python <https://realpython.com/python-bindings-overview/#strengths-and-weaknesses_2>`_
 * `Implementing C++ Virtual Functions in Cython <https://monadical.com/posts/virtual-classes-in-cython.html>`_
 * `Wrapping C++ with Cython: intro <https://azhpushkin.me/posts/cython-cpp-intro>`_
+* `How vectorization speeds up your Python code <https://pythonspeed.com/articles/vectorization-python/>`_
+  Quite a few interesting ideas:
+  * self-instrumenting a python program for performance measurements
+  * using pypy
+* `Speeding up your code <https://pythonspeed.com/performance/>`_
 
 Approaches mimicking or wrapping OpenMP and MPI:
 
@@ -136,10 +150,15 @@ Profiling
 * `Yet Another Python Profiler, but this time thread&coroutine&greenlet aware <https://github.com/sumerc/yappi>`_
 * `scalene <https://www.youtube.com/watch?v=nrQPqy3YY5A&list=PL2Uw4_HvXqvYk1Y5P8kryoyd83L_0Uk5K&index=19>`_
 
+Memory profiling
+----------------
+* `Optimizing Memory Usage in Python Applications <https://martinheinz.dev/blog/68>`_
+
 Resource monitoring
 -------------------
 * `Remora <https://www.admin-magazine.com/HPC/Articles/Remora-Resource-Monitoring-for-Users?utm_source=ADMIN+Newsletter&utm_campaign=HPC_Update_143_2020-12-10_Remora%3A_Resource_Monitoring+_or_Users&utm_medium=email>`_
 * `REMORA: REsource MOnitoring for Remote Applications <https://github.com/TACC/remora>`_
+* `My favorite Linux top command options <https://opensource.com/article/22/3/linux-top-command>`_
 
 Python idioms and readability
 -----------------------------
@@ -270,6 +289,7 @@ Testing
 * `Learning Python Test Automation <https://automationpanda.com/2020/11/09/learning-python-test-automation/amp/>`_
   These days, there’s a wealth of great content on Python testing. Here’s a brief reference to help you get started.
 * `How to write doctests in Python <https://www.digitalocean.com/community/tutorials/how-to-write-doctests-in-python>`_
+* `A Gentle Introduction to Testing with PyTest <https://bas.codes/posts/python-pytest-introduction>`_
 
 Debugging
 ---------
@@ -287,6 +307,7 @@ Debugging
 * `GDBGUI - A browser-based frontend to gdb <https://www.gdbgui.com>`_
 * `GDB Tutorial - a walkthrough with examples <https://www.cs.umd.edu/~srhuang/teaching/cmsc212/gdb-tutorial-handout.pdf>`_
 * `Debugging Python and C(++) extensions with gdb and pdb <https://www.researchgate.net/figure/Debugging-both-C-extensions-and-Python-code-with-gdb-and-pdb_fig2_220307949>`_
+* `When C extensions crash: easier debugging for your Python application <https://pythonspeed.com/articles/python-c-extension-crashes/>`_
 
 Logging
 -------
@@ -306,8 +327,14 @@ Scientific Python
 * `Numeric and Scientific Python Packages built on Numpy <https://wiki.python.org/moin/NumericAndScientific>`_
 * `Symbolic Maths in Python <https://alexandrugris.github.io/maths/2017/04/30/symbolic-maths-python.html>`_
 * `How to use HDF5 files in Python <https://www.pythonforthelab.com/blog/how-to-use-hdf5-files-in-python/>`_
+* `A Gentle Introduction to Serialization for Python (pickle, hdf5) <https://machinelearningmastery.com/a-gentle-introduction-to-serialization-for-python/>`_
 * `A free course on Numpy <https://www.youtube.com/playlist?list=PL9oKUrtC4VP6gDp1Vq3BzfViO0TWgR0vR>`_
 * `Generating Stl Models with Python (CAD) <https://micronote.tech/2020/12/Generating-STL-Models-with-Python/>`_
+* `Matplotlib Tutorial (2022): For Physicists, Engineers, and Mathematicians <https://www.youtube.com/watch?v=cTJBJH8hacc>`_
+* `SciPy Tutorial (2022): For Physicists, Engineers, and Mathematicians <https://www.youtube.com/watch?v=jmX4FOUEfgU>`_
+* `NumPy Tutorial (2022): For Physicists, Engineers, and Mathematicians <https://www.youtube.com/watch?v=DcfYgePyedM>`_
+* `SymPy Tutorial (2022): For Physicists, Engineers, and Mathematicians <https://www.youtube.com/watch?v=1yBPEPhq54M>`_
+* `Scientific Visualization using Python and Matplotlib <https://github.com/rougier/scientific-visualization-book>`_
 
 Machine learning and datascience
 --------------------------------
@@ -324,6 +351,15 @@ Machine learning and datascience
 * `A free course on Python Pandas <https://www.youtube.com/playlist?list=PL9oKUrtC4VP7ry0um1QOUUfJBXKnkf-dA>`_
 * `Neural Networks Explained from Scratch using Python <https://youtu.be/9RN2Wr8xvro>`_
 * `Machine learning made easy withe Python <https://opensource.com/article/21/1/machine-learning-python?utm_medium=Email&utm_campaign=weekly&sc_cid=7013a0000026SeIAAU>`_
+* `Speeding up your pandas code <https://iip.readthedocs.io/en/latest/setup.html#setting-up-your-local-environment>`_
+* `The great Python dataframe showdown, part 1: Demystifying Apache Arrow <https://www.orchest.io/blog/the-great-python-dataframe-showdown-part-1-demystifying-apache-arrow>`_
+* `NN template <https://github.com/grok-ai/nn-template>`_
+* `Object localization using PyTorch : part 1 <https://blog.paperspace.com/object-localization-using-pytorch-1/>`_
+* `Object localization using PyTorch : part 2 <https://blog.paperspace.com/object-localization-using-pytorch-2/>`_
+* `µTransfer: A technique for hyperparameter tuning of enormous neural networks <https://www.microsoft.com/en-us/research/blog/µtransfer-a-technique-for-hyperparameter-tuning-of-enormous-neural-networks/>`_
+* `Practical Quantization in PyTorch <https://pytorch.org/blog/quantization-in-practice/>`_
+* `Tutorial: Indexing DataFrames in Pandas <https://www.dataquest.io/blog/tutorial-indexing-dataframes-in-pandas/>`_
+
 
 CLIs and scripting
 ------------------
@@ -414,6 +450,7 @@ git and other VCS
 * `gitlab <https://learn.gitlab.com/>`_
 * `git flight rules <https://github.com/k88hudson/git-flight-rules>`_
 * `HUBFS · File System for GitHub <https://github.com/winfsp/hubfs>`_
+* `Git for professionals: Tools & Concepts for Mastering Version Control with Git <https://www.youtube.com/watch?v=Uszj_k0DGsg>`_
 
 Development environment, developement workflow
 ----------------------------------------------
@@ -430,10 +467,15 @@ Development environment, developement workflow
 * `Rewriting your git history, removing files permanently - cheatsheet & guide <https://blog.gitguardian.com/rewriting-git-history-cheatsheet/>`_
 * `pipupgrade <https://github.com/achillesrasquinha/pipupgrade>`_
 * `How to Set Environment Variables in Linux and Mac: The Missing Manual <https://doppler.com/blog/how-to-set-environment-variables-in-linux-and-mac>`_
+* `GitHub Actions: the full course <https://www.youtube.com/playlist?list=PLArH6NjfKsUhvGHrpag7SuPumMzQRhUKY>`_
 
 Problem solving
 ---------------
 * `The mental game of Python - Raymond Hettinger - pybay 2019 <https://www.youtube.com/watch?v=UANN2Eu6ZnM>`_
+
+Jupyter
+-------
+* `Jupyter everywhere <https://blog.jupyter.org/jupyter-everywhere-f8151c2cc6e8>`_
 
 Documentation
 -------------
