@@ -88,6 +88,9 @@ Python internals
 * `sockets for dummies <https://mathspp.com/blog/sockets-for-dummies>`_
 * `Python bytecode explained <https://github.com/MoserMichael/pyasmtool/blob/master/bytecode_disasm.md>`_
 * `A tour of Python's itertools library <https://www.blog.pythonlibrary.org/2021/12/07/a-tour-of-pythons-itertools-library/>`_
+* `This Is Why Python Data Classes Are Awesome <https://www.youtube.com/watch?v=CvQ7e6yUtnw>`_
+* `understanding class and instance variables <https://www.digitalocean.com/community/tutorials/understanding-class-and-instance-variables-in-python-3>`_
+* `Type annotations <https://dev.to/dan_starner/using-pythons-type-annotations-4cfe>`_
 
 Python for HPC
 --------------
@@ -359,7 +362,8 @@ Machine learning and datascience
 * `µTransfer: A technique for hyperparameter tuning of enormous neural networks <https://www.microsoft.com/en-us/research/blog/µtransfer-a-technique-for-hyperparameter-tuning-of-enormous-neural-networks/>`_
 * `Practical Quantization in PyTorch <https://pytorch.org/blog/quantization-in-practice/>`_
 * `Tutorial: Indexing DataFrames in Pandas <https://www.dataquest.io/blog/tutorial-indexing-dataframes-in-pandas/>`_
-
+* `Efficient pandas Dataframes <https://www.youtube.com/watch?v=u4_c2LDi4b8>`_
+* `Speed up your slow pandas python code by 2500x... <https://www.youtube.com/watch?v=SAFmrTnEHLg&t=1s>`_
 
 CLIs and scripting
 ------------------
