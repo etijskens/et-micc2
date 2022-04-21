@@ -27,6 +27,9 @@ C makes it easy to shoot yourself in the foot; C++ makes it harder, but when you
 
 A system administrator has two problems: 1. Dumb users. 2. Smart users.
 
+"Never trust a programmer in a suit." - Anonymous
+
+
 For Beginners
 -------------
 * `De Programmeursleerling - Pieter Spronck <http://www.spronck.net/pythonbook/dutchindex.xhtml>`_ (in Dutch)
@@ -91,6 +94,9 @@ Python internals
 * `This Is Why Python Data Classes Are Awesome <https://www.youtube.com/watch?v=CvQ7e6yUtnw>`_
 * `understanding class and instance variables <https://www.digitalocean.com/community/tutorials/understanding-class-and-instance-variables-in-python-3>`_
 * `Type annotations <https://dev.to/dan_starner/using-pythons-type-annotations-4cfe>`_
+* `Python behind the scenes #13: the GIL and its effects on Python multithreading <https://tenthousandmeters.com/blog/python-behind-the-scenes-13-the-gil-and-its-effects-on-python-multithreading/>`_
+* `Blog on Python internals with many interesting topics <https://tenthousandmeters.com/>`_
+* `Python List sort(): An In-Depth Guide to Sorting Lists <https://datagy.io/python-list-sort/>`_
 
 Python for HPC
 --------------
@@ -110,6 +116,7 @@ rely on automatic code transformation from Python, so there is no need to write 
   * self-instrumenting a python program for performance measurements
   * using pypy
 * `Speeding up your code <https://pythonspeed.com/performance/>`_
+* `Cython, Rust, and more: choosing a language for Python extensions <https://pythonspeed.com/articles/rust-cython-python-extensions/>`_
 
 Approaches mimicking or wrapping OpenMP and MPI:
 
@@ -215,6 +222,8 @@ Python idioms and readability
 * `Learn something new about Python every day in less than 1 minute <https://www.youtube.com/c/PythonIn1Minute/videos>`_
 * `The pass Statement: How to Do Nothing in Python <https://realpython.com/python-pass/>`_
 * `73 Examples to Help You Master Python's f-strings <https://miguendes.me/amp/73-examples-to-help-you-master-pythons-f-strings>`_
+* `Python f-strings Are More Powerful Than You Might Think <https://martinheinz.dev/blog/70>`_
+* `The Correct Way to Overload Functions in Python <https://towardsdatascience.com/the-correct-way-to-overload-functions-in-python-b11b50ca7336>`_
 
 Useful packages
 ---------------
@@ -311,6 +320,7 @@ Debugging
 * `GDB Tutorial - a walkthrough with examples <https://www.cs.umd.edu/~srhuang/teaching/cmsc212/gdb-tutorial-handout.pdf>`_
 * `Debugging Python and C(++) extensions with gdb and pdb <https://www.researchgate.net/figure/Debugging-both-C-extensions-and-Python-code-with-gdb-and-pdb_fig2_220307949>`_
 * `When C extensions crash: easier debugging for your Python application <https://pythonspeed.com/articles/python-c-extension-crashes/>`_
+* `Debugging Python C extensions with GDB <https://developers.redhat.com/articles/2021/09/08/debugging-python-c-extensions-gdb#debugging_with_gbd_in_python_3_9>`_
 
 Logging
 -------
@@ -318,7 +328,7 @@ Logging
 * `Writing custom profilers for Python <https://pythonspeed.com/articles/custom-python-profiler/>`_
 * `Do not log <https://sobolevn.me/2020/03/do-not-log>`_
 * `Understanding Python's logging library <https://blog.urbanpiper.com/understanding-python-logging-library/>`_
-
+* `Logging like a pro <https://guicommits.com/how-to-log-in-python-like-a-pro/>`_
 
 Profiling
 ---------
@@ -339,8 +349,8 @@ Scientific Python
 * `SymPy Tutorial (2022): For Physicists, Engineers, and Mathematicians <https://www.youtube.com/watch?v=1yBPEPhq54M>`_
 * `Scientific Visualization using Python and Matplotlib <https://github.com/rougier/scientific-visualization-book>`_
 
-Machine learning and datascience
---------------------------------
+Machine learning and data science
+---------------------------------
 * `Scikit-learn, wrapping your head around machine learning - PyCon 2019 <https://www.youtube.com/watch?v=kTdt0P0e3Qc>`_
 * `Applied Deep Learning for NLP Using PyTorch <https://youtu.be/VBM1u-UIoI0>`_
 * `Data Science Best Practices with pandas - PyCon 2019 <https://www.youtube.com/watch?v=ZjrUmNq41Eo>`_
@@ -364,6 +374,7 @@ Machine learning and datascience
 * `Tutorial: Indexing DataFrames in Pandas <https://www.dataquest.io/blog/tutorial-indexing-dataframes-in-pandas/>`_
 * `Efficient pandas Dataframes <https://www.youtube.com/watch?v=u4_c2LDi4b8>`_
 * `Speed up your slow pandas python code by 2500x... <https://www.youtube.com/watch?v=SAFmrTnEHLg&t=1s>`_
+* `How to iterate over DataFrame rows (and should you?) <https://www.wrighters.io/how-to-iterate-over-dataframe-rows-and-should-you/>`_
 
 CLIs and scripting
 ------------------
@@ -400,6 +411,7 @@ Packaging
 * `Python Packaging Made Better: An Intro to Python Wheels <https://realpython.com/python-wheels/>`_
 * `Options for packaging your Python code: Wheels, Conda, Docker, and more <https://pythonspeed.com/articles/distributing-software/>`_
 * `What the heck is pyproject.toml? <https://snarky.ca/what-the-heck-is-pyproject-toml/>`_
+* `4 Things Tutorials Don't Tell You About PyPI <https://blog.paoloamoroso.com/2021/09/4-things-tutorials-dont-tell-you-about.html>`_
 
 Graphics
 --------
@@ -436,6 +448,10 @@ Tools
 * `Explore binaries using this full-featured Linux tool <https://opensource.com/article/21/1/linux-radare2?utm_medium=Email&utm_campaign=weekly&sc_cid=7013a0000026SeIAAU>`_
 * `How to write a configuration file in python <https://towardsdatascience.com/from-novice-to-expert-how-to-write-a-configuration-file-in-python-273e171a8eb3>`_
 * `How to automatically set up a development machine with Ansible <https://stribny.name/blog/ansible-dev/>`_
+* `direnv -- unclutter your .profile <https://github.com/direnv/direnv?utm_source=tldrnewsletter.`_
+  direnv is an extension for your shell. It augments existing shells with a new feature that can load and unload
+  environment variables depending on the current directory.
+* `A list of new(ish) command line tools <https://jvns.ca/blog/2022/04/12/a-list-of-new-ish--command-line-tools/?utm_source=tldrnewsletter>`_
 
 git and other VCS
 
@@ -455,10 +471,13 @@ git and other VCS
 * `git flight rules <https://github.com/k88hudson/git-flight-rules>`_
 * `HUBFS · File System for GitHub <https://github.com/winfsp/hubfs>`_
 * `Git for professionals: Tools & Concepts for Mastering Version Control with Git <https://www.youtube.com/watch?v=Uszj_k0DGsg>`_
+* `Create changelog from git history <https://github.com/orhun/git-cliff>`_
+* `10 Git tips we can't live without <https://opensource.com/article/22/4/git-tips>`_
 
 Development environment, developement workflow
 ----------------------------------------------
 * `pyenv+poetry+pipx <https://jacobian.org/2019/nov/11/python-environment-2020/>`
+* `Improving Python Dependency Management With pipx and Poetry <https://cedaei.com/posts/python-poetry-pipx/>`_
 * https://sourcery.ai/blog/python-best-practices/
 * https://pypi.org/project/create-python-package/ a micc 'light'
 * `Managing Python Environments <https://www.pluralsight.com/tech-blog/managing-python-environments/>`_
