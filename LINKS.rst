@@ -159,6 +159,7 @@ Profiling
 * `A Comprehensive Guide to Profiling Python Programs <https://medium.com/better-programming/a-comprehensive-guide-to-profiling-python-programs-f8b7db772e6>`_
 * `Yet Another Python Profiler, but this time thread&coroutine&greenlet aware <https://github.com/sumerc/yappi>`_
 * `scalene <https://www.youtube.com/watch?v=nrQPqy3YY5A&list=PL2Uw4_HvXqvYk1Y5P8kryoyd83L_0Uk5K&index=19>`_
+* `Memory profiler for Python <https://github.com/bloomberg/memray>`_
 
 Memory profiling
 ----------------
