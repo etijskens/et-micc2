@@ -11,6 +11,7 @@ __version__ = "0.0.0"
 
 import re,os
 from pathlib import Path
+import shutil
 
 def expand_string(s, parameters):
     for parameter,value in parameters.items():
@@ -78,7 +79,14 @@ def expand_folder(path_to_template_folder, destination, parameters):
         replaced with parameters[variable].
     """
     root = path_to_template_folder
+    pycaches = []
     for d, dirs, files in os.walk(path_to_template_folder):
+        # print('@@',d,dirs,files)
+        if (d.endswith('__pycache__')):
+            ## pip install et-micc2 creates __pycache__ folders in the templates folder. we don't want that!
+            # skip them and remember them to remove them
+            pycaches.append(d) 
+            continue
         for f in files:
             if f != '.DS_Store':
                 try:
@@ -86,3 +94,7 @@ def expand_folder(path_to_template_folder, destination, parameters):
                 except ValueError as exc:
                     msg = exc.args[0] + f'\n    while expanding template folder {path_to_template_folder}.'
                     raise ValueError(msg)
+    
+    # Remove __pycache__ folders
+    for d in pycaches:
+        shutil.rmtree(d, ignore_errors=True)
