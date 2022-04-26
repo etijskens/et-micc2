@@ -225,6 +225,7 @@ Python idioms and readability
 * `73 Examples to Help You Master Python's f-strings <https://miguendes.me/amp/73-examples-to-help-you-master-pythons-f-strings>`_
 * `Python f-strings Are More Powerful Than You Might Think <https://martinheinz.dev/blog/70>`_
 * `The Correct Way to Overload Functions in Python <https://towardsdatascience.com/the-correct-way-to-overload-functions-in-python-b11b50ca7336>`_
+* `Singleton is a bad idea <https://nedbatchelder.com/blog/202204/singleton_is_a_bad_idea.html>`_
 
 Useful packages
 ---------------
@@ -244,6 +245,7 @@ Useful packages
 * `rich: rich text and beautiful formatting in the terminal <https://github.com/willmcgugan/rich>`_
 * `Awesome pattern matching (apm) for Python <https://github.com/scravy/awesome-pattern-matching>`_
 * `Scheduling All Kinds of Recurring Jobs with Python <https://towardsdatascience.com/scheduling-all-kinds-of-recurring-jobs-with-python-b8784c74d5dc>`_
+* `bidict <https://towardsdatascience.com/python-bi-dictionary-key-can-be-value-and-value-can-be-key-50715a2046af>`_
 
 Exceptions
 ----------
