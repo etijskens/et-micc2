@@ -117,6 +117,7 @@ rely on automatic code transformation from Python, so there is no need to write 
   * using pypy
 * `Speeding up your code <https://pythonspeed.com/performance/>`_
 * `Cython, Rust, and more: choosing a language for Python extensions <https://pythonspeed.com/articles/rust-cython-python-extensions/>`_
+* `PyCon 22 Talk - Henry Fredrick Schreiner III: Building a binary extension <https://www.youtube.com/watch?v=gROGDQakzas&list=PL2Uw4_HvXqvYeXy8ab7iRHjA-9HiYhRQl&index=24>`_
 
 Approaches mimicking or wrapping OpenMP and MPI:
 
@@ -175,6 +176,7 @@ Python idioms and readability
 -----------------------------
 * `The Elements of Python Stylez <https://github.com/amontalenti/elements-of-python-style>`_
 * `Practical decorators <https://www.youtube.com/watch?v=MjHpMCIvwsY&t=1475s>`_ Reuven Lerner
+* `Useful Python decorators for Data Scientists <https://bytepawn.com/python-decorators-for-data-scientists.html>`_
 * `Elegant Solutions For Everyday Python Problems - PyCon 2018 <https://youtu.be/WiQqqB9Mlk>`_
 * `Yes, It's Time to Learn Regular Expressions - PyCon 2017 <https://youtu.be/abrcJ9MpF60>`_
 * `Decorators, unwrapped How do they work - PyCon 2017 <https://youtu.be/UBSyD1RkOX0>`_
@@ -226,6 +228,8 @@ Python idioms and readability
 * `Python f-strings Are More Powerful Than You Might Think <https://martinheinz.dev/blog/70>`_
 * `The Correct Way to Overload Functions in Python <https://towardsdatascience.com/the-correct-way-to-overload-functions-in-python-b11b50ca7336>`_
 * `Singleton is a bad idea <https://nedbatchelder.com/blog/202204/singleton_is_a_bad_idea.html>`_
+* `The unreasonable effectiveness of f-strings and re.VERBOSE <https://death.andgravity.com/f-re>`_ how to construct
+  readable and documented regular expressions.
 
 Useful packages
 ---------------
@@ -398,6 +402,7 @@ CLIs and scripting
 GUI
 ---
 * `Use PyQt's QThread to Prevent Freezing GUIs <https://realpython.com/python-pyqt-qthread/>`_
+* `CustomTkinter UI-Library <https://github.com/TomSchimansky/CustomTkinter>`_
 
 Packaging
 ---------
@@ -489,19 +494,19 @@ Development environment, developement workflow
 * `Hypermodern Python <https://cjolowicz.github.io/posts/hypermodern-python-01-setup/>`_
 * `Thoughts on where tools fit into a workflow <https://snarky.ca/thoughts-on-a-tooling-workflow/>`_
 * `poetry <https://github.com/python-poetry/poetry>`_
-* `Blazing fast CI with GitHub Actions, Poetry, Black and Pytest <https://medium.com/@vanflymen/blazing-fast-ci-with-github-actions-poetry-black-and-pytest-9e74299dd4a5>`_
 * `Rewriting your git history, removing files permanently - cheatsheet & guide <https://blog.gitguardian.com/rewriting-git-history-cheatsheet/>`_
 * `pipupgrade <https://github.com/achillesrasquinha/pipupgrade>`_
 * `How to Set Environment Variables in Linux and Mac: The Missing Manual <https://doppler.com/blog/how-to-set-environment-variables-in-linux-and-mac>`_
 * `GitHub Actions: the full course <https://www.youtube.com/playlist?list=PLArH6NjfKsUhvGHrpag7SuPumMzQRhUKY>`_
 
+CI/CD
+-----
+* `Blazing fast CI with GitHub Actions, Poetry, Black and Pytest <https://medium.com/@vanflymen/blazing-fast-ci-with-github-actions-poetry-black-and-pytest-9e74299dd4a5>`_
+* `A beginner’s guide to CI/CD and automation on GitHub <https://github.blog/2022-06-03-a-beginners-guide-to-ci-cd-and-automation-on-github/?utm_source=tldrnewsletter>`_
+
 Problem solving
 ---------------
 * `The mental game of Python - Raymond Hettinger - pybay 2019 <https://www.youtube.com/watch?v=UANN2Eu6ZnM>`_
-
-Jupyter
--------
-* `Jupyter everywhere <https://blog.jupyter.org/jupyter-everywhere-f8151c2cc6e8>`_
 
 Documentation
 -------------
@@ -538,6 +543,8 @@ Compilers
 Notebooks
 ---------
 * `Jupyter Notebooks in the IDE <https://towardsdatascience.com/jupyter-notebooks-in-the-ide-visual-studio-code-versus-pycharm-5e72218eb3e8>`_
+* `Jupyter everywhere <https://blog.jupyter.org/jupyter-everywhere-f8151c2cc6e8>`_
+* `8 surprising ways how to use Jupyter Notebook <https://mljar.com/blog/how-to-use-jupyter-notebook/>`_
 
 Containers
 ----------
