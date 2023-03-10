@@ -1,4 +1,4 @@
-This page is a compilation of links I found interesting while learning Python and while solving
+                                                        This page is a compilation of links I found interesting while learning Python and while solving
 everyday problems in project management and maintenance, and of course scientific computing.
 As I keep on learning this list evolves continuously :-)
 
@@ -29,9 +29,13 @@ A system administrator has two problems: 1. Dumb users. 2. Smart users.
 
 "Never trust a programmer in a suit." - Anonymous
 
+"Fools ignore complexity. Pragmatists suffer it. Some can avoid it. Geniuses remove it." -  Alan J. Perlis
+
+"Theory and practice sometimes clash. And when that happens, theory loses. Every single time." - Linus Torvalds
 
 For Beginners
 -------------
+* `Learn Python: 7 of my favorite resources <https://opensource.com/article/22/11/learn-python>`_
 * `De Programmeursleerling - Pieter Spronck <http://www.spronck.net/pythonbook/dutchindex.xhtml>`_ (in Dutch)
 * `Slither into Python <https://www.slitherintopython.com>`_
 * `Learn Python by building 5 games <https://www.youtube.com/watch?v=XGf2GcyHPhc>`_
@@ -39,7 +43,8 @@ For Beginners
 * `Learn Python Programming <https://www.programiz.com/python-programming>`_
 * `Python cheat sheet <https://websitesetup.org/wp-content/uploads/2020/04/Python-Cheat-Sheet.pdf>`_
 * `Getting started with Python <https://stackoverflow.blog/2021/07/14/getting-started-with-python/>`_
-* `The full Python tutoria/ <https://www.youtube.com/watch?v=FggJNXN68fs&list=PLkdGijFCNuVnGxo-1fSNcdHh5gZc17oRM>`_
+* `The full Python tutorial <https://www.youtube.com/watch?v=FggJNXN68fs&list=PLkdGijFCNuVnGxo-1fSNcdHh5gZc17oRM>`_
+* `Python & PyGame Tutorial – Code a Duck Hunt Game <https://www.youtube.com/watch?v=T2pd3KRSoHI>`_
 
 Python as a language
 --------------------
@@ -62,6 +67,7 @@ Software engineering
 * `Software Engineering's Greatest Hits <https://www.youtube.com/watch?v=HrVtA-ue-x0>`_
   Very interesting.
 * `SOLID principles for software design <https://stackoverflow.blog/2021/11/01/why-solid-principles-are-still-the-foundation-for-modern-software-architecture/>`_
+* `Software engineering practices <https://simonwillison.net/2022/Oct/1/software-engineering-practices/?utm_source=tldrnewsletter>`_
 
 Python internals
 ----------------
@@ -118,6 +124,8 @@ rely on automatic code transformation from Python, so there is no need to write 
 * `Speeding up your code <https://pythonspeed.com/performance/>`_
 * `Cython, Rust, and more: choosing a language for Python extensions <https://pythonspeed.com/articles/rust-cython-python-extensions/>`_
 * `PyCon 22 Talk - Henry Fredrick Schreiner III: Building a binary extension <https://www.youtube.com/watch?v=gROGDQakzas&list=PL2Uw4_HvXqvYeXy8ab7iRHjA-9HiYhRQl&index=24>`_
+* `Deep CMake for library authors <https://www.youtube.com/watch?v=m0DwB4OvDXk>`_ CppCon 2019, Interesting CMake stuff by craig scott,
+  the author of `Professional CMake - a practical guide <https://crascit.com/professional-cmake/>`_
 
 Approaches mimicking or wrapping OpenMP and MPI:
 
@@ -161,10 +169,14 @@ Profiling
 * `Yet Another Python Profiler, but this time thread&coroutine&greenlet aware <https://github.com/sumerc/yappi>`_
 * `scalene <https://www.youtube.com/watch?v=nrQPqy3YY5A&list=PL2Uw4_HvXqvYk1Y5P8kryoyd83L_0Uk5K&index=19>`_
 * `Memory profiler for Python <https://github.com/bloomberg/memray>`_
+* `Python timer functions <https://realpython.com/python-timer/>`_
+* `How to Benchmark (Python) Code <https://switowski.com/blog/how-to-benchmark-python-code/>`_
 
 Memory profiling
 ----------------
 * `Optimizing Memory Usage in Python Applications <https://martinheinz.dev/blog/68>`_
+
+
 
 Resource monitoring
 -------------------
@@ -230,6 +242,8 @@ Python idioms and readability
 * `Singleton is a bad idea <https://nedbatchelder.com/blog/202204/singleton_is_a_bad_idea.html>`_
 * `The unreasonable effectiveness of f-strings and re.VERBOSE <https://death.andgravity.com/f-re>`_ how to construct
   readable and documented regular expressions.
+* `Organize Python code like a PRO <https://guicommits.com/organize-python-code-like-a-pro/>`_
+* `Coding 102: Writing code other people can read <https://stackoverflow.blog/2023/02/13/coding-102-writing-code-other-people-can-read/?utm_source=Iterable&utm_medium=email&utm_campaign=the_overflow_newsletter>`_
 
 Useful packages
 ---------------
@@ -309,6 +323,8 @@ Testing
   These days, there’s a wealth of great content on Python testing. Here’s a brief reference to help you get started.
 * `How to write doctests in Python <https://www.digitalocean.com/community/tutorials/how-to-write-doctests-in-python>`_
 * `A Gentle Introduction to Testing with PyTest <https://bas.codes/posts/python-pytest-introduction>`_
+* `unittest’s new context methods in Python 3.11 <https://adamj.eu/tech/2022/11/14/unittest-context-methods-python-3-11-backports/>`_
+
 
 Debugging
 ---------
@@ -328,6 +344,15 @@ Debugging
 * `Debugging Python and C(++) extensions with gdb and pdb <https://www.researchgate.net/figure/Debugging-both-C-extensions-and-Python-code-with-gdb-and-pdb_fig2_220307949>`_
 * `When C extensions crash: easier debugging for your Python application <https://pythonspeed.com/articles/python-c-extension-crashes/>`_
 * `Debugging Python C extensions with GDB <https://developers.redhat.com/articles/2021/09/08/debugging-python-c-extensions-gdb#debugging_with_gbd_in_python_3_9>`_
+* `Add custom windows to GDB: Programming the TUI in Python <https://developers.redhat.com/articles/2022/08/03/add-custom-windows-gdb-programming-tui-python/>`_
+* All about gdb, TUI and python inside gdb:
+    * `CppCon 2015: Greg Law "Give me 15 minutes & I'll change your view of GDB <https://www.youtube.com/watch?v=PorfLSr3DDI>`_
+    * `CppCon 2016: Greg Law “GDB - A Lot More Than You Knew <https://www.youtube.com/watch?v=-n9Fkq1e6sg>`_
+    * `Getting the Most Out of GDB - Mark Williamson & Greg Law - C++ on Sea 2022 <https://www.youtube.com/watch?v=to8KkFQn7jE>`_
+    * `CppCon 2018: Greg Law “Debugging Linux C++” <https://www.youtube.com/watch?v=V1t6faOKjuQ>`_
+    * `Cool New Stuff in Gdb 9 and Gdb 10 - Greg Law - CppCon 2021 <https://www.youtube.com/watch?v=xSnetY3eoIk>`_
+    * `Cool New Stuff in GDB 9, 10 and 11 - Greg Law - ACCU 2022 <https://www.youtube.com/watch?v=KLXnNWYa5YA>`_
+    * ` <>`_
 
 Logging
 -------
@@ -336,10 +361,6 @@ Logging
 * `Do not log <https://sobolevn.me/2020/03/do-not-log>`_
 * `Understanding Python's logging library <https://blog.urbanpiper.com/understanding-python-logging-library/>`_
 * `Logging like a pro <https://guicommits.com/how-to-log-in-python-like-a-pro/>`_
-
-Profiling
----------
-* `Python timer functions <https://realpython.com/python-timer/>`_
 
 Scientific Python
 -----------------
@@ -356,8 +377,8 @@ Scientific Python
 * `SymPy Tutorial (2022): For Physicists, Engineers, and Mathematicians <https://www.youtube.com/watch?v=1yBPEPhq54M>`_
 * `Scientific Visualization using Python and Matplotlib <https://github.com/rougier/scientific-visualization-book>`_
 
-Machine learning and data science
----------------------------------
+Artificial intelligence, machine learning and data science
+----------------------------------------------------------
 * `Scikit-learn, wrapping your head around machine learning - PyCon 2019 <https://www.youtube.com/watch?v=kTdt0P0e3Qc>`_
 * `Applied Deep Learning for NLP Using PyTorch <https://youtu.be/VBM1u-UIoI0>`_
 * `Data Science Best Practices with pandas - PyCon 2019 <https://www.youtube.com/watch?v=ZjrUmNq41Eo>`_
@@ -372,24 +393,33 @@ Machine learning and data science
 * `Neural Networks Explained from Scratch using Python <https://youtu.be/9RN2Wr8xvro>`_
 * `Machine learning made easy withe Python <https://opensource.com/article/21/1/machine-learning-python?utm_medium=Email&utm_campaign=weekly&sc_cid=7013a0000026SeIAAU>`_
 * `Speeding up your pandas code <https://iip.readthedocs.io/en/latest/setup.html#setting-up-your-local-environment>`_
-* `The great Python dataframe showdown, part 1: Demystifying Apache Arrow <https://www.orchest.io/blog/the-great-python-dataframe-showdown-part-1-demystifying-apache-arrow>`_
 * `NN template <https://github.com/grok-ai/nn-template>`_
 * `Object localization using PyTorch : part 1 <https://blog.paperspace.com/object-localization-using-pytorch-1/>`_
 * `Object localization using PyTorch : part 2 <https://blog.paperspace.com/object-localization-using-pytorch-2/>`_
 * `µTransfer: A technique for hyperparameter tuning of enormous neural networks <https://www.microsoft.com/en-us/research/blog/µtransfer-a-technique-for-hyperparameter-tuning-of-enormous-neural-networks/>`_
 * `Practical Quantization in PyTorch <https://pytorch.org/blog/quantization-in-practice/>`_
+* `Natural language processing demistified <https://www.nlpdemystified.org>`_
+* `Neural Networks: Zero to Hero <https://karpathy.ai/zero-to-hero.html?utm_source=tldrnewsletter>`_
+* `This guide is designated to anybody with basic programming knowledge or a computer science background interested in becoming a Research Scientist with 🎯 on Deep Learning and NLP <https://github.com/ahmedbahaaeldin/From-0-to-Research-Scientist-resources-guide?utm_source=tldrnewsletter>`_
+* `pyGWalker <https://github.com/Kanaries/pygwalker>`_
+
+Pandas
+------
+* `The great Python dataframe showdown, part 1: Demystifying Apache Arrow <https://www.orchest.io/blog/the-great-python-dataframe-showdown-part-1-demystifying-apache-arrow>`_
 * `Tutorial: Indexing DataFrames in Pandas <https://www.dataquest.io/blog/tutorial-indexing-dataframes-in-pandas/>`_
 * `Efficient pandas Dataframes <https://www.youtube.com/watch?v=u4_c2LDi4b8>`_
 * `Speed up your slow pandas python code by 2500x... <https://www.youtube.com/watch?v=SAFmrTnEHLg&t=1s>`_
 * `How to iterate over DataFrame rows (and should you?) <https://www.wrighters.io/how-to-iterate-over-dataframe-rows-and-should-you/>`_
+* `Python for Data Analysis, 3d Edition <https://wesmckinney.com/book/>`_
+* `Effective Pandas (Matt Harrison) <https://www.youtube.com/watch?v=zgbUk90aQ6A>`_
+
 
 CLIs and scripting
 ------------------
 * `Building a CLI for Firmware Projects using Invoke <https://interrupt.memfault.com/blog/building-a-cli-for-firmware-projects>`_
-* `Click <https://click.palletsprojects.com/en/7.x/>`_
+* `Click <https://click.palletsprojects.com>`_
 * `QUICK: A real quick GUI generator for click <https://github.com/szsdk/quick>`_
 * `When laziness is efficient: Make the most of your command line <https://stackoverflow.blog/2020/02/12/when-laziness-is-efficient-make-the-most-of-your-command-line/?utm_source=Iterable&utm_medium=email&utm_campaign=the_overflow_newsletter&utm_content=02-19-20>`_
-* `Typer: build CLIs with Python type hints <https://typer.tiangolo.com/>`_
 * `Messing with the python shell <https://www.kbairak.net/programming/python/2021/02/01/messing-with-the-python-shell.html>`_
 * `Converting shell scripts to python scripts <https://github.com/jroose/shtk>`_
 * `a Python shell environment that combines the expressiveness of shell pipelines with the power of python iterators <https://github.com/redhog/pieshell>`_
@@ -398,11 +428,15 @@ CLIs and scripting
 * `Questionary is a Python library for effortlessly building pretty command line interfaces <https://github.com/tmbo/questionary>`_
 * `Command Line Interface Guidelines <https://clig.dev>`_
 * `iterm2 plugins written in python <https://cgamesplay.com/post/2020/11/25/iterm-plugins/>`_
+* `typer: Python library for building CLI applications <https://github.com/tiangolo/typer>`_
+  Built on top of click
 
 GUI
 ---
 * `Use PyQt's QThread to Prevent Freezing GUIs <https://realpython.com/python-pyqt-qthread/>`_
 * `CustomTkinter UI-Library <https://github.com/TomSchimansky/CustomTkinter>`_
+* `Learn Python GUI Development for Desktop – PySide6 and Qt Tutorial <https://www.youtube.com/watch?v=Z1N9JzNax2k>`_
+* `Create a modern user interface with the Tkinter Python library <https://opensource.com/article/23/2/user-interface-tkinter-python>`_
 
 Packaging
 ---------
@@ -420,6 +454,7 @@ Packaging
 * `Options for packaging your Python code: Wheels, Conda, Docker, and more <https://pythonspeed.com/articles/distributing-software/>`_
 * `What the heck is pyproject.toml? <https://snarky.ca/what-the-heck-is-pyproject-toml/>`_
 * `4 Things Tutorials Don't Tell You About PyPI <https://blog.paoloamoroso.com/2021/09/4-things-tutorials-dont-tell-you-about.html>`_
+* `How to improve Python packaging, or why fourteen tools are at least twelve too many <https://chriswarrick.com/blog/2023/01/15/how-to-improve-python-packaging/>`_
 
 Graphics
 --------
@@ -462,6 +497,7 @@ Tools
 * `A list of new(ish) command line tools <https://jvns.ca/blog/2022/04/12/a-list-of-new-ish--command-line-tools/?utm_source=tldrnewsletter>`_
 
 git and other VCS
+-----------------
 
 * `lazygit: A simple terminal UI for git commands <https://github.com/jesseduffield/lazygit?utm_source=tldrnewsletter>`_
 * `Introduction to Git In 16 Minutes <https://vickyikechukwu.hashnode.dev/introduction-to-git-in-16-minutes?utm_source=tldrnewsletter>`_
@@ -481,6 +517,8 @@ git and other VCS
 * `Git for professionals: Tools & Concepts for Mastering Version Control with Git <https://www.youtube.com/watch?v=Uszj_k0DGsg>`_
 * `Create changelog from git history <https://github.com/orhun/git-cliff>`_
 * `10 Git tips we can't live without <https://opensource.com/article/22/4/git-tips>`_
+* `idiot proof git <https://softwaredoug.com/blog/2022/11/09/idiot-proof-git-aliases.html?utm_source=tldrnewsletter>`_
+* `how to use git squash, git rebase, and git cherry-pick <https://opensource.com/article/22/11/advanced-git-commands>`_
 
 Development environment, developement workflow
 ----------------------------------------------
@@ -507,6 +545,7 @@ CI/CD
 Problem solving
 ---------------
 * `The mental game of Python - Raymond Hettinger - pybay 2019 <https://www.youtube.com/watch?v=UANN2Eu6ZnM>`_
+* `You should be reading academic computer science papers <https://stackoverflow.blog/2022/12/30/you-should-be-reading-academic-computer-science-papers>`_
 
 Documentation
 -------------
@@ -518,6 +557,8 @@ Documentation
     interesting section about tox
 * `Scott Meyers' advise on writing <https://scottmeyers.blogspot.com/2013/01/effective-effective-books.html>`_
 * `A “How to” Guide for Sphinx + ReadTheDocs <https://sphinx-rtd-tutorial.readthedocs.io>`_
+* `Write documentation as code <https://opensource.com/article/22/10/docs-as-code>`_
+* `sphinx-autodoc-typehints <https://pypi.org/project/sphinx-autodoc-typehints/>`_
 
 Django
 ------
@@ -533,6 +574,7 @@ C++
 ---
 * `A friendly guide to the syntax of C++ method pointers <https://opensource.com/article/21/2/ccc-method-pointers?utm_medium=Email&utm_campaign=weekly&sc_cid=7013a000002vqnQAAQ>`_
 * `How Many Strings Does C++ Have? <https://blogs.msmvps.com/gdicanio/2018/05/28/how-many-strings-does-c-have/>`_
+* `Johnny's software lab <https://johnnysswlab.com>`_ very thorough site on C++ performance issues.
 
 Compilers
 ---------
