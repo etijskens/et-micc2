@@ -1,3 +1,10 @@
+import os
+from pathlib import Path
+
+import click
+
+from et_micc2.subcmds.add import get_submodule_type
+
 def info(project):
     """Output info on the project."""
 

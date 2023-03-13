@@ -29,8 +29,10 @@ sys_path_helper()
 from et_micc2 import __version__
 from et_micc2.tools.project import Project
 import et_micc2.tools.config as config
+import et_micc2.tools.messages as messages
 
 from et_micc2.subcmds.create import create as create_cmd
+from et_micc2.subcmds.info import info as info_cmd
 
 if '3.8' < sys.version:
     from et_micc2.check_environment import check_cmd
@@ -517,9 +519,9 @@ def info(ctx,name,version):
         print(project.version)
         return
     else:
-        with et_micc2.logger.logtime(project):
+        with messages.logtime(project):
             try:
-                project.info_cmd()
+                info_cmd(project)
             except RuntimeError:
                 ctx.exit(project.exit_code)
 
