@@ -3,9 +3,15 @@
 """
 Application micc2
 """
+import os
+from pathlib import Path
+import pkg_resources
+import shutil
 import subprocess
+import sys
+from types import SimpleNamespace
 
-
+import click
 
 def sys_path_helper():
     """Make sure that et_micc2 can be imported in case this file is executed as::
@@ -18,18 +24,13 @@ def sys_path_helper():
         p = Path(__file__) / '..' / '..'
         sys.path.insert(0, str(p.resolve()))
 
-
-import os, sys, shutil
-from types import SimpleNamespace
-from pathlib import Path
-
-import click
-
 sys_path_helper()
-from et_micc2.project import Project, micc_version, error
-import et_micc2.logger
-import et_micc2.config
-import pkg_resources
+
+from et_micc2 import __version__
+from et_micc2.tools.project import Project
+import et_micc2.tools.config as config
+
+from et_micc2.subcmds.create import create as create_cmd
 
 if '3.8' < sys.version:
     from et_micc2.check_environment import check_cmd
@@ -113,7 +114,7 @@ _preferences_setup = { "full_name":
 )
 # end of preferences overwrite options
 # Don't put any options below, otherwise they will be treated as overwrite preferences.
-@click.version_option(version=micc_version())
+@click.version_option(version=__version__)
 @click.pass_context
 def main( ctx, verbosity, project_path, clear_log
         , **overwrite_preferences
@@ -167,10 +168,10 @@ def main( ctx, verbosity, project_path, clear_log
                       f'         Ignoring `{key}={value}`.')
 
     try:
-        preferences = et_micc2.config.Config(file_loc=ctx.obj.project_path / _cfg_filename)
+        preferences = config.Config(file_loc=ctx.obj.project_path / _cfg_filename)
     except FileNotFoundError:
         try:
-            preferences = et_micc2.config.Config(file_loc=_cfg_dir / _cfg_filename)
+            preferences = config.Config(file_loc=_cfg_dir / _cfg_filename)
         except FileNotFoundError:
             preferences = None
 
@@ -256,7 +257,7 @@ def setup( ctx
                 if not 'choices' in description:
                     description['default'] = context.preferences[name]
             try:
-                selected[name] = et_micc2.config.get_param(name, description)
+                selected[name] = config.get_param(name, description)
             except KeyboardInterrupt:
                 print('Interupted - Preferences are not saved.')
                 ctx.exit(1)
@@ -269,7 +270,7 @@ def setup( ctx
     selected["py"] = "py"
 
     # Transfer the selected preferences to a Config object and save it to disk.
-    context.preferences = et_micc2.config.Config(**selected)
+    context.preferences = config.Config(**selected)
     save_to = _cfg_dir / _cfg_filename
     print(f'These preferences are saved to {save_to}:\n{context.preferences}')
     answer = input("Continue? yes/no >:")
@@ -416,9 +417,9 @@ def create( ctx
 
     context.no_git = no_git
     if no_git:
-        context.remote_access = 'none'
+        context.github_repo = 'none'
     else:
-        context.remote_access = None if remote=='none' else remote
+        context.github_repo = None if remote=='none' else remote
 
     context.templates = ['top-level-package']
 
@@ -430,7 +431,7 @@ def create( ctx
 
     try:
         project = Project(context)
-        project.create_cmd()
+        create_cmd(project)
     except RuntimeError:
         ctx.exit(2)
 

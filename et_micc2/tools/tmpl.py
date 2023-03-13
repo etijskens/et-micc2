@@ -7,7 +7,6 @@ Package tmpl
 Top-level package for tmpl.
 """
 
-__version__ = "0.0.0"
 
 import re,os
 from pathlib import Path

@@ -1,5 +1,15 @@
 .. include:: ../HYPERLINKS.rst
 
+What i don't like about micc2
+=============================
+
+* It's badly structured
+* I don't thrust the `micc2 mv` command and its implementation is clumsy, not intuitive
+* no support for .md docs (mkdocs)
+* dependency on poetry which i don't use any more, except for publishing to PyPI, but pip can install from github,
+  so not really useful.
+* don't write a log file. it has never been used.
+
 TODO
 ====
 
