@@ -13,6 +13,8 @@ from types import SimpleNamespace
 
 import click
 
+from et_micc2.tools.env import ExitCodes
+
 def sys_path_helper():
     """Make sure that et_micc2 can be imported in case this file is executed as::
 
@@ -77,6 +79,10 @@ _preferences_setup = { "full_name":
     , help="The verbosity of the program output."
     , default=1
 )
+@click.option('-s', '--silent'
+    , help="The verbosity of the program output."
+    , default=False, is_flag=True
+)
 @click.option('-p', '--project-path'
     , help="The path to the project directory. "
            "The default is the current working directory."
@@ -120,7 +126,7 @@ _preferences_setup = { "full_name":
 # Don't put any options below, otherwise they will be treated as overwrite preferences.
 @click.version_option(version=et_micc2.__version__)
 @click.pass_context
-def main( ctx, verbosity, project_path, clear_log
+def main( ctx, verbosity, silent, project_path, clear_log
         , **overwrite_preferences
         ):
     """Micc2 command line interface.
@@ -143,13 +149,13 @@ def main( ctx, verbosity, project_path, clear_log
 
     ctx.obj = SimpleNamespace(
         verbosity=verbosity,
+        silent=silent,
         project_path=Path(project_path).resolve(),
         default_project_path=(project_path=='.'),
         clear_log=clear_log,
         _cfg_filename=_cfg_filename,
         _cfg_dir=_cfg_dir,
         invoked_subcommand=ctx.invoked_subcommand
-
     )
 
     overwrite_preferences_set = {}
@@ -402,7 +408,7 @@ def create( ctx
                   f"         name -> {name}"
                    "       You must choose one or the other, not both."
                  )
-            ctx.exit(-1)
+            ctx.exit(ExitCodes.RuntimeError)
         else:
             # overwrite the -p global option so the project will be created:
             context.project_path = Path(name).resolve()
@@ -417,7 +423,7 @@ def create( ctx
               f"       --remote=private\n"
               f"       --remote=none\n"
               )
-        ctx.exit(-1)
+        ctx.exit(ExitCodes.ValueError)
 
     context.no_git = no_git
     if no_git:
@@ -436,8 +442,8 @@ def create( ctx
     try:
         project = Project(context)
         create_cmd(project)
-    except RuntimeError:
-        ctx.exit(2)
+    except RuntimeError as runtime_error:
+        ctx.exit(runtime_error.exit_code)
 
 
 ####################################################################################################
@@ -583,13 +589,13 @@ def version(ctx, major, minor, patch, rule, tag, short, dry_run):
     try:
         project = Project(context)
     except RuntimeError:
-        ctx.exit(2)
+        ctx.exit(ExitCodes.RuntimeError)
 
     with et_micc2.logger.logtime(project):
         try:
             project.version_cmd()
         except RuntimeError:
-            ctx.exit(2)
+            ctx.exit(ExitCodes.RuntimeError)
         else:
             if tag:
                 project.tag_cmd()
@@ -608,7 +614,7 @@ def tag(ctx):
         project = Project(context)
         project.tag_cmd()
     except RuntimeError:
-        ctx.exit(2)
+        ctx.exit(ExitCodes.RuntimeError)
 
 
 ####################################################################################################
@@ -741,7 +747,7 @@ def mv(ctx, cur_name, new_name, silent, entire_package, entire_project):
         with et_micc2.logger.logtime(context):
             project.mv_component()
     except RuntimeError:
-        ctx.exit(2)
+        ctx.exit(ExitCodes.RuntimeError)
 
 
 ####################################################################################################
@@ -782,7 +788,7 @@ def build( ctx
         answer = input('>: Continue? (y/N)')
         if answer != 'y':
             print('')
-            ctx.exit(-1)
+            ctx.exit(ExitCodes.UserInterruptError)
 
     context = ctx.obj
     context.build_options = SimpleNamespace( module_to_build = module
@@ -798,7 +804,7 @@ def build( ctx
         with messages.logtime(context):
             build_cmd(project)
     except RuntimeError:
-        ctx.exit(2)
+        ctx.exit(ExitCodes.RuntimeError)
 
 
 ####################################################################################################

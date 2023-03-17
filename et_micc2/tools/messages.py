@@ -6,13 +6,14 @@ Module et_micc2.tools.messages
 Helper functions for logging.
 """
 
-import sys
 from contextlib import contextmanager
-import logging 
 from datetime import datetime
+import logging
+import sys
+
 import click
 
-
+from et_micc2.tools.env import ExitCodes
 def verbosity_to_loglevel(verbosity):
     """Tranlate :py:obj:`verbosity` into a loglevel.
 
@@ -219,18 +220,20 @@ def logtime(project=None):
     spent = stop - start
     logfun(f"spent = {spent}")
 
-def error(msg, exit_code=1, raise_runtimeerror=True):
-    """Print an error message,  set this project's exit_code, and optionally raise a
-    RuntimeError.
 
-    :param str msg: the error message
-    :param int exit_code: the exit_code to set
-    :param bool raise_runtimeerror: raise RuntimeError if True
+def error(msg: str, exit_code=None):
+    """Print an error message, and raise a RuntimeError if the exit_code is not None.
+    The exit code is stored in the error
+
+    Params:
+        msg: the error message
+        exit_code: the exit_code to report
     """
     click.secho("[ERROR]\n" + msg, fg='bright_red')
-    if raise_runtimeerror:
-        raise RuntimeError(msg, exit_code)
-
+    if exit_code:
+        runtime_error = RuntimeError(msg)
+        runtime_error.exit_code = exit_code
+        raise runtime_error
 
 def warning(msg):
     """Print a warning message ``msg``."""
@@ -258,6 +261,6 @@ def ask_user_to_continue_or_not(default=False, stop_message='Exiting.'):
         answer = True if answer.startswith('y') else False
 
     if not answer:
-        error(stop_message, exit_code=_exit_missing_component)
+        error(stop_message, exit_code=ExitCodes.MISSING_COMPONENT)
 
 

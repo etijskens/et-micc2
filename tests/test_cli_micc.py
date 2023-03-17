@@ -22,6 +22,7 @@ from tests import helpers
 
 # import et_micc2.tools.messages as messages
 from et_micc2 import cli_micc
+import et_micc2.tools.env as env
 import et_micc2.tools.project as project
 import et_micc2.tools.utils as utils
 import et_micc2.subcmds.build as build
@@ -208,24 +209,24 @@ def test_git_missing():
     """"""
     helpers.clear_test_workspace()
 
-    project.ToolInfo.mock = ['git']
+    env.ToolInfo.mock = ['git']
 
     with utils.in_directory(helpers.test_workspace):
         #Create package NOGIT
-        result = micc( ['-vv', '-p', 'NOGIT', 'create', '--allow-nesting', '--remote=none', '--package']
-                      , stdin='\n', assert_exit_code=False
-                      )
-        assert result.exit_code == project.__exit_missing_component__
+        result = micc( ['-vv', '--silent', 'create', 'NOGIT', '--allow-nesting', '--remote=none']
+                     , stdin='\n', assert_exit_code=False
+                     )
+        assert result.exit_code == env.ExitCodes.MISSING_COMPONENT.value
         assert not Path('NOGIT/nogit/__init__.py').exists()
 
-    project.ToolInfo.mock = []
+    env.ToolInfo.mock = []
 
 
 def test_gh_missing():
     """"""
     helpers.clear_test_workspace()
     
-    project.ToolInfo.mock = ['gh']
+    env.ToolInfo.mock = ['gh']
 
     with utils.in_directory(helpers.test_workspace):
         results = []
@@ -237,14 +238,14 @@ def test_gh_missing():
         assert not Path('NOGH/nogh/__init__.py').exists()
         results.append(result)
 
-    project.ToolInfo.mock = []
+    env.ToolInfo.mock = []
 
 
 def test_cmake_missing():
     """"""
     helpers.clear_test_workspace()
 
-    project.ToolInfo.mock = ['cmake']
+    env.ToolInfo.mock = ['cmake']
 
     with utils.in_directory(helpers.test_workspace):
         #Create package NOCMAKE
@@ -261,13 +262,13 @@ def test_cmake_missing():
                 result = micc(['-v', 'add', submodule, flag])
                 assert result.exit_code == 0
 
-    project.ToolInfo.mock = []
+    env.ToolInfo.mock = []
 
 def test_pybind11_f2py_missing():
     """"""
     helpers.clear_test_workspace()
 
-    project.ToolInfo.mock = ['f2py']
+    env.ToolInfo.mock = ['f2py']
     project.PkgInfo.mock = ['pybind11']
 
     with utils.in_directory(helpers.test_workspace):
@@ -285,7 +286,7 @@ def test_pybind11_f2py_missing():
                 result = micc(['-v', 'add', submodule, flag])
                 assert result.exit_code == 0
 
-    project.ToolInfo.mock = []
+    env.ToolInfo.mock = []
     project.PkgInfo.mock = []
 
 
@@ -313,7 +314,7 @@ def test_build_pybind11_missing():
                 result = micc(['-vv', 'build', '-m', submodule, '--clean'], assert_exit_code=False)
                 assert result.exit_code == project.__exit_missing_component__
 
-    project.ToolInfo.mock = []
+    env.ToolInfo.mock = []
     project.PkgInfo.mock = []
 
 
@@ -335,7 +336,7 @@ def test_doc_cmd():
 
 if __name__ == "__main__":
     print(sys.version_info)
-    the_test_you_want_to_debug = test_package
+    the_test_you_want_to_debug = test_git_missing
 
     print(f"__main__ running {the_test_you_want_to_debug}")
     the_test_you_want_to_debug()

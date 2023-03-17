@@ -33,7 +33,6 @@ import et_micc2.tools.utils as utils
 
 
 __FILE__ = Path(__file__).resolve()
-_exit_missing_component = -1
 
 
 def is_project_directory(path: Path, project=None) -> bool:

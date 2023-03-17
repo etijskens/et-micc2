@@ -8,7 +8,15 @@ import subprocess
 import et_micc2.tools.messages as messages
 
 PYBIND11_MINIMAL_VERSION =  '2.6.2'
-ExitCodes = Enum('ExitCodes', ['MISSING_COMPONENT', 'Overwrite'])
+ExitCodes = Enum(
+    'ExitCodes',
+    [ 'MISSING_COMPONENT'
+    , 'Overwrite'
+    , 'RuntimeError'
+    , 'ValueError'
+    , 'UserInterruptError'
+    ]
+)
 
 
 def on_vsc_cluster():

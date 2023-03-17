@@ -37,8 +37,10 @@ def create(project):
                 'To install git: https://git-scm.com/downloads.\n'
                 'If you continue, this project will NOT have a local git repository.'
             )
-
-        messages.ask_user_to_continue_or_not(stop_message='Project not created.')
+        if project.context.silent:
+            messages.error("Git is missing. Project not created.", exit_code=env.ExitCodes.MISSING_COMPONENT.value)
+        else:
+            messages.ask_user_to_continue_or_not(stop_message="Git is missing. Project not created.")
 
     if project.context.github_repo != 'none':
         # Check that we have github username
