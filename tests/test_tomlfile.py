@@ -5,7 +5,7 @@
 from pathlib import Path
 import shutil
 
-from et_micc2.tools.tomlfile import TomlFile
+from et_micc2.tools .tomlfile import TomlFile
 
 
 def test_exists():
