@@ -1,16 +1,29 @@
-__pybind11_required_version__ = '2.6.2'
+from pathlib import Path
+import os
+import shutil
+from types import SimpleNamespace
+import site
+import subprocess
+import sys
+import sysconfig
 
-def build_cmd(project):
+import et_micc2.tools.env as env
+import et_micc2.tools.messages as messages
+import et_micc2.tools.project as project
+import et_micc2.tools.utils as utils
+from et_micc2.subcmds.add import get_submodule_type
+
+def build(project):
     """Build a binary extension."""
 
     # Exit if cmake is not available:
-    if not ToolInfo('cmake').is_available():
+    if not env.ToolInfo('cmake').is_available():
         msg = 'The build command requires cmake, which is not available in your current environment.\n'
-        if on_vsc_cluster():
+        if env.on_vsc_cluster():
             msg += 'Load a cluster module that enables cmake.'
         else:
             msg += 'Make sure cmake is installed and on your PATH.'
-        error(msg)
+        messages.error(msg)
 
     # get extension for binary extensions (depends on OS and python version)
     extension_suffix = get_extension_suffix()
@@ -24,51 +37,26 @@ def build_cmd(project):
     succeeded = []
     failed = []
     for root, dirs, files in os.walk(package_path):
-        for dir in dirs:
+        for dir_ in dirs:
             p_root = Path(root)
-            submodule_type = get_submodule_type(p_root / dir)
-            # print(root, dir,submodule_type)
+            submodule_type = get_submodule_type(p_root / dir_)
+            # print(root, dir_, submodule_type)
             if submodule_type in ('f90', 'cpp'):
                 build = True
                 if build_options.module_to_build:
-                    if build_options.module_to_build != p_root / dir:
+                    if build_options.module_to_build != p_root / dir_:
                         build = False
                 if build:
                     if submodule_type == 'f90':
                         # Exit if f2py is not available
-                        if not ToolInfo('f2py').is_available():
-                            msg = 'Building a Fortran binary extension requires f2py, which is not available in your current environment.\n' \
-                                  '(F2py is part of the numpy Python package).'
-                            if on_vsc_cluster():
-                                msg += 'Load a cluster module that has the numpy package pre-installed.'
-                            else:
-                                msg += 'If you are using a virtual environment, install numpy as:\n' \
-                                       '    (.venv) > pip install numpy\n' \
-                                       'otherwise,\n' \
-                                       '    > pip install numpy --user\n'
-                            error(msg)
+                        env.check_f2py(required=True)
+
                     elif submodule_type == 'cpp':
                         # exit if pybind11 is not available, and warn if too old...
-                        pybind11 = PkgInfo('pybind11')
-                        if not pybind11.is_available():
-                            error(
-                                'Building C++ binary extensions requires pybind11, which is not available in your current environment.\n'
-                                'If you are using a virtual environment, install it as .\n'
-                                '    (.venv) > pip install pybind11\n'
-                                'otherwise,\n'
-                                '    > pip install pybind11 --user\n'
-                                , exit_code=_exit_missing_component
-                            )
-                        else:
-                            if pybind11.version() < __pybind11_required_version__:
-                                warning(
-                                    f'Building C++ binary extensions requires pybind11, which is available in your current environment (v{pybind11.version()}).\n'
-                                    f'However, you may experience problems because it is older than v{__pybind11_required_version__}.\n'
-                                    'Upgrading is recommended.'
-                                )
+                        env.check_pybind11(required=True)
 
-                    build_options.submodule_srcdir_path = build_options.module_to_build if build_options.module_to_build else (
-                                p_root / dir)
+                    build_options.submodule_srcdir_path = build_options.module_to_build \
+                        if build_options.module_to_build else (p_root / dir_)
                     build_options.submodule_path = build_options.submodule_srcdir_path.parent
                     build_options.submodule_name = build_options.submodule_srcdir_path.name
                     build_options.submodule_binary = build_options.submodule_path / (
@@ -91,7 +79,7 @@ def build_cmd(project):
             project.logger.error(f"  - {binary_extension}")
 
     if not succeeded and not failed:
-        warning(f"No binary extensions found in package ({project.context.package_name}).")
+        messages.warning(f"No binary extensions found in package ({project.context.package_name}).")
 
 
 def build_binary_extension(context):
@@ -109,8 +97,8 @@ def build_binary_extension(context):
         pass
     module_to_build = build_options.submodule_srcdir_path.relative_to(context.project_path)
     build_log_file = build_options.submodule_srcdir_path / "micc-build.log"
-    build_logger = et_micc2.logger.create_logger(build_log_file, filemode='w')
-    with et_micc2.logger.log(build_logger.info, f"Building {build_options.submodule_type} module '{module_to_build}':"):
+    build_logger = messages.create_logger(build_log_file, filemode='w')
+    with messages.log(build_logger.info, f"Building {build_options.submodule_type} module '{module_to_build}':"):
         destination = build_options.submodule_binary
 
         if build_options.submodule_type in ('cpp', 'f90') and (build_options.submodule_srcdir_path / 'CMakeLists.txt').is_file():
@@ -121,7 +109,7 @@ def build_binary_extension(context):
                 shutil.rmtree(output_dir)
             output_dir.mkdir(parents=True, exist_ok=True)
 
-            with et_micc2.utils.in_directory(output_dir):
+            with utils.in_directory(output_dir):
                 cmake_cmd = ['cmake', '-D', f"PYTHON_EXECUTABLE={sys.executable}"]
                 # CAVEAT: using sys.executable implies that we automatically build against the python version used
                 #         by micc2. This is not always what we want.
@@ -148,7 +136,7 @@ def build_binary_extension(context):
                 if not fix:
                     cmds.append([make, 'install'])
 
-                exit_code = et_micc2.utils.execute(
+                exit_code = utils.execute(
                     cmds, build_logger.debug, stop_on_error=True, env=os.environ.copy()
                 )
 
@@ -163,9 +151,9 @@ def build_binary_extension(context):
 
                 if build_options.cleanup:
                     build_logger.info(f"--cleanup: shutil.removing('{output_dir}').")
-                    shutil.rmtree(build_dir)
+                    shutil.rmtree(output_dir)
         else:
-            raise RuntimeError("Bad submodule type, or no CMakeLists.txt   ")
+            raise RuntimeError("Bad submodule type, or no CMakeLists.txt")
 
     return exit_code
 
@@ -198,36 +186,25 @@ def get_extension_suffix():
     return sysconfig.get_config_var('EXT_SUFFIX')
 
 
-def auto_build_binary_extension(package_path, module_to_build):
+def build_missing(package_location: str, module_to_build: str):
+    """Automatically build a binary extension if missing.
+
+    Params:
+        package_location: location of the package's `__init__.py` file.
+        module_to_build: name of the module to be build.
+
+    Raises:
+        BinaryExtensionNotFoundError: if the build went wrong somehow
     """
+    project_path = project.get_project_path(package_location)
+    package_path = project.get_package_path(project_path)
+    with utils.in_directory(project_path):
+        so = package_path / f'{module_to_build}{get_extension_suffix()}'
+        if not so.is_file():
+            completed_process = subprocess.run(['micc2', 'build', module_to_build])
+            if completed_process.returncode != 0:
+                raise BinaryExtensionNotFoundError(f"Failed auto-building {so}.")
 
-    :param Path package_path:
-    :param str module_to_build:
-    :return: exit_code
-    """
-    options = SimpleNamespace( package_path  = package_path
-                             , verbosity     = 1
-                             , module_name   = module_to_build
-                             , build_options = SimpleNamespace( module_to_build = module_to_build
-                                                              , clean           = True
-                                                              , cleanup         = True
-                                                              , cmake           = {'CMAKE_BUILD_TYPE': 'RELEASE'}
-                                                              )
-                             )
-    for module_prefix in ["cpp", "f90"]:
-        module_srcdir_path = package_path / f"{module_prefix}_{context.module_name}"
-        if module_srcdir_path.exists():
-            context.module_kind = module_prefix
-            context.module_srcdir_path = module_srcdir_path
-            context.build_options.build_tool_options = {}
-            break
-    else:
-        raise ValueError(f"No binary extension source directory found for module '{module_to_build}'.")
 
-    exit_code = build_binary_extension(options)
-
-    msg = ("[ERROR]\n"
-          F"    Binary extension module '{context.module_name}{get_extension_suffix()}' could not be build.\n"
-           "    Any attempt to use it will raise exceptions.\n"
-           ) if exit_code else ""
-    return msg
+class BinaryExtensionNotFoundError(ModuleNotFoundError):
+    """raised when trying to autobuild a binary extension."""

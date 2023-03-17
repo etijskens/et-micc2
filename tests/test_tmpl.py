@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 """Tests for tmpl package."""
-import shutil
-
-import et_micc2.tmpl
-
 from pathlib import Path
 import pytest
+import shutil
+
+import et_micc2.tools.tmpl
+
 
 def test_expand_string():
     s = "This is {{tmpl.bar}} and this is {{tmpl.foo}}.\nAnd this is {{tmpl.foobar}}."

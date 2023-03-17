@@ -26,16 +26,18 @@ def sys_path_helper():
 
 sys_path_helper()
 
-from et_micc2 import __version__
+import et_micc2
 from et_micc2.tools.project import Project
 import et_micc2.tools.config as config
 import et_micc2.tools.messages as messages
 
+from et_micc2.subcmds.add import add as add_cmd
+from et_micc2.subcmds.build import build as build_cmd
 from et_micc2.subcmds.create import create as create_cmd
 from et_micc2.subcmds.info import info as info_cmd
 
 if '3.8' < sys.version:
-    from et_micc2.check_environment import check_cmd
+    from et_micc2.subcmds.check_env import check_env
 
 __template_help = "Ordered list of Cookiecutter templates, or a single Cookiecutter template."
 
@@ -116,7 +118,7 @@ _preferences_setup = { "full_name":
 )
 # end of preferences overwrite options
 # Don't put any options below, otherwise they will be treated as overwrite preferences.
-@click.version_option(version=__version__)
+@click.version_option(version=et_micc2.__version__)
 @click.pass_context
 def main( ctx, verbosity, project_path, clear_log
         , **overwrite_preferences
@@ -599,7 +601,7 @@ def version(ctx, major, minor, patch, rule, tag, short, dry_run):
 @main.command()
 @click.pass_context
 def tag(ctx):
-    """Create a git tag for the current version and push it to the remote repo."""
+    """Create a git tag and push it to the GitHub repo."""
     context = ctx.obj
 
     try:
@@ -663,8 +665,9 @@ def add(ctx
         , overwrite
         , backup
         ):
-    """Add a component to the projcect, e.g. CLI, sub-module, sub-package, binary extension 
-    module (C++, Fortran, C++/CUDA )
+    """Add a component to the project
+
+    E.g. a CLI, sub-module, sub-package, binary extension module (C++, Fortran, C++/CUDA ).
 
     :param str name: name of the component. Maybe path-like relative to package directory to
         create sub-sub-modules.
@@ -690,11 +693,11 @@ def add(ctx
         project = Project(context)
         n_selected = cli+clisub+py+f90+cpp # yes, you can add bool variables, they are literally 0|1
         if n_selected == 0:
-            error('You must select a component type:\n    add flag: --py | --cli | --clisub | --f90 | --cpp.')
+            messages.error('You must select a component type:\n    add flag: --py | --cli | --clisub | --f90 | --cpp.')
         if n_selected > 1:
-            error(f'You must select just one component type, not {n_selected}.')
-        with et_micc2.logger.logtime(project):
-            project.add_cmd()
+            messages.error(f'You must select just one component type, not {n_selected}.')
+        with messages.logtime(project):
+            add_cmd(project)
     except RuntimeError as exc:
         ctx.exit(exc.args[1])
 
@@ -719,7 +722,7 @@ def add(ctx
 @click.argument('new_name', type=str, default='')
 @click.pass_context
 def mv(ctx, cur_name, new_name, silent, entire_package, entire_project):
-    """Rename or remove a component, i.e an app (CLI) or a submodule.
+    """Rename or remove a component.
 
     :param cur_name: name of component to be removed or renamed.
     :param new_name: new name of the component. If empty, the component will be removed.
@@ -792,8 +795,8 @@ def build( ctx
 
     try:
         project = Project(context)
-        with et_micc2.logger.logtime(context):
-            project.build_cmd()
+        with messages.logtime(context):
+            build_cmd(project)
     except RuntimeError:
         ctx.exit(2)
 
@@ -809,7 +812,7 @@ def build( ctx
 @click.pass_context
 def check( ctx
          ):
-    """Check wether the current environment has all the neccessary tools available.
+    """Check the completeness of the environment.
 
     Python packages:
 

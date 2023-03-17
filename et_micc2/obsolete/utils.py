@@ -19,7 +19,7 @@ from contextlib import contextmanager
 
 import semantic_version as sv
 
-from et_micc2.tomlfile import TomlFile
+from et_micc2.tools.tomlfile import TomlFile
 import et_micc2.logger
 
 from pypi_simple import PyPISimple

@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 """Tests for et_micc2.tomlfile module."""
 
-import shutil
 from pathlib import Path
+import shutil
 
-from et_micc2.tomlfile import TomlFile
+from et_micc2.tools.tomlfile import TomlFile
 
 
 def test_exists():

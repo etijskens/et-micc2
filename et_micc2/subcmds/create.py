@@ -8,6 +8,7 @@ import et_micc2.tools.env as env
 import et_micc2.tools.expand as expand
 import et_micc2.tools.messages as messages
 import et_micc2.tools.utils as utils
+import et_micc2.tools.project
 
 def create(project):
     """Create a new project skeleton."""
@@ -59,7 +60,7 @@ def create(project):
         # Prevent the creation of a project inside another project
         p = project.context.project_path.parent.resolve()
         while not p.samefile(os.sep):
-            if env.is_project_directory(p):
+            if et_micc2.tools.project.is_project_directory(p):
                 messages.error(
                     f"Cannot create project in ({project.context.project_path}):\n"
                     f"  Specify '--allow-nesting' to create a et_micc2 project inside another et_micc2 project ({p})."

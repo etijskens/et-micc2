@@ -7,15 +7,16 @@ Package tmpl
 Top-level package for tmpl.
 """
 
-
-import re,os
+import os
 from pathlib import Path
+import re
 import shutil
+
 
 def expand_string(s, parameters):
     for parameter,value in parameters.items():
         pattern = '{{tmpl.' + parameter +'}}'
-        s = s.replace(pattern, value)
+        s = s.replace(pattern, str(value))
     validate(s)
     return s
 

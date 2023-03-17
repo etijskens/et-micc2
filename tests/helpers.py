@@ -14,31 +14,33 @@ import traceback
 from pathlib import Path
 import subprocess
 import time
-from et_micc2.tomlfile import TomlFile
-import et_micc2.logger
 
-test_workspace = (Path(__file__).parent / 'test_workspace').resolve()
-print(test_workspace)
+import et_micc2
+test_workspace = (Path(et_micc2.__file__).parent.parent / '.test-workspace').resolve()
+print(f"{test_workspace=}")
+
+from et_micc2.tools.tomlfile import TomlFile
+import et_micc2.tools.messages as messages
+
 
 
 def clear_test_workspace(folder=None):
-    """If dir is None, clear the test workspace by removing it and recreating it.
+    """If folder is None, clear the test workspace by removing it and recreating it.
     Otherwise, only remove directory folder
     """
     if 'VSC_HOME' in os.environ:
         # see https://stackoverflow.com/questions/58943374/shutil-rmtree-error-when-trying-to-remove-nfs-mounted-directory
-        et_micc2.logger.logging.shutdown()
+        messages.logging.shutdown()
 
-    p0 = test_workspace
     if not folder is None:
-        p = p0 / folder
+        p = test_workspace / folder
         if p.exists():
             shutil.rmtree(p)
     else:
-        if p0.exists():
-            shutil.rmtree(p0)
+        if test_workspace.exists():
+            shutil.rmtree(test_workspace)
 
-    p0.mkdir(exist_ok=True)
+    test_workspace.mkdir(exist_ok=True)
         
 
 @contextlib.contextmanager

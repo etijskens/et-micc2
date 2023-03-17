@@ -7,47 +7,53 @@ Module et_micc2.project
 An OO interface to *micc* projects.
 
 """
-from copy import copy
-import os, sys, site, subprocess, re
-import sysconfig
-import shutil
-import json
-from pathlib import Path
-from operator import xor
-import requests
-from types import SimpleNamespace
+import copy
 from importlib import import_module
+import json
+from operator import xor
+import os
+from pathlib import Path
+import re
+import requests
+import shutil
+import site
+import subprocess
+import sys
+import sysconfig
+from types import SimpleNamespace
 
 import click
 import semantic_version
 
-import et_micc2.tools.config as config
-import et_micc2.tools.utils as utils
-import et_micc2.tools.expand as expand
+# import et_micc2.tools.config as config
+# import et_micc2.tools.expand as expand
 import et_micc2.tools.messages as messages
-from et_micc2.tomlfile import TomlFile
+from   et_micc2.tools.tomlfile import TomlFile
+import et_micc2.tools.utils as utils
 
 
 __FILE__ = Path(__file__).resolve()
 _exit_missing_component = -1
 
 
-def is_project_directory(path, project=None):
+def is_project_directory(path: Path, project=None) -> bool:
     """Verify that the directory :file:`path` is a project directory. 
 
-    :param Path path: path to a directory.
-    :param Project project: if not None these variables are set:
+    Params:
+        path: path to a directory.
+        project: if not None, these variables are set:
 
         * project.project_name
         * project.package_name
         * project.pyproject_toml
 
-    :returns: bool.
+    Returns:
+         whether the path is a project directory or not.
 
-    As a sufficident condition, we request that 
+    As a sufficient condition, we request the presence of
 
-    * there is a pyproject.toml file, exposing the project's name:py:obj:`['tool']['poetry']['name']`
-    * that there is a python package or module with that name, converted by :py:meth:`pep8_module_name`.
+    * a pyproject.toml file, exposing the project's name `[x'tool']['poetry']['name']`
+    * a python package with the name `pep8_module_name(name)`.
     """
     if not isinstance(path, Path):
         path = Path(path)
@@ -63,6 +69,38 @@ def is_project_directory(path, project=None):
         return False
 
     return verify_project_structure(path, project)
+
+
+def get_project_path(p: Path) -> Path:
+    """Look for a project directory in the parents of path :py:obj:`p`.
+
+    Params:
+        p: path to some directory or file.
+
+    Returns:
+        the closest containing project directory of `p`
+
+    Raises:
+         RuntimeError if p` is not inside a project directory.
+    """
+    root = Path('/')
+    p = Path(p).resolve()
+    pp = copy.copy(p)
+    while not is_project_directory(pp):
+        pp = pp.parent
+        if pp == root:
+            raise RuntimeError(f"Folder {p0} is not in a Python project.")
+    return pp
+
+
+def get_package_path(p: Path) -> Path:
+    """Get the package path (top level) from the path `p` to a file or directory in a project.
+
+    Raises:
+         RuntimeError if `p` is not in a project.
+    """
+    project_path = get_project_path(p)
+    return project_path / utils.pep8_module_name(project_path.name)
 
 
 def verify_project_structure(path, project=None):
@@ -208,7 +246,7 @@ class Project:
             self.db[self.context.add_name] = db_entry
 
         # finally, serialize self.db
-        with et_micc2.utils.in_directory(self.context.project_path):
+        with utils.in_directory(self.context.project_path):
             with open('db.json','w') as f:
                 json.dump(self.db, f, indent=2)
 

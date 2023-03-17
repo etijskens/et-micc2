@@ -25,7 +25,7 @@ import et_micc2.config
 import et_micc2.utils
 import et_micc2.expand
 import et_micc2.logger
-from et_micc2.tomlfile import TomlFile
+from et_micc2.tools.tomlfile import TomlFile
 import pkg_resources
 
 
@@ -118,8 +118,6 @@ class ToolInfo:
         else:
             self.version = ''
         return self.version
-
-_exit_missing_component = -1
 
 
 def is_project_directory(path, project=None):

@@ -308,23 +308,6 @@ def log_completed_process(completed_process, logfun=None):
     return completed_process.returncode
 
 
-def get_project_path(p):
-    """Look for a project directory in the parents of path :py:obj:`p`.
-    
-    :param Path p:
-    :returns: the nearest directory above :py:obj:`p` that is project directory.
-    :raise: RuntimeError if :py:obj:`p` is noe inside a project directory.
-    """
-    root = Path('/')
-    p = Path(p).resolve()
-    p0 = copy.copy(p)
-    while not is_project_directory(p):
-        p = p.parent
-        if p==root:
-            raise RuntimeError(f"Folder {p0} is not inside a Python project.")
-    return p
-
-
 def insert_in_file(file, lines=[], before=False, startswith=None):
     """Insert *lines* at a specific position in a <file>.
     

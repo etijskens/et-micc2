@@ -1,7 +1,14 @@
+from enum import Enum
 import os
 import pkg_resources
+import semantic_version
 import shutil
 import subprocess
+
+import et_micc2.tools.messages as messages
+
+PYBIND11_MINIMAL_VERSION =  '2.6.2'
+ExitCodes = Enum('ExitCodes', ['MISSING_COMPONENT', 'Overwrite'])
 
 
 def on_vsc_cluster():
@@ -92,3 +99,55 @@ def verify_project_name(project_name):
     """
     p = re.compile(r"\A[a-zA-Z][a-zA-Z0-9_-]*\Z")
     return bool(p.match(project_name))
+
+def check_pybind11(required=False):
+    pybind11 = PkgInfo('pybind11')
+    is_available = pybind11.is_available()
+    if not is_available:
+        msg = (
+            'Building C++ binary extensions requires pybind11.\n'
+            'Pybind11 is not available in your environment. Install it as .\n'
+            '    > pip install pybind11\n'
+            'Add the `--user` flag on the cluster if you are not using a virtual environment.\n'
+        )
+        if required:
+            messages.error(msg, ExitCodes.MISSING_COMPONENT)
+        else:
+            messages.warning(msg)
+    else:
+
+        if semantic_version.Version(pybind11.version()) < semantic_version.Version(PYBIND11_MINIMAL_VERSION):
+            messages.warning(
+                f'Building C++ binary extensions requires pybind11.\n'
+                f'The pybind11 version in your environment is v{pybind11.version()}, '
+                f'which is older than v{PYBIND11_MINIMAL_VERSION}.\n'
+                f'This may cause problems. Upgrading is recommended.'
+            )
+
+def check_f2py(required=False):
+    if not ToolInfo('f2py').is_available():
+        msg = (
+            'Building a Fortran binary extension requires f2py.\n'
+            'F2py is not available in your current environment. It is part of the numpy Python package.'
+        )
+        if on_vsc_cluster():
+            msg += 'Load a cluster module that has the numpy package pre-installed.'
+        else:
+            msg += (
+                'Install numpy as:\n'
+                '    > pip install numpy [--user]'
+            )
+        if required:
+            messages.error(msg, ExitCodes.MISSING_COMPONENT)
+        else:
+            messages.warning(msg)
+
+def check_cmake(required=False):
+    if not ToolInfo('cmake').is_available():
+        messages.warning(
+            'Building binary extensions requires CMake (is missing).\n'
+            'Make available as:\n'
+            '  - on UAntwerpen clusters: `module load buildtools`\n'
+            '  - on other VSC clusters: `module load CMake`\n'
+            '  - locally: `pip install cmake`, or install from https://cmake.org'
+        )

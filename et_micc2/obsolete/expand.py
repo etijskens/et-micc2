@@ -17,7 +17,7 @@ import et_micc2.logger
 
 EXIT_OVERWRITE = -3
 __FILE__ = Path(__file__).resolve() 
-import et_micc2.tmpl
+import et_micc2.tools.tmpl
 
 
 def expand_templates(options):
