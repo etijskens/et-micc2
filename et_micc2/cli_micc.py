@@ -13,7 +13,7 @@ from types import SimpleNamespace
 
 import click
 
-from et_micc2.tools.env import ExitCodes
+from et_micc2.tools.messages import ExitCodes
 
 def sys_path_helper():
     """Make sure that et_micc2 can be imported in case this file is executed as::
@@ -36,6 +36,7 @@ import et_micc2.tools.messages as messages
 from et_micc2.subcmds.add import add as add_cmd
 from et_micc2.subcmds.build import build as build_cmd
 from et_micc2.subcmds.create import create as create_cmd
+from et_micc2.subcmds.doc import doc as doc_cmd
 from et_micc2.subcmds.info import info as info_cmd
 
 if '3.8' < sys.version:
@@ -803,8 +804,8 @@ def build( ctx
         project = Project(context)
         with messages.logtime(context):
             build_cmd(project)
-    except RuntimeError:
-        ctx.exit(ExitCodes.RuntimeError)
+    except RuntimeError as runtime_error:
+        ctx.exit(runtime_error.exit_code)
 
 
 ####################################################################################################
@@ -858,13 +859,13 @@ def doc(ctx, what):
     context.what = what
     try:
         project = Project(context)
-        with et_micc2.logger.logtime(context):
-            project.doc_cmd()
+        with messages.logtime(context):
+            doc_cmd(project)
 
-    except RuntimeError:
-        pass
+    except RuntimeError as runtime_error:
+        ctx.exit(runtime_error.exit_code)
 
-    ctx.exit(project.exit_code)
+    ctx.exit(0)
 
 
 ####################################################################################################

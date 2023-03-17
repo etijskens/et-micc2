@@ -23,6 +23,7 @@ from tests import helpers
 # import et_micc2.tools.messages as messages
 from et_micc2 import cli_micc
 import et_micc2.tools.env as env
+import et_micc2.tools.messages as messages
 import et_micc2.tools.project as project
 import et_micc2.tools.utils as utils
 import et_micc2.subcmds.build as build
@@ -216,7 +217,7 @@ def test_git_missing():
         result = micc( ['-vv', '--silent', 'create', 'NOGIT', '--allow-nesting', '--remote=none']
                      , assert_exit_code=False
                      )
-        assert result.exit_code == env.ExitCodes.MISSING_COMPONENT.value
+        assert result.exit_code == messages.ExitCodes.MISSING_COMPONENT.value
         assert not Path('NOGIT/nogit/__init__.py').exists()
 
     env.ToolInfo.mock = []
@@ -234,7 +235,7 @@ def test_gh_missing():
         result = micc( ['-vv', '--silent', 'create', 'NOGH', '--allow-nesting']
                      , assert_exit_code=False
                      )
-        assert result.exit_code == env.ExitCodes.MISSING_COMPONENT.value
+        assert result.exit_code == messages.ExitCodes.MISSING_COMPONENT.value
         assert not Path('NOGH/nogh/__init__.py').exists()
         results.append(result)
 
@@ -263,7 +264,7 @@ def test_cmake_missing():
                 assert result.exit_code == 0
 
             result = micc(['-v', 'build', 'submodule_cpp'], assert_exit_code=False)
-            assert result.exit_code == env.ExitCodes.MISSING_COMPONENT.value
+            assert result.exit_code == messages.ExitCodes.MISSING_COMPONENT.value
 
     env.ToolInfo.mock = []
 
@@ -288,7 +289,7 @@ def test_f2py_missing():
                 result = micc(['-v', 'add', submodule, flag], assert_exit_code=False)
                 assert result.exit_code == 0
                 result = micc(['-v', 'build', submodule], assert_exit_code=False)
-                assert result.exit_code == env.ExitCodes.MISSING_COMPONENT.value
+                assert result.exit_code == messages.ExitCodes.MISSING_COMPONENT.value
 
     env.ToolInfo.mock = []
 
@@ -315,7 +316,7 @@ def test_pybind11_missing():
                 assert result.exit_code == 0
                 # test micc build
                 result = micc(['-vv', 'build', submodule], assert_exit_code=False)
-                assert result.exit_code == env.ExitCodes.MISSING_COMPONENT.value
+                assert result.exit_code == messages.ExitCodes.MISSING_COMPONENT.value
 
     env.PkgInfo.mock = []
 
@@ -326,8 +327,7 @@ def test_doc_cmd():
         print('Not testing build documentation')
     else:
         with utils.in_directory(helpers.test_workspace):
-            #Create package nopybind11
-            result = micc( ['-vv', '-p', 'DOC', 'create', '--remote=none', '--allow-nesting']
+            result = micc( ['-vv', 'create', 'DOC', '--remote=none', '--allow-nesting']
                           , assert_exit_code=False
                           )
             assert result.exit_code == 0
@@ -338,7 +338,7 @@ def test_doc_cmd():
 
 if __name__ == "__main__":
     print(sys.version_info)
-    the_test_you_want_to_debug = test_pybind11_missing
+    the_test_you_want_to_debug = test_doc_cmd
 
     print(f"__main__ running {the_test_you_want_to_debug}")
     the_test_you_want_to_debug()

@@ -8,12 +8,23 @@ Helper functions for logging.
 
 from contextlib import contextmanager
 from datetime import datetime
+from enum import Enum
 import logging
 import sys
 
 import click
 
-from et_micc2.tools.env import ExitCodes
+ExitCodes = Enum(
+    'ExitCodes',
+    [ 'MISSING_COMPONENT'
+    , 'Overwrite'
+    , 'RuntimeError'
+    , 'ValueError'
+    , 'UserInterruptError'
+    ]
+)
+
+
 def verbosity_to_loglevel(verbosity):
     """Tranlate :py:obj:`verbosity` into a loglevel.
 
