@@ -108,15 +108,15 @@ def verify_project_name(project_name):
     p = re.compile(r"\A[a-zA-Z][a-zA-Z0-9_-]*\Z")
     return bool(p.match(project_name))
 
+
 def check_pybind11(required=False):
     pybind11 = PkgInfo('pybind11')
     is_available = pybind11.is_available()
     if not is_available:
         msg = (
-            'Building C++ binary extensions requires pybind11.\n'
-            'Pybind11 is not available in your environment. Install it as .\n'
-            '    > pip install pybind11\n'
-            'Add the `--user` flag on the cluster if you are not using a virtual environment.\n'
+            'Pybind11 is missing. C++ binary extension modules can be added, but `Pybind11` must\n'
+            'be availaible to build them. \n'
+            '  - run `pip install pybind11 [--user]``\n'
         )
         if required:
             messages.error(msg, ExitCodes.MISSING_COMPONENT)
@@ -125,38 +125,35 @@ def check_pybind11(required=False):
     else:
         if semantic_version.Version(pybind11.version()) < semantic_version.Version(PYBIND11_MINIMAL_VERSION):
             messages.warning(
-                f'Building C++ binary extensions requires pybind11.\n'
                 f'The pybind11 version in your environment is v{pybind11.version()}, '
                 f'which is older than v{PYBIND11_MINIMAL_VERSION}.\n'
                 f'This may cause problems. Upgrading is recommended.'
+                f'  - run `pip install pybind11 [--user] --upgrade`\n'
             )
+
 
 def check_f2py(required=False):
     if not ToolInfo('f2py').is_available():
         msg = (
-            'Building a Fortran binary extension requires f2py.\n'
-            'F2py is not available in your current environment. It is part of the numpy Python package.'
+            'F2py is missing. Fortran binary extension modules can be added, but `f2py` must\n'
+            'be availaible to build them. F2py is part of the `numpy` Python package.\n'
+            '  - on the cluster load a module that exposes `numpy`\n'
+            '  - elsewhere  `pip install numpy [--user]`'
         )
-        if on_vsc_cluster():
-            msg += 'Load a cluster module that has the numpy package pre-installed.'
-        else:
-            msg += (
-                'Install numpy as:\n'
-                '    > pip install numpy [--user]'
-            )
         if required:
             messages.error(msg, ExitCodes.MISSING_COMPONENT)
         else:
             messages.warning(msg)
 
+
 def check_cmake(required=False):
     if not ToolInfo('cmake').is_available():
         msg = (
-            'Building binary extensions requires CMake, which is missing.\n'
-            'The project is added, but cannot be build without making `cmake` available. To do so:\n'
+            'CMake is missing. C++ binary extension modules can be added, but `cmake` must\n'
+            'be available to build them.'
             '  - on UAntwerpen clusters: `module load buildtools`\n'
             '  - on other VSC clusters: `module load CMake`\n'
-            '  - locally: `pip install cmake`, or install from https://cmake.org'
+            '  - elsewhere: `pip install cmake [--user]`, or install from https://cmake.org'
         )
         if required:
             messages.error(msg, ExitCodes.MISSING_COMPONENT)

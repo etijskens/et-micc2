@@ -276,7 +276,7 @@ def test_pybind11_f2py_missing():
 
     with utils.in_directory(helpers.test_workspace):
         #Create package nopybind11_nof2py
-        result = micc( ['-vv', '-p', 'nopybind11_nof2py', 'create', '--remote=none', '--allow-nesting']
+        result = micc( ['-vv', '--silent', 'create', 'nopybind11_nof2py', '--remote=none', '--allow-nesting']
                      , assert_exit_code=False
                      )
         assert result.exit_code == 0
@@ -284,7 +284,7 @@ def test_pybind11_f2py_missing():
 
         with utils.in_directory('nopybind11_nof2py'):
             # Add a binary sub-module
-            for flag in ['--cpp', '--f90']:
+            for flag in ['--f90']:
                 submodule = f'submodule_{flag[2:]}'
                 result = micc(['-v', 'add', submodule, flag], assert_exit_code=False)
                 assert result.exit_code == 0
