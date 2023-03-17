@@ -5,16 +5,16 @@ from pathlib import Path
 import pytest
 import shutil
 
-import et_micc2.tools.tmpl
+import et_micc2.tools.tmpl as tmpl
 
 
 def test_expand_string():
     s = "This is {{tmpl.bar}} and this is {{tmpl.foo}}.\nAnd this is {{tmpl.foobar}}."
     parameters = { 'foo':'expanded_foo'}
     with pytest.raises(ValueError):
-        s = et_micc2.tmpl.expand_string(s,parameters)
+        s = tmpl.expand_string(s,parameters)
     parameters = { 'foo':'expanded_foo', 'bar':'expanded_bar', 'foobar':'expanded_foobar'}
-    s = et_micc2.tmpl.expand_string(s, parameters)
+    s = tmpl.expand_string(s, parameters)
     assert s == 'This is expanded_bar and this is expanded_foo.\nAnd this is expanded_foobar.'
 
 
@@ -32,10 +32,10 @@ def test_expand_file():
                  , 'foobar':'expanded_foobar'
                  }
     with pytest.raises(ValueError):
-        et_micc2.tmpl.expand_file(root, path_to_template, destination, parameters)
+        tmpl.expand_file(root, path_to_template, destination, parameters)
 
     parameters['fname'] = 'expanded_template'
-    assert et_micc2.tmpl.expand_file(root, path_to_template, destination, parameters) is None
+    assert tmpl.expand_file(root, path_to_template, destination, parameters) is None
 
     f = (destination / 'template_file_expanded_template')
     assert f.is_file()
@@ -61,7 +61,7 @@ def test_expand_folder():
                  , 'dnamesub':'expanded_dnamesub'
                  }
 
-    et_micc2.tmpl.expand_folder(path_to_template, destination, parameters)
+    tmpl.expand_folder(path_to_template, destination, parameters)
 
     assert (destination / 'template_folder_expanded_dname').is_dir()
     assert (destination / 'template_folder_expanded_dname/template_file_expanded_fname').is_file()
