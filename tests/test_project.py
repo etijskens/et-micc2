@@ -5,7 +5,8 @@
 from types import SimpleNamespace
 from pathlib import Path
 
-from et_micc2.project import Project, ToolInfo
+import et_micc2.tools.env as env
+import et_micc2.tools.project as project
 
 def test_ctor():
     options = SimpleNamespace(
@@ -15,16 +16,16 @@ def test_ctor():
         clear_log=False,
         preferences = {}
     )
-    proj = Project(options)
+    proj = project.Project(options)
     print(proj.pyproject_toml['tool']['poetry']['dependencies'])
 
 
 def test_existing_tool():
-    ti = ToolInfo('gh')
+    ti = env.ToolInfo('gh')
     assert ti.is_available()
 
 def test_inexisting_tool():
-    ti = ToolInfo('ghh')
+    ti = env.ToolInfo('ghh')
     assert not ti.is_available()
     if not ti.is_available():
         print('The ghh command is not available in your environment.\n'
