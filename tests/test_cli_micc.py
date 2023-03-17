@@ -267,37 +267,37 @@ def test_cmake_missing():
 
     env.ToolInfo.mock = []
 
-def test_pybind11_f2py_missing():
+def test_f2py_missing():
     """"""
     helpers.clear_test_workspace()
 
     env.ToolInfo.mock = ['f2py']
-    project.PkgInfo.mock = ['pybind11']
 
     with utils.in_directory(helpers.test_workspace):
-        #Create package nopybind11_nof2py
-        result = micc( ['-vv', '--silent', 'create', 'nopybind11_nof2py', '--remote=none', '--allow-nesting']
+        #Create package nof2py
+        result = micc( ['-vv', '--silent', 'create', 'nof2py', '--remote=none', '--allow-nesting']
                      , assert_exit_code=False
                      )
         assert result.exit_code == 0
-        assert Path('nopybind11_nof2py/nopybind11_nof2py/__init__.py').exists()
+        assert Path('nof2py/nof2py/__init__.py').exists()
 
-        with utils.in_directory('nopybind11_nof2py'):
+        with utils.in_directory('nof2py'):
             # Add a binary sub-module
             for flag in ['--f90']:
                 submodule = f'submodule_{flag[2:]}'
                 result = micc(['-v', 'add', submodule, flag], assert_exit_code=False)
                 assert result.exit_code == 0
+                result = micc(['-v', 'build', submodule], assert_exit_code=False)
+                assert result.exit_code == env.ExitCodes.MISSING_COMPONENT.value
 
     env.ToolInfo.mock = []
-    project.PkgInfo.mock = []
 
 
-def test_build_pybind11_missing():
+def test_pybind11_missing():
     """"""
     helpers.clear_test_workspace()
 
-    project.PkgInfo.mock = ['pybind11']
+    env.PkgInfo.mock = ['pybind11']
 
     with utils.in_directory(helpers.test_workspace):
         #Create package nopybind11
@@ -311,14 +311,13 @@ def test_build_pybind11_missing():
             # Add a binary sub-module
             for flag in ['--cpp']:
                 submodule = f'submodule_{flag[2:]}'
-                result = micc(['-v', 'add', submodule, flag])
+                result = micc(['-v', 'add', submodule, flag], assert_exit_code=False)
                 assert result.exit_code == 0
                 # test micc build
-                result = micc(['-vv', 'build', '-m', submodule, '--clean'], assert_exit_code=False)
-                assert result.exit_code == project.__exit_missing_component__
+                result = micc(['-vv', 'build', submodule], assert_exit_code=False)
+                assert result.exit_code == env.ExitCodes.MISSING_COMPONENT.value
 
-    env.ToolInfo.mock = []
-    project.PkgInfo.mock = []
+    env.PkgInfo.mock = []
 
 
 def test_doc_cmd():
@@ -339,7 +338,7 @@ def test_doc_cmd():
 
 if __name__ == "__main__":
     print(sys.version_info)
-    the_test_you_want_to_debug = test_cmake_missing
+    the_test_you_want_to_debug = test_pybind11_missing
 
     print(f"__main__ running {the_test_you_want_to_debug}")
     the_test_you_want_to_debug()
