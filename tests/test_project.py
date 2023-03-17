@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """Tests for `micc` package."""
-from types import SimpleNamespace
 from pathlib import Path
+from types import SimpleNamespace
 
 import et_micc2.tools.env as env
 import et_micc2.tools.project as project

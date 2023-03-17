@@ -1,35 +1,36 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Tests for et_micc2.logger module."""
+"""Tests for messages module."""
 
 from pathlib import Path
 import types
 
-import et_micc2.project
-import et_micc2.utils
-import et_micc2.logger
+import et_micc2.tools.project as project
+import et_micc2.tools.utils as utils
+import et_micc2.tools.messages as messages
 
 def test_log():
-    with et_micc2.logger.log():
+    with messages.log():
         print('test_log without logfun')
         
-    logfile = et_micc2.utils.get_project_path('.') / 'et_micc2.log'
+    logfile = utils.get_project_path('.') / 'et_micc2.log'
     print(logfile.resolve())
     if logfile.exists():
         logfile.unlink()
     assert not logfile.exists()
 
-    options = types.SimpleNamespace(verbosity=3
-                                          ,project_path=Path().resolve()
-                                          ,clear_log=False
-                                          )
-    project = et_micc2.project.Project(options)
+    options = types.SimpleNamespace(
+        verbosity=3,
+        project_path=Path().resolve(),
+        clear_log=False
+    )
+    proj = project.Project(options)
 
-    with et_micc2.logger.logtime(project):
-        with et_micc2.logger.log(project.logger.info):
-            project.logger.info('test_log with a logfun')
-            project.logger.debug('debug message\nwith 2 lines')
-    logfile = project.log_file
+    with messages.logtime(proj):
+        with messages.log(proj.logger.info):
+            proj.logger.info('test_log with a logfun')
+            proj.logger.debug('debug message\nwith 2 lines')
+    logfile = proj.log_file
     assert logfile.exists()
     logtext = logfile.read_text()
     print(logtext)
