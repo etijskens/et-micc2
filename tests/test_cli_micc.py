@@ -249,8 +249,8 @@ def test_cmake_missing():
 
     with utils.in_directory(helpers.test_workspace):
         #Create package NOCMAKE
-        result = micc( ['-vv', '-p', 'NOCMAKE', 'create', '--remote=none', '--allow-nesting', '--package']
-                      , stdin='\n', assert_exit_code=False
+        result = micc( ['-vv', '--silent', 'create', 'NOCMAKE', '--remote=none', '--allow-nesting']
+                      , assert_exit_code=False
                       )
         assert result.exit_code == 0
         assert Path('NOCMAKE/nocmake/__init__.py').exists()
@@ -259,8 +259,11 @@ def test_cmake_missing():
             # Add a binary sub-module
             for flag in ['--cpp', '--f90']:
                 submodule = f'submodule_{flag[2:]}'
-                result = micc(['-v', 'add', submodule, flag])
+                result = micc(['-v', 'add', submodule, flag], assert_exit_code=False)
                 assert result.exit_code == 0
+
+            result = micc(['-v', 'build', 'submodule_cpp'], assert_exit_code=False)
+            assert result.exit_code == env.ExitCodes.MISSING_COMPONENT.value
 
     env.ToolInfo.mock = []
 
@@ -273,9 +276,9 @@ def test_pybind11_f2py_missing():
 
     with utils.in_directory(helpers.test_workspace):
         #Create package nopybind11_nof2py
-        result = micc( ['-vv', '-p', 'nopybind11_nof2py', 'create', '--remote=none', '--allow-nesting', '--package']
-                      , stdin='\n', assert_exit_code=False
-                      )
+        result = micc( ['-vv', '-p', 'nopybind11_nof2py', 'create', '--remote=none', '--allow-nesting']
+                     , assert_exit_code=False
+                     )
         assert result.exit_code == 0
         assert Path('nopybind11_nof2py/nopybind11_nof2py/__init__.py').exists()
 
@@ -283,7 +286,7 @@ def test_pybind11_f2py_missing():
             # Add a binary sub-module
             for flag in ['--cpp', '--f90']:
                 submodule = f'submodule_{flag[2:]}'
-                result = micc(['-v', 'add', submodule, flag])
+                result = micc(['-v', 'add', submodule, flag], assert_exit_code=False)
                 assert result.exit_code == 0
 
     env.ToolInfo.mock = []
@@ -298,8 +301,8 @@ def test_build_pybind11_missing():
 
     with utils.in_directory(helpers.test_workspace):
         #Create package nopybind11
-        result = micc( ['-vv', '-p', 'nopybind11', 'create', '--remote=none', '--allow-nesting', '--package']
-                      , stdin='\n', assert_exit_code=False
+        result = micc( ['-vv', '-p', 'nopybind11', 'create', '--remote=none', '--allow-nesting']
+                      , assert_exit_code=False
                       )
         assert result.exit_code == 0
         assert Path('nopybind11/nopybind11/__init__.py').exists()
@@ -325,8 +328,8 @@ def test_doc_cmd():
     else:
         with utils.in_directory(helpers.test_workspace):
             #Create package nopybind11
-            result = micc( ['-vv', '-p', 'DOC', 'create', '--remote=none', '--allow-nesting', '--package']
-                          , stdin='\n', assert_exit_code=False
+            result = micc( ['-vv', '-p', 'DOC', 'create', '--remote=none', '--allow-nesting']
+                          , assert_exit_code=False
                           )
             assert result.exit_code == 0
             assert Path('DOC/docs').exists()
@@ -336,7 +339,7 @@ def test_doc_cmd():
 
 if __name__ == "__main__":
     print(sys.version_info)
-    the_test_you_want_to_debug = test_gh_missing
+    the_test_you_want_to_debug = test_cmake_missing
 
     print(f"__main__ running {the_test_you_want_to_debug}")
     the_test_you_want_to_debug()

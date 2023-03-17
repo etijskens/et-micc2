@@ -16,15 +16,6 @@ from et_micc2.subcmds.add import get_submodule_type
 def build(project):
     """Build a binary extension."""
 
-    # Exit if cmake is not available:
-    if not env.ToolInfo('cmake').is_available():
-        msg = 'The build command requires cmake, which is not available in your current environment.\n'
-        if env.on_vsc_cluster():
-            msg += 'Load a cluster module that enables cmake.'
-        else:
-            msg += 'Make sure cmake is installed and on your PATH.'
-        messages.error(msg)
-
     # get extension for binary extensions (depends on OS and python version)
     extension_suffix = get_extension_suffix()
 
@@ -52,15 +43,19 @@ def build(project):
                         env.check_f2py(required=True)
 
                     elif submodule_type == 'cpp':
+                        # Exit if cmake is not available:
+                        env.check_cmake(required=True)
                         # exit if pybind11 is not available, and warn if too old...
                         env.check_pybind11(required=True)
 
                     build_options.submodule_srcdir_path = build_options.module_to_build \
                         if build_options.module_to_build else (p_root / dir_)
+
                     build_options.submodule_path = build_options.submodule_srcdir_path.parent
                     build_options.submodule_name = build_options.submodule_srcdir_path.name
                     build_options.submodule_binary = build_options.submodule_path / (
-                                build_options.submodule_name + extension_suffix)
+                        build_options.submodule_name + extension_suffix
+                    )
                     build_options.submodule_type = submodule_type
 
                     if build_binary_extension(project.context):

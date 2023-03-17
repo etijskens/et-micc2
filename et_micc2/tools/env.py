@@ -123,7 +123,6 @@ def check_pybind11(required=False):
         else:
             messages.warning(msg)
     else:
-
         if semantic_version.Version(pybind11.version()) < semantic_version.Version(PYBIND11_MINIMAL_VERSION):
             messages.warning(
                 f'Building C++ binary extensions requires pybind11.\n'
@@ -152,10 +151,14 @@ def check_f2py(required=False):
 
 def check_cmake(required=False):
     if not ToolInfo('cmake').is_available():
-        messages.warning(
-            'Building binary extensions requires CMake (is missing).\n'
-            'Make available as:\n'
+        msg = (
+            'Building binary extensions requires CMake, which is missing.\n'
+            'The project is added, but cannot be build without making `cmake` available. To do so:\n'
             '  - on UAntwerpen clusters: `module load buildtools`\n'
             '  - on other VSC clusters: `module load CMake`\n'
             '  - locally: `pip install cmake`, or install from https://cmake.org'
         )
+        if required:
+            messages.error(msg, ExitCodes.MISSING_COMPONENT)
+        else:
+            messages.warning(msg)
