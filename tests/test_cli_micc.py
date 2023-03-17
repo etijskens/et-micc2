@@ -214,7 +214,7 @@ def test_git_missing():
     with utils.in_directory(helpers.test_workspace):
         #Create package NOGIT
         result = micc( ['-vv', '--silent', 'create', 'NOGIT', '--allow-nesting', '--remote=none']
-                     , stdin='\n', assert_exit_code=False
+                     , assert_exit_code=False
                      )
         assert result.exit_code == env.ExitCodes.MISSING_COMPONENT.value
         assert not Path('NOGIT/nogit/__init__.py').exists()
@@ -231,10 +231,10 @@ def test_gh_missing():
     with utils.in_directory(helpers.test_workspace):
         results = []
         #Create package NOGH
-        result = micc( ['-vv', '-p', 'NOGH', 'create', '--allow-nesting', '--package']
-                      , stdin='\n', assert_exit_code=False
-                      )
-        assert result.exit_code == project.__exit_missing_component__
+        result = micc( ['-vv', '--silent', 'create', 'NOGH', '--allow-nesting']
+                     , assert_exit_code=False
+                     )
+        assert result.exit_code == env.ExitCodes.MISSING_COMPONENT.value
         assert not Path('NOGH/nogh/__init__.py').exists()
         results.append(result)
 
@@ -336,7 +336,7 @@ def test_doc_cmd():
 
 if __name__ == "__main__":
     print(sys.version_info)
-    the_test_you_want_to_debug = test_git_missing
+    the_test_you_want_to_debug = test_gh_missing
 
     print(f"__main__ running {the_test_you_want_to_debug}")
     the_test_you_want_to_debug()
