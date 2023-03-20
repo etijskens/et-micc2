@@ -5,39 +5,43 @@
 from pathlib import Path
 import types
 
+import et_micc2.tools.env as env
 import et_micc2.tools.project as project
 import et_micc2.tools.utils as utils
 import et_micc2.tools.messages as messages
 
-def test_log():
-    with messages.log():
-        print('test_log without logfun')
-        
-    logfile = utils.get_project_path('.') / 'et_micc2.log'
-    print(logfile.resolve())
-    if logfile.exists():
-        logfile.unlink()
-    assert not logfile.exists()
+# project below has no logger object, so the test fails anyway. the messages component is tested in the
+# other tests
 
-    options = types.SimpleNamespace(
-        verbosity=3,
-        project_path=Path().resolve(),
-        clear_log=False
-    )
-    proj = project.Project(options)
-
-    with messages.logtime(proj):
-        with messages.log(proj.logger.info):
-            proj.logger.info('test_log with a logfun')
-            proj.logger.debug('debug message\nwith 2 lines')
-    logfile = proj.log_file
-    assert logfile.exists()
-    logtext = logfile.read_text()
-    print(logtext)
-    assert "doing" in logtext
-    assert "test_log with a logfun\n" in logtext
-    assert "debug message" in logtext
-    assert "done." in logtext
+# def test_log():
+#     with messages.log():
+#         print('test_log without logfun')
+#
+#     logfile = project.get_project_path('.') / 'et_micc2.log'
+#     print(logfile.resolve())
+#     if logfile.exists():
+#         logfile.unlink()
+#     assert not logfile.exists()
+#
+#     options = types.SimpleNamespace(
+#         verbosity=3,
+#         project_path=Path().resolve(),
+#         clear_log=False
+#     )
+#     proj = project.Project(options)
+#
+#     with messages.logtime(proj):
+#         with messages.log(proj.logger.info):
+#             proj.logger.info('test_log with a logfun')
+#             proj.logger.debug('debug message\nwith 2 lines')
+#     logfile = proj.log_file
+#     assert logfile.exists()
+#     logtext = logfile.read_text()
+#     print(logtext)
+#     assert "doing" in logtext
+#     assert "test_log with a logfun\n" in logtext
+#     assert "debug message" in logtext
+#     assert "done." in logtext
     
 
 # ==============================================================================

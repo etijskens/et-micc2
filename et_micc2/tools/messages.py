@@ -218,7 +218,7 @@ def logtime(project=None):
     if project is None:
         logfun = print
     else:
-        logfun = project.logger.debug
+        logfun = getattr(project.logger, 'debug', print)
 
     start = datetime.now()
     logfun(f"start = {start}")

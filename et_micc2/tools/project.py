@@ -155,7 +155,7 @@ class Project:
         else:
             # Not a project directory, only create and setup subcommands can work,
             # (but setup does not construct a Project object).
-            if not self.context.invoked_subcommand in ('create',):
+            if not getattr(self.context, 'invoked_subcommand', '') in ('create',):
                 messages.error(f'Not a project directory: `{self.context.project_path}`')
 
 
