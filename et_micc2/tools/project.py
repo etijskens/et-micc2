@@ -88,7 +88,7 @@ def get_project_path(p: Path) -> Path:
     while not is_project_directory(pp):
         pp = pp.parent
         if pp == root:
-            raise RuntimeError(f"Folder {p0} is not in a Python project.")
+            raise RuntimeError(f"Folder {p} is not in a Python project.")
     return pp
 
 
