@@ -29,21 +29,28 @@ def test_rename_remove_1():
             else:
                 assert (Path('.') / 'BAR' / 'bar' / component_name).is_dir()
 
-        # rename submod -> foo
+        # rename components submod -> foo
         for flag in component_flags:
             component_name  = f"submod_{flag[2:]}"
             component_new_name = f'foo_{flag[2:]}'
             results.append(helpers.micc(['-p', 'BAR', 'mv', component_name, component_new_name]))
             if 'cli' in flag:
                 assert (Path('.') / 'BAR' / 'bar' / f"cli_{component_new_name}.py").is_file()
+                assert (Path('.') / 'BAR' / 'tests' / 'bar' / f"test_cli_{component_new_name}.py").is_file()
             else:
                 assert (Path('.') / 'BAR' / 'bar' / component_new_name).is_dir()
+                assert (Path('.') / 'BAR' / 'tests' / 'bar' / component_new_name).is_dir()
 
-
-
-        # delete foo
-        # results.append(helpers.micc(['-p', 'BAR', 'mv', 'foo']))
-        # assert (Path('.') / 'BAR' / 'bar'  / 'foo' / '__init__.py').is_file()
+        # remove foo
+        for flag in component_flags:
+            component_new_name = f'foo_{flag[2:]}'
+            results.append(helpers.micc(['-p', 'BAR', 'mv', component_new_name]))
+            if 'cli' in flag:
+                assert not (Path('.') / 'BAR' / 'bar' / f"cli_{component_new_name}.py").is_file()
+                assert not (Path('.') / 'BAR' / 'tests' / 'bar' / f"test_cli_{component_new_name}.py").is_file()
+            else:
+                assert not (Path('.') / 'BAR' / 'bar' / component_new_name).is_dir()
+                assert not (Path('.') / 'BAR' / 'tests' / 'bar' / component_new_name).is_dir()
 
         print('ok')
 
