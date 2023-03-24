@@ -1,59 +1,76 @@
+import os
+
+import et_micc2.tools.env as env
+import et_micc2.tools.messages as messages
+
+
 def mv_component(project):
     """Rename or Remove a component (submodule, sub-package, Fortran module, C++ module, app (CLI)."""
     cur_name, new_name = project.context.cur_name, project.context.new_name
+    
     # Look up <cur_name> in the project's database to find out what kind of a component it is:
     project.deserialize_db()
-    db_entry = project.db[cur_name]  # may raise KeyError
+    try:
+        db_entry = project.db[cur_name]  # may raise KeyError
+    except KeyError:
+        msg = f"Submodule '{new_name}' not found."
+        similar = [component for component in env.list_folders_only() if (new_name in component)]
+        if similar:
+            msg +="\nDid you mean:"
+            for s in similar:
+                msg += f"\n  - {s} ?"
+        messages.error(msg, exit_code=messages.ExitCodes.SUBMODULE_NOT_FOUND.value)
 
-    component_options = db_entry['context']
+    component_context = db_entry['context']
     if new_name:  # rename
-        with et_micc2.logger.log(project.logger.info
-                , f"Package '{project.context.package_name}' Renaming component {cur_name} -> {new_name}:"
-                                 ):
-            if project.context.entire_project:
-                project.logger.info(f"Renaming entire project (--entire-project): '{project.context.project_path.name}'")
-                project.replace_in_folder(project.context.project_path, cur_name, new_name)
+            # if project.context.where == 'project':
+            #     project.logger.info(f"Replacing all occurrences of '{cur_name}' with '{new_name}' in entire project.")
+            #     messages.ask_user_to_continue_or_not()
+            #     project.replace_in_folder(project.context.project_path, cur_name, new_name)
+            #
+            # elif project.context.where == 'package':
+            #     project.logger.info(f"Replacing all occurrences of '{cur_name}' with '{new_name}' in entire package.")
+            #     project.replace_in_folder(
+            #         project.context.project_path / project.context.package_name,
+            #         cur_name, new_name
+            #     )
 
-            elif project.context.entire_package:
-                project.logger.info(f"Renaming entire package (--entire-package): '{project.context.package_name}'")
-                project.replace_in_folder(project.context.project_path / project.context.package_name, cur_name, new_name)
+        component_type = \
+            'Python submodule'  if component_context['flag_py' ] else \
+            'Fortran submodule' if component_context['flag_cpp'] else \
+            'C++ submodule'     if component_context['flag_cpp'] else \
+            'CLI application'   if component_context['flag_cli'] else \
+            'CLI application (with subcommands)' if component_context['flag_clisub'] else 'oops'
+        if component_type.startswith('CLI'):
+            component_name    = f"cli_{cur_name}"
+            component_new_name = f"cli_{new_name}"
+        else:
+            component_name    = cur_name
+            component_new_name = new_name
 
-            elif component_options['package']:
-                project.logger.info(f"Renaming Python sub-package: '{cur_name}{os.sep}__init__.py'")
-                project.replace_in_folder(project.context.project_path / project.context.package_name / cur_name, cur_name,
-                                       new_name)
-                project.logger.info(f"Renaming test file: 'tests/test_{cur_name}.py'")
-                project.replace_in_file(project.context.project_path / 'tests' / f'test_{cur_name}.py', cur_name, new_name)
-
-            elif component_options['py']:
-                project.logger.info(f"Renaming Python submodule: '{cur_name}.py'")
-                project.replace_in_file(project.context.project_path / project.context.package_name / f'{cur_name}.py', cur_name,
-                                     new_name)
-                project.logger.info(f"Renaming test file: 'tests/test_{cur_name}.py'")
-                project.replace_in_file(project.context.project_path / 'tests' / f'test_{cur_name}.py', cur_name, new_name)
-
-            elif component_options['f90']:
-                project.logger.info(f"Fortran submodule: 'f90_{cur_name}{os.sep}{cur_name}.f90'")
-                project.replace_in_folder(project.context.project_path / project.context.package_name / f'f90_{cur_name}',
-                                       cur_name, new_name)
-                project.logger.info(f"Renaming test file: 'tests/test_{cur_name}.py'")
-                project.replace_in_file(project.context.project_path / 'tests' / f'test_f90_{cur_name}.py', cur_name,
-                                     new_name)
-
-            elif component_options['cpp']:
-                project.logger.info(f"C++ submodule: 'cpp_{cur_name}{os.sep}{cur_name}.cpp'")
-                project.replace_in_folder(project.context.project_path / project.context.package_name / f'cpp_{cur_name}',
-                                       cur_name, new_name)
-                project.logger.info(f"Renaming test file: 'tests/test_{cur_name}.py'")
-                project.replace_in_file(project.context.project_path / 'tests' / f'test_cpp_{cur_name}.py', cur_name,
-                                     new_name)
-
-            elif component_options['app'] or component_options['group']:
-                project.logger.info(f"Command line interface (no subcommands): 'cli_{cur_name}.py'")
-                project.replace_in_file(project.context.project_path / project.context.package_name / f"cli_{cur_name}.py",
-                                     cur_name, new_name)
-                project.replace_in_file(project.context.project_path / 'tests' / f"test_cli_{cur_name}.py", cur_name,
-                                     new_name)
+        with messages.log(
+                project.logger.info,
+                f"Package '{project.context.package_name}': "
+                f"Renaming {component_type} '{component_name}' -> '{component_new_name}':"
+            ):
+            if component_type.startswith('CLI'):
+                project.replace_in_file(
+                    project.context.project_path / project.context.package_name / f"{component_name}.py",
+                    cur_name, new_name
+                )
+                project.replace_in_file(
+                    project.context.project_path / 'tests' / project.context.package_name / f"test_{component_name}.py",
+                    cur_name, new_name
+                )
+            else:
+                project.replace_in_folder(
+                    project.context.project_path / project.context.package_name / component_name,
+                    cur_name, new_name
+                )
+                project.replace_in_folder(
+                    project.context.project_path / 'tests' / project.context.package_name,
+                    cur_name, new_name
+                )
 
             for key, val in db_entry.items():
                 if not key == 'context':
@@ -67,34 +84,34 @@ def mv_component(project):
             project.db[new_name] = db_entry
 
     else:  # remove
-        with et_micc2.logger.log(project.logger.info
+        with messages.log(project.logger.info
                 , f"Package '{project.context.package_name}' Removing component '{cur_name}'"
                                  ):
-            if component_options['package']:
+            if component_context['package']:
                 project.logger.info(f"Removing Python sub-package: '{cur_name}{os.sep}__init__.py'")
                 project.remove_folder(project.context.project_path / project.context.package_name / cur_name)
                 project.logger.info(f"Removing test file: 'tests/test_{cur_name}.py'")
                 project.remove_file(project.context.project_path / 'tests' / f'test_{cur_name}.py', )
 
-            elif component_options['py']:
+            elif component_context['py']:
                 project.logger.info(f"Removing Python submodule: '{cur_name}.py'")
                 project.remove_file(project.context.project_path / project.context.package_name / f'{cur_name}.py')
                 project.logger.info(f"Removing test file: 'tests/test_{cur_name}.py'")
                 project.remove_file(project.context.project_path / 'tests' / f'test_{cur_name}.py')
 
-            elif component_options['f90']:
+            elif component_context['f90']:
                 project.logger.info(f"Removing Fortran submodule: 'f90_{cur_name}")
                 project.remove_folder(project.context.project_path / project.context.package_name / f'f90_{cur_name}')
                 project.logger.info(f"Removing test file: 'tests/test_f90_{cur_name}.py'")
                 project.remove_file(project.context.project_path / 'tests' / f'test_f90_{cur_name}.py')
 
-            elif component_options['cpp']:
+            elif component_context['cpp']:
                 project.logger.info(f"Removing C++ submodule: 'cpp_{cur_name}")
                 project.remove_folder(project.context.project_path / project.context.package_name / f'cpp_{cur_name}')
                 project.logger.info(f"Removing test file: 'tests/test_cpp_{cur_name}.py'")
                 project.remove_file(project.context.project_path / 'tests' / f'test_cpp_{cur_name}.py')
 
-            elif component_options['cli'] or component_options['clisub']:
+            elif component_context['cli'] or component_context['clisub']:
                 project.logger.info(f"Removing CLI: 'cli_{cur_name}.py'")
                 project.remove_file(project.context.project_path / project.context.package_name / f"cli_{cur_name}.py")
                 project.logger.info(f"Removing test file: 'test_cli_{cur_name}.py'")

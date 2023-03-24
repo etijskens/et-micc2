@@ -38,6 +38,7 @@ from et_micc2.subcmds.build import build as build_cmd
 from et_micc2.subcmds.create import create as create_cmd
 from et_micc2.subcmds.doc import doc as doc_cmd
 from et_micc2.subcmds.info import info as info_cmd
+from et_micc2.subcmds.mv import mv_component as mv_cmd
 
 if '3.8' < sys.version:
     from et_micc2.subcmds.check_env import check_env
@@ -713,22 +714,14 @@ def add(ctx
 # mv
 ####################################################################################################
 @main.command()
-@click.option('--silent', is_flag=True
-    , help="Do not ask for confirmation on deleting a component."
-    , default=False
-)
-@click.option('--entire-package', is_flag=True
-    , help="Replace all occurences of <cur_name> in the entire package and in the ``tests`` directory."
-    , default=False
-)
-@click.option('--entire-project', is_flag=True
-    , help="Replace all occurences of <cur_name> in the entire project."
-    , default=False
+@click.option('--where', type=click.Choice(['project', 'package'], case_sensitive=False)
+    , help="where to replace occurrences of <cur_name>."
+    , default='package'
 )
 @click.argument('cur_name', type=str)
 @click.argument('new_name', type=str, default='')
 @click.pass_context
-def mv(ctx, cur_name, new_name, silent, entire_package, entire_project):
+def mv(ctx, cur_name, new_name, where):
     """Rename or remove a component.
 
     :param cur_name: name of component to be removed or renamed.
@@ -738,15 +731,14 @@ def mv(ctx, cur_name, new_name, silent, entire_package, entire_project):
 
     context.cur_name = cur_name
     context.new_name = new_name
-    context.silent = silent
     if new_name:
-        context.entire_package, context.entire_project =  entire_package, entire_project
-    # else these flags are ignored.
+        context.where =  where
+    # else: ignore these flags
 
     try:
         project = Project(context)
-        with et_micc2.logger.logtime(context):
-            project.mv_component()
+        with messages.logtime(context):
+            mv_cmd(project)
     except RuntimeError:
         ctx.exit(ExitCodes.RuntimeError)
 

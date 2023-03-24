@@ -250,33 +250,36 @@ class Project:
                 json.dump(self.db, f, indent=2)
 
 
-    def replace_in_folder( self, folderpath, cur_name, new_name ):
-        """"""
-        cur_dirname = folderpath.name
+    def replace_in_folder( self, folder_path, cur_name, new_name ):
+        """replace every occurence of cur_name with new_name in folder folder_path
+        """
+        cur_dirname = folder_path.name
         new_dirname = cur_dirname.replace(cur_name,new_name)
 
-        with messages.log(self.logger.info, f'Renaming folder "{cur_dirname}" -> "{new_dirname}"'):
+        with messages.log(self.logger.info, f'Renaming folder: "{cur_dirname}" -> "{new_dirname}"'):
             # first rename the folder
-            new_folderpath = folderpath.parent / new_dirname
-            os.rename(folderpath, new_folderpath)
+            new_folder_path = folder_path.parent / new_dirname
+            os.rename(folder_path, new_folder_path)
 
             # rename subfolder names:
             folder_list = [] # list of tuples with (oldname,newname)
-            for root, folders, files in os.walk(str(new_folderpath)):
+            for root, folders, files in os.walk(str(new_folder_path)):
                 _filter(folders) # in place modification of the list of folders to traverse
                 for folder in folders:
                     new_folder = folder.replace(cur_name,new_name)
                     folder_list.append((os.path.join(root,folder), os.path.join(root,new_folder)))
 
             # rename subfolder names:
-            for tpl in folder_list:
-                old_folder = tpl[0]
-                new_folder = tpl[1]
-                self.logger.info(f"Renaming folder '{old_folder}'  -> '{new_folder}'")
+            project_path = self.context.project_path
+            for old_folder, new_folder in folder_list: # every tuplein the list is automatically unpacked
+                self.logger.info(
+                    f"Renaming folder '{Path(old_folder).relative_to(self.context.project_path)}'"
+                    f"  -> '{Path(new_folder).relative_to(self.context.project_path)}'"
+                )
                 os.rename(old_folder, new_folder)
 
             # rename in files and file contents:
-            for root, folders, files in os.walk(str(new_folderpath)):
+            for root, folders, files in os.walk(str(new_folder_path)):
                 for file in files:
                     if file.startswith('.orig.'):
                         continue
@@ -304,34 +307,38 @@ class Project:
     def replace_in_file(self, filepath, cur_name, new_name, contents_only=False):
         """Replace <cur_name> with <new_name> in the filename and its contents."""
 
+        project_path = self.context.project_path
         file = filepath.name
-
         what = 'Modifying' if contents_only else 'Renaming'
-        with messages.log(self.logger.info, f"{what} file {filepath}:"):
-            self.logger.info(f'Reading from {filepath}')
+        with messages.log(self.logger.info, f"{what} file '{filepath.relative_to(project_path)}':"):
+            self.logger.info(f"Reading file '{filepath.relative_to(project_path)}'")
             with open(filepath,'r') as f:
                 old_contents = f.read()
 
-            self.logger.info(f'Replacing "{cur_name}" with "{new_name}" in file contents.')
+            self.logger.info(f"Replacing '{cur_name}' with '{new_name}' in file contents.")
             new_contents = old_contents.replace(cur_name, new_name)
 
             if contents_only:
                 new_file = file
+                new_path = filepath.relative_to(project_path)
             else:
                 new_file = file.replace(cur_name,new_name)
-                self.logger.info(f'Replacing "{cur_name}" with "{new_name}" in file name -> "{new_file}"')
-            new_path = filepath.parent / new_file
+                new_path = (filepath.parent / new_file).relative_to(project_path)
+                if new_file != file:
+                    self.logger.info(f"Replacing '{cur_name}' with '{new_name}' in file name -> '{new_path}'.")
 
-            # By first renaming the original file, we avoid problems when the new
-            # file name is identical to the old file name (because it is invariant,
-            # e.g. __init__.py)
+            # By first renaming the original file, we avoid problems when the new file name
+            # is identical to the old file name (because it is invariant, e.g. __init__.py)
             orig_file = '.orig.'+file
             orig_path = filepath.parent / orig_file
-            self.logger.info(f'Keeping original file "{file}" as "{orig_file}".')
+            self.logger.info(
+                f"Keeping original file '{filepath.relative_to(project_path)}'"
+                f" as '{orig_path.relative_to(project_path)}'."
+            )
             os.rename(filepath, orig_path)
 
-            self.logger.info(f'Writing modified file contents to {new_path}: ')
-            with open(new_path,'w') as f:
+            self.logger.info(f"Writing modified file contents to '{new_path}'.")
+            with open(project_path / new_path,'w') as f:
                 f.write(new_contents)
 
 
@@ -339,19 +346,6 @@ def _filter(folders):
     """"In place modification of the list of folders to traverse.
 
     see https://docs.python.org/3/library/os.html
-
-    ...
-
-    When topdown is True, the caller can modify the dirnames list in-place
-    (perhaps using del or slice assignment), and walk() will only recurse
-    into the subdirectories whose names remain in dirnames; this can be used
-    to prune the search, impose a specific order of visiting, or even to
-    inform walk() about directories the caller creates or renames before it
-    resumes walk() again. Modifying dirnames when topdown is False has no
-    effect on the behavior of the walk, because in bottom-up mode the
-    directories in dirnames are generated before dirpath itself is generated.
-
-    ...
     """
     exclude_folders = ['.venv', '.git', '_build', '_cmake_build', '__pycache__']
     folders[:] = [f for f in folders if not f in exclude_folders]

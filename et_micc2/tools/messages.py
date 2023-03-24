@@ -18,9 +18,8 @@ ExitCodes = Enum(
     'ExitCodes',
     [ 'MISSING_COMPONENT'
     , 'Overwrite'
-    , 'RuntimeError'
-    , 'ValueError'
-    , 'UserInterruptError'
+    , 'USER_INTERRUPTION'
+    , 'SUBMODULE_NOT_FOUND'
     ]
 )
 
@@ -251,27 +250,25 @@ def warning(msg):
     click.secho("[WARNING]\n" + msg, fg='green')
 
 
-def ask_user_to_continue_or_not(default=False, stop_message='Exiting.'):
+def ask_user_to_continue_or_not(default_answer=False, stop_message='Exiting.'):
     """Ask the user if he wants to continue or stop a command.
 
-    If the answer is to stop, sets self.exit_code to -1, and prints the stop_message.
+    Params:
+        default_answer: The answer, if the user just presses enter.
+        stop_message: message printed if the user answers 'no'.
 
-    :param bool default: The answer if the user just presses enter.
-    :return: True if the user wants to stop, False otherwise.
+    Returns: True if the user wants to stop, False otherwise.
     """
-    if default == True:
-        question = 'Continue? [Yes]/No'
-    else:
-        question = 'Continue? [No]/Yes'
+    question = 'Continue? [Yes]/No' if default_answer else 'Continue? [No]/Yes'
     answer = input(question)
 
     if not answer:
-        answer = default
+        answer = default_answer
     else:
         answer = answer.lower()
-        answer = True if answer.startswith('y') else False
+        answer = True if answer.startswith('y') or answer == '1' else False
 
     if not answer:
-        error(stop_message, exit_code=ExitCodes.MISSING_COMPONENT)
+        error(stop_message, exit_code=ExitCodes.USER_INTERRUPTION)
 
 

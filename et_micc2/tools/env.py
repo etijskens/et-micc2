@@ -1,4 +1,6 @@
 import os
+import typing
+from pathlib import Path
 import pkg_resources
 import semantic_version
 import shutil
@@ -146,6 +148,14 @@ def check_cmake(required=False):
             '  - elsewhere: `pip install cmake [--user]`, or install from https://cmake.org'
         )
         if required:
-            messages.error(msg, ExitCodes.MISSING_COMPONENT)
+            messages.error(msg, messages.ExitCodes.MISSING_COMPONENT)
         else:
             messages.warning(msg)
+
+def list_folders_only(dir_path: Path) -> typing.List[str]:
+    """Get a list of all subfolders of dir_path."""
+    lines = []
+    for entry in dir_path.iterdir():
+        if entry.is_dir():
+            lines.append(str(entry))
+    return lines
