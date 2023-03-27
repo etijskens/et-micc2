@@ -68,10 +68,10 @@ def test_rename_remove_2():
         # add Python submodule 'foo/soup'
         results.append(helpers.micc(['-p', 'BAR', 'add', 'foo/soup', '--py']))
         assert (Path('.') / 'BAR' / 'bar' / 'foo'/ 'soup').is_dir()
-        # rename
+        # rename bar/foo/soup -> bar/foo/onion_aoup
         results.append(helpers.micc(['-p', 'BAR', 'mv', 'foo/soup', 'onion_soup']))
         assert (Path('.') / 'BAR' / 'bar' / 'foo'/ 'onion_soup').is_dir()
-        # remove
+        # remove foo/onion_soup (keep foo)
         results.append(helpers.micc(['-p', 'BAR', 'mv', 'foo/onion_soup']))
         assert not (Path('.') / 'BAR' / 'bar' / 'foo'/ 'onion_soup').is_dir()
 
