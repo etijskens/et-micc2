@@ -250,15 +250,35 @@ class Project:
                 json.dump(self.db, f, indent=2)
 
 
-    def replace_in_folder( self, folder_path, cur_name, new_name ):
+    def replace_in_folder( self, folder_path: Path
+                           , new_name: str
+                           , replace_what=[]
+                           , replace_with=[]
+                         ):
         """replace every occurence of cur_name with new_name in folder folder_path
-        """
-        cur_dirname = folder_path.name
-        new_dirname = cur_dirname.replace(cur_name,new_name)
 
-        with messages.log(self.logger.info, f'Renaming folder: "{cur_dirname}" -> "{new_dirname}"'):
+        Params:
+            folder_path: path to component to be renamed or removed
+            new_name:
+            replace_what: list of strings to be replaced
+            replace_with: list of strings to replace with
+        """
+        cur_name = folder_path.name
+        if not replace_what:
+            replace_what = [cur_name]
+            replace_with = [new_name]
+        if not cur_name in replace_what:
+            replace_what.append(cur_name)
+            replace_with.append(new_name)
+
+        new_folder_path = folder_path.parent / new_name
+
+        with messages.log(
+                self.logger.info,
+                f"Renaming folder: '{folder_path.relative_to(self.context.project_path)}'"
+                f" -> '{new_folder_path.relative_to(self.context.project_path)}'."
+            ):
             # first rename the folder
-            new_folder_path = folder_path.parent / new_dirname
             os.rename(folder_path, new_folder_path)
 
             # rename subfolder names:
@@ -271,14 +291,14 @@ class Project:
 
             # rename subfolder names:
             project_path = self.context.project_path
-            for old_folder, new_folder in folder_list: # every tuplein the list is automatically unpacked
+            for old_folder, new_folder in folder_list: # every tuple in the list is automatically unpacked
                 self.logger.info(
                     f"Renaming folder '{Path(old_folder).relative_to(self.context.project_path)}'"
                     f"  -> '{Path(new_folder).relative_to(self.context.project_path)}'"
                 )
                 os.rename(old_folder, new_folder)
 
-            # rename in files and file contents:
+            # rename in file names and file contents:
             for root, folders, files in os.walk(str(new_folder_path)):
                 for file in files:
                     if file.startswith('.orig.'):
@@ -289,57 +309,78 @@ class Project:
                         continue
                     if file.endswith('.lock'):
                         continue
-                    self.replace_in_file(Path(root) / file, cur_name, new_name)
+                    for cur_str, new_str in zip(replace_what, replace_with):
+                        self.replace_in_file(Path(root) / file, cur_str, new_str)
                 _filter(folders) # in place modification of the list of folders to traverse
 
 
-    def remove_file(self,path):
+    def replace_in_file( self
+                       , filepath: Path
+                       , cur_name: str
+                       , new_name: str
+                       , contents_only=False
+                       ):
+        """Replace <cur_name> with <new_name> in file filepath. If `contents_only ==False`
+        this action is also performed on the filename.
+
+        Params:
+            filepath: path to file
+            cur_name: name to be replaced
+            new_name: the replacement for cur_name
+        """
+        project_path = self.context.project_path
+        file = filepath.name
+        what = 'Modifying' if contents_only else 'Renaming'
+        with messages.log(self.logger.info, f"{what} file '{filepath.relative_to(project_path)}':"):
+            self.logger.info(f"Reading file comtents from '{filepath.relative_to(project_path)}'")
+            with open(filepath,'r') as f:
+                old_contents = f.read()
+
+            new_contents = old_contents.replace(cur_name, new_name)
+            contents_modified = new_contents != old_contents
+
+            if contents_only:
+                new_file = file
+                new_path = filepath.relative_to(project_path)
+                filename_modified = False
+            else:
+                new_file = file.replace(cur_name,new_name)
+                filename_modified = new_file != file
+                new_path = (filepath.parent / new_file).relative_to(project_path)
+
+            if contents_modified and filename_modified:
+                self.logger.info(f"Replacing '{cur_name}' with '{new_name}': modified file name and contents -> '{new_path}'.")
+            elif contents_modified:
+                self.logger.info(f"Replacing '{cur_name}' with '{new_name}': modified file contents -> '{new_path}'.")
+            elif filename_modified:
+                self.logger.info(f"Replacing '{cur_name}' with '{new_name}': modified file name -> '{new_path}'.")
+            else:
+                self.logger.info(f"Replacing '{cur_name}' with '{new_name}': unchanged file -> '{new_path}'.")
+
+            if filename_modified or contents_modified:
+                # By first renaming the original file, we avoid problems when the new file name
+                # is identical to the old file name (because it is invariant, e.g. __init__.py)
+                orig_file = '.orig.'+file
+                orig_path = filepath.parent / orig_file
+                self.logger.info(
+                    f"Keeping original file '{filepath.relative_to(project_path)}'"
+                    f" as '{orig_path.relative_to(project_path)}'."
+                )
+                os.rename(filepath, orig_path)
+                with open(project_path / new_path,'w') as f:
+                    f.write(new_contents)
+                self.logger.info(f"Writing file comtents to '{new_path}'")
+
+
+    def remove_file(self, path):
         try:
             os.remove(path)
         except FileNotFoundError:
             pass
 
 
-    def remove_folder(self,path):
+    def remove_folder(self, path):
         shutil.rmtree(path)
-
-
-    def replace_in_file(self, filepath, cur_name, new_name, contents_only=False):
-        """Replace <cur_name> with <new_name> in the filename and its contents."""
-
-        project_path = self.context.project_path
-        file = filepath.name
-        what = 'Modifying' if contents_only else 'Renaming'
-        with messages.log(self.logger.info, f"{what} file '{filepath.relative_to(project_path)}':"):
-            self.logger.info(f"Reading file '{filepath.relative_to(project_path)}'")
-            with open(filepath,'r') as f:
-                old_contents = f.read()
-
-            self.logger.info(f"Replacing '{cur_name}' with '{new_name}' in file contents.")
-            new_contents = old_contents.replace(cur_name, new_name)
-
-            if contents_only:
-                new_file = file
-                new_path = filepath.relative_to(project_path)
-            else:
-                new_file = file.replace(cur_name,new_name)
-                new_path = (filepath.parent / new_file).relative_to(project_path)
-                if new_file != file:
-                    self.logger.info(f"Replacing '{cur_name}' with '{new_name}' in file name -> '{new_path}'.")
-
-            # By first renaming the original file, we avoid problems when the new file name
-            # is identical to the old file name (because it is invariant, e.g. __init__.py)
-            orig_file = '.orig.'+file
-            orig_path = filepath.parent / orig_file
-            self.logger.info(
-                f"Keeping original file '{filepath.relative_to(project_path)}'"
-                f" as '{orig_path.relative_to(project_path)}'."
-            )
-            os.rename(filepath, orig_path)
-
-            self.logger.info(f"Writing modified file contents to '{new_path}'.")
-            with open(project_path / new_path,'w') as f:
-                f.write(new_contents)
 
 
 def _filter(folders):

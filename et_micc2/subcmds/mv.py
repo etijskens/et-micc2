@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import et_micc2.tools.env as env
 import et_micc2.tools.messages as messages
@@ -13,7 +14,7 @@ def mv_component(project):
     try:
         db_entry = project.db[cur_name]  # may raise KeyError
     except KeyError:
-        msg = f"Submodule '{new_name}' not found."
+        msg = f"Submodule '{cur_name}' not found."
         similar = [component for component in env.list_folders_only() if (new_name in component)]
         if similar:
             msg +="\nDid you mean:"
@@ -24,7 +25,7 @@ def mv_component(project):
     component_context = db_entry['context']
     component_type = \
         'Python submodule'  if component_context['flag_py' ] else \
-        'Fortran submodule' if component_context['flag_cpp'] else \
+        'Fortran submodule' if component_context['flag_f90'] else \
         'C++ submodule'     if component_context['flag_cpp'] else \
         'CLI application'   if component_context['flag_cli'] else \
         'CLI application (with subcommands)' if component_context['flag_clisub'] else 'oops'
@@ -54,13 +55,16 @@ def mv_component(project):
                     cur_name, new_name
                 )
             else:
+                if '/' in new_name:
+                    messages.error(f"new name must not be path-like: '{new_name}. Change to {Path(new_name).name}'.")
+
                 project.replace_in_folder(
                     project.context.project_path / project.context.package_name / component_name,
-                    cur_name, new_name
+                    new_name
                 )
                 project.replace_in_folder(
-                    project.context.project_path / 'tests' / project.context.package_name,
-                    cur_name, new_name
+                    project.context.project_path / 'tests' / project.context.package_name / component_name,
+                    new_name
                 )
 
             for key, val in db_entry.items():
@@ -72,7 +76,7 @@ def mv_component(project):
 
             # Update the database:
             project.logger.info(f"Updating database entry for : '{cur_name}'")
-            project.db[new_name] = db_entry
+            project.db[str(Path(cur_name).parent / new_name)] = db_entry
 
     else:  # remove
         with messages.log(

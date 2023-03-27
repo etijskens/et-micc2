@@ -84,8 +84,8 @@ class Submodule:
 
 
     def create(self):
-        """Create the submodule
-        """
+        """Create a submodule."""
+
         db_entry = {'context': self.context}
 
         if self.context.flag_py:
