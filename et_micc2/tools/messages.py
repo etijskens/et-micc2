@@ -20,6 +20,7 @@ ExitCodes = Enum(
     , 'Overwrite'
     , 'USER_INTERRUPTION'
     , 'SUBMODULE_NOT_FOUND'
+    , 'RuntimeError'
     ]
 )
 

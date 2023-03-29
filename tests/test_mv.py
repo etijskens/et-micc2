@@ -118,12 +118,12 @@ def test_move_1():
         # add Python submodule 'foo2'
         results.append(helpers.micc(['-p', 'BAR', 'add', 'foo2', '--py']))
         assert (Path('.') / 'BAR' / 'bar' / 'foo2').is_dir()
-        # move soup from foo to foo2
+        # rename soup -> onion_soup
         results.append(helpers.micc(['-p', 'BAR', 'mv', 'foo/soup', 'onion_soup']))
         assert (Path('.') / 'BAR' / 'bar' / 'foo'/ 'onion_soup').is_dir()
-        # rename
+        # move onion_soup from foo to foo2
         results.append(helpers.micc(['-p', 'BAR', 'mv', 'foo/onion_soup', 'foo2']))
-        assert not (Path('.') / 'BAR' / 'bar' / 'foo'/ 'onion_soup').is_dir()
+        assert not (Path('.') / 'BAR' / 'bar' / 'foo'/ 'soup').is_dir()
 
 
 if __name__ == "__main__":

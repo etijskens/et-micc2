@@ -39,7 +39,7 @@ from et_micc2.subcmds.check_env import check_env as check_cmd
 from et_micc2.subcmds.create import create as create_cmd
 from et_micc2.subcmds.doc import doc as doc_cmd
 from et_micc2.subcmds.info import info as info_cmd
-# from et_micc2.subcmds.mv import mv_component as mv_cmd
+from et_micc2.subcmds.mv import mv_component as mv_cmd
 
 if '3.8' < sys.version:
     from et_micc2.subcmds.check_env import check_env
@@ -720,22 +720,22 @@ def add(ctx
     default=''
 )
 @click.argument('component', type=str)
-@click.argument('destination', type=str, default='')
+@click.argument('to', default='')
 @click.pass_context
-def mv(ctx, component, destination, msg):
+def mv(ctx, component, to, msg):
     """Rename, remove or move a component.
 
     Params:
         component: name or relative path to the component that is to be renamed, removed or moved.
-        destination: New name for <component>, relative path of the component's new location, or ''
+        to: New name for <component>, relative path of the component's new location, or ''
             to remove the component.
     """
     context = ctx.obj
 
     context.component = component
-    context.destination = destination
+    context.to = to
     if not msg:
-        msg = f'Commit prior to `micc2 mv {component} {destination}`'
+        msg = f"Commit prior to `micc2 mv {component} {to}`"
     context.msg = msg
 
     try:

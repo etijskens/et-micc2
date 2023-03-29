@@ -251,55 +251,56 @@ class Project:
 
 
     def replace_in_folder( self, folder_path: Path
-                           , new_name: str
-                           , replace_what=[]
-                           , replace_with=[]
+                           , replace_what
+                           , replace_with
                          ):
-        """replace every occurence of cur_name with new_name in folder folder_path
+        """replace every occurence of replace_what[i] with replace_with[i] in folder folder_path (also
+        in file and folder names.
 
         Params:
             folder_path: path to component to be renamed or removed
-            new_name:
-            replace_what: list of strings to be replaced
-            replace_with: list of strings to replace with
+            replace_what: string to be replaced
+            replace_with: string to replace with
         """
-        cur_name = folder_path.name
-        if not replace_what:
-            replace_what = [cur_name]
-            replace_with = [new_name]
-        if not cur_name in replace_what:
-            replace_what.append(cur_name)
-            replace_with.append(new_name)
+        folder_name = folder_path.name
+        folder_nam2 = folder_name.replace(replace_what, replace_with)
 
-        new_folder_path = folder_path.parent / new_name
 
         with messages.log(
                 self.logger.info,
-                f"Renaming folder: '{folder_path.relative_to(self.context.project_path)}'"
-                f" -> '{new_folder_path.relative_to(self.context.project_path)}'."
+                f"replace_in_folder: '{folder_path.relative_to(self.context.project_path)}: '"
+                f" '{replace_what}' -> '{replace_with}'."
             ):
             # first rename the folder
-            os.rename(folder_path, new_folder_path)
+            if folder_nam2 != folder_name:
+                to = folder_path.parent / folder_nam2
+                self.logger.info(
+                    f"Renaming folder '{folder_path.relative_to(self.context.project_path)}'"
+                    f"  -> '{to.relative_to(self.context.project_path)}'"
+                )
+                folder_path.rename(to)
 
             # rename subfolder names:
             folder_list = [] # list of tuples with (oldname,newname)
-            for root, folders, files in os.walk(str(new_folder_path)):
+            for root, folders, files in os.walk(str(to)):
                 _filter(folders) # in place modification of the list of folders to traverse
+                root_path = Path(root)
                 for folder in folders:
-                    new_folder = folder.replace(cur_name,new_name)
-                    folder_list.append((os.path.join(root,folder), os.path.join(root,new_folder)))
+                    new_folder = folder.replace(replace_what, replace_with)
+                    folder_list.append((root_path / folder, root_path / new_folder))
 
             # rename subfolder names:
             project_path = self.context.project_path
             for old_folder, new_folder in folder_list: # every tuple in the list is automatically unpacked
                 self.logger.info(
-                    f"Renaming folder '{Path(old_folder).relative_to(self.context.project_path)}'"
-                    f"  -> '{Path(new_folder).relative_to(self.context.project_path)}'"
+                    f"Renaming folder '{old_folder.relative_to(self.context.project_path)}'"
+                    f"  -> '{to.relative_to(self.context.project_path)}'"
                 )
-                os.rename(old_folder, new_folder)
+                old_folder.rename(new_folder)
 
             # rename in file names and file contents:
-            for root, folders, files in os.walk(str(new_folder_path)):
+            for root, folders, files in os.walk(str(to)):
+                root_path = Path(root)
                 for file in files:
                     if file.startswith('.orig.'):
                         continue
@@ -309,24 +310,23 @@ class Project:
                         continue
                     if file.endswith('.lock'):
                         continue
-                    for cur_str, new_str in zip(replace_what, replace_with):
-                        self.replace_in_file(Path(root) / file, cur_str, new_str)
+                    self.replace_in_file(root_path / file, replace_what, replace_with)
                 _filter(folders) # in place modification of the list of folders to traverse
 
 
     def replace_in_file( self
                        , filepath: Path
-                       , cur_name: str
-                       , new_name: str
+                       , replace_what: str
+                       , replace_with: str
                        , contents_only=False
                        ):
-        """Replace <cur_name> with <new_name> in file filepath. If `contents_only ==False`
+        """Replace <replace_what> with <replace_with> in file filepath. If `contents_only ==False`
         this action is also performed on the filename.
 
         Params:
             filepath: path to file
-            cur_name: name to be replaced
-            new_name: the replacement for cur_name
+            replace_what: name to be replaced
+            replace_with: the replacement for replace_what
         """
         project_path = self.context.project_path
         file = filepath.name
@@ -336,7 +336,7 @@ class Project:
             with open(filepath,'r') as f:
                 old_contents = f.read()
 
-            new_contents = old_contents.replace(cur_name, new_name)
+            new_contents = old_contents.replace(replace_what, replace_with)
             contents_modified = new_contents != old_contents
 
             if contents_only:
@@ -344,18 +344,18 @@ class Project:
                 new_path = filepath.relative_to(project_path)
                 filename_modified = False
             else:
-                new_file = file.replace(cur_name,new_name)
+                new_file = file.replace(replace_what,replace_with)
                 filename_modified = new_file != file
                 new_path = (filepath.parent / new_file).relative_to(project_path)
 
             if contents_modified and filename_modified:
-                self.logger.info(f"Replacing '{cur_name}' with '{new_name}': modified file name and contents -> '{new_path}'.")
+                self.logger.info(f"Replacing '{replace_what}' with '{replace_with}': modified file name and contents -> '{new_path}'.")
             elif contents_modified:
-                self.logger.info(f"Replacing '{cur_name}' with '{new_name}': modified file contents -> '{new_path}'.")
+                self.logger.info(f"Replacing '{replace_what}' with '{replace_with}': modified file contents -> '{new_path}'.")
             elif filename_modified:
-                self.logger.info(f"Replacing '{cur_name}' with '{new_name}': modified file name -> '{new_path}'.")
+                self.logger.info(f"Replacing '{replace_what}' with '{replace_with}': modified file name -> '{new_path}'.")
             else:
-                self.logger.info(f"Replacing '{cur_name}' with '{new_name}': unchanged file -> '{new_path}'.")
+                self.logger.info(f"Replacing '{replace_what}' with '{replace_with}': unchanged file -> '{new_path}'.")
 
             if filename_modified or contents_modified:
                 # By first renaming the original file, we avoid problems when the new file name
@@ -366,17 +366,14 @@ class Project:
                     f"Keeping original file '{filepath.relative_to(project_path)}'"
                     f" as '{orig_path.relative_to(project_path)}'."
                 )
-                os.rename(filepath, orig_path)
+                filepath.rename(orig_path)
                 with open(project_path / new_path,'w') as f:
                     f.write(new_contents)
-                self.logger.info(f"Writing file comtents to '{new_path}'")
+                self.logger.info(f"Writing file contents to '{new_path}'")
 
 
-    def remove_file(self, path):
-        try:
-            os.remove(path)
-        except FileNotFoundError:
-            pass
+    def remove_file(self, path: Path):
+        path.unlink(missing_ok=True)
 
 
     def remove_folder(self, path):
