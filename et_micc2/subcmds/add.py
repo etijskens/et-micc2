@@ -269,16 +269,19 @@ class Cli:
         self.context = context
         app_name = self.context.add_name
         if os.sep in app_name:
-            messages.error("CLIs must be located in the package directory. They cannot be path-like.")
+            messages.error(
+                f"CLIs are automatically placed in the '{context.package_name}/cli' directory. "
+                f"The name ('{app_name}') must not be path-like."
+            )
 
-        if (context.project_path / context.package_name / f"cli_{app_name}.py").is_file():
+        if (context.project_path / context.package_name / 'cli' / f"{app_name}.py").is_file():
             messages.error(f"Project {self.context.project_path.name} has already an app named {app_name}.")
 
         if not utils.verify_project_name(app_name):
             messages.error(
                 f"Not a valid app name ({app_name}_. Valid names:\n"
-                f"  * start with a letter [a-zA-Z]\n"
-                f"  * contain only [a-zA-Z], digits, hyphens, and underscores\n"
+                f"  * start with a letter [a-zA-Z],\n"
+                f"  * contain only [a-zA-Z], digits, underscores, and hyphens.\n"
             )
 
     def create(self):
@@ -287,12 +290,13 @@ class Cli:
 
         if self.context.flag_clisub:
             self.context.templates = ['app-sub-commands']
+            cli_type = '(CLI with subcommands)'
         else:
             self.context.templates = ['app-single-command']
+            cli_type = '(single command CLI)'
 
         app_name = self.context.add_name
-        cli_app_name = 'cli_' + utils.pep8_module_name(app_name)
-        cli_type = '(CLI with subcommands)' if self.context.flag_clisub else '(single command CLI)'
+        cli_app_name = 'cli/' + utils.pep8_module_name(app_name)
 
         with messages.log(
                 self.context.logger.info, 
@@ -300,19 +304,17 @@ class Cli:
                 f"    {cli_type}."
             ):
             self.context.template_parameters.update(
-                {'app_name': app_name
-                    , 'cli_app_name': cli_app_name
-                 }
+                {'app_name': app_name}
             )
 
             msg = expand.expand_templates(self.context)
             if msg:
-                self.logger.critical(msg)
+                self.context.logger.critical(msg)
                 return
 
             package_name = self.context.template_parameters['package_name']
-            src_file = os.path.join(self.context.project_path.name, package_name, f"cli_{app_name}.py")
-            tst_file = os.path.join(self.context.project_path.name, 'tests', f"test_cli_{app_name}.py")
+            src_file = os.path.join(self.context.project_path.name, package_name, 'cli', f"{app_name}.py")
+            tst_file = os.path.join(self.context.project_path.name, 'tests', 'cli', f"test_{app_name}.py")
             self.context.logger.info(f"- Python source file {src_file}.")
             self.context.logger.info(f"- Python test code   {tst_file}.")
 
@@ -346,7 +348,7 @@ class Cli:
                             + '\n'
                             )
                 # create entry for this apps documentation
-                txt2 = (f".. click:: {package_name}.{cli_app_name}:main\n"
+                txt2 = (f".. click:: {package_name}.cli.{app_name}:main\n"
                         f"   :prog: {app_name}\n"
                         f"   :show-nested:\n\n"
                         )
@@ -360,13 +362,15 @@ class Cli:
                 pyproject_toml = TomlFile(self.context.project_path / 'pyproject.toml')
                 pyproject_toml['tool']['poetry']['scripts'][app_name] = f"{package_name}:{cli_app_name}.main"
                 pyproject_toml.save()
+                # huh?
                 db_entry['pyproject.toml'] = f'{app_name} = "refactoring_dev:cli_{app_name}.main"\n'
 
+                # This does not seem very useful:
                 # add 'import <package_name>.cli_<app_name> to __init__.py
-                line = f"import {package_name}.cli_{app_name}\n"
-                file = self.context.project_path / self.context.package_name / '__init__.py'
-                utils.insert_in_file(file, [line], before=True, startswith="__version__")
-                db_entry[os.path.join(self.context.package_name, '__init__.py')] = line
+                # line = f"import {package_name}.{app_name}\n"
+                # file = self.context.project_path / self.context.package_name / '__init__.py'
+                # utils.insert_in_file(file, [line], before=True, startswith="__version__")
+                # db_entry[os.path.join(self.context.package_name, '__init__.py')] = line
 
         return db_entry
 

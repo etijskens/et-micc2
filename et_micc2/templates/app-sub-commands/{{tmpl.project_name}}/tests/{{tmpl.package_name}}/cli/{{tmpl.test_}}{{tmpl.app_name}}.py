@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Tests for `{{tmpl.project_name}}.{{tmpl.cli_app_name}} ` CLI."""
+"""Tests for `{{tmpl.project_name}}.{{tmpl.app_name}} ` CLI."""
 
 import pytest
 
@@ -10,7 +10,7 @@ from click import echo
 
 from click.testing import CliRunner
 
-from {{tmpl.package_name}}.{{tmpl.cli_app_name}} import main
+from {{tmpl.package_name}}.cli.{{tmpl.app_name}} import main
 
 
 def test_hello():

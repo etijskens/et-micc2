@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 import re
+import requests
 import subprocess
 
 import et_micc2.tools.config as config
@@ -76,7 +77,7 @@ def create(project):
         # derive package name from project name
         if not utils.verify_project_name(project.context.project_path.name):
             messages.error(
-                f"The project name ({project_name}) does not yield a PEP8 compliant module name:\n"
+                f"The project name ({project.context.project_path.name}) does not yield a PEP8 compliant module name:\n"
                 f"  The project name must start with char, and contain only chars, digits, hyphens and underscores.\n"
                 f"  Alternatively, provide an explicit module name with the --module-name=<name>."
             )
@@ -169,11 +170,10 @@ def create(project):
                             cmds = [['git', 'init']
                                     ]
                         cmds.extend(
-                            [['git', 'add', '*']
-                                , ['git', 'add', '.gitignore']
-                                , ['git', 'commit', '-m',
-                                   f'"Initial commit from `micc2 create {project.context.project_path.name}`"']
-                             ]
+                            [ ['git', 'add', '*']
+                            , ['git', 'add', '.gitignore']
+                            , ['git', 'commit', '-m', f'"Initial commit from `micc2 create {project.context.project_path.name}`"']
+                            ]
                         )
 
                         returncode = utils.execute(cmds, project.logger.debug, stop_on_error=True)

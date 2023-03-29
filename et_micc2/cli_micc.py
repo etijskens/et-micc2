@@ -35,10 +35,11 @@ import et_micc2.tools.messages as messages
 
 from et_micc2.subcmds.add import add as add_cmd
 from et_micc2.subcmds.build import build as build_cmd
+from et_micc2.subcmds.check_env import check_env as check_cmd
 from et_micc2.subcmds.create import create as create_cmd
 from et_micc2.subcmds.doc import doc as doc_cmd
 from et_micc2.subcmds.info import info as info_cmd
-from et_micc2.subcmds.mv import mv_component as mv_cmd
+# from et_micc2.subcmds.mv import mv_component as mv_cmd
 
 if '3.8' < sys.version:
     from et_micc2.subcmds.check_env import check_env
@@ -714,26 +715,28 @@ def add(ctx
 # mv
 ####################################################################################################
 @main.command()
-@click.option('--where', type=click.Choice(['project', 'package'], case_sensitive=False)
-    , help="where to replace occurrences of <cur_name>."
-    , default='package'
+@click.option('-m', '--msg', type=str,
+    help="If specified, execute `git commit -a -m <msg>` prior to the mv.",
+    default=''
 )
-@click.argument('cur_name', type=str)
-@click.argument('new_name', type=str, default='')
+@click.argument('component', type=str)
+@click.argument('destination', type=str, default='')
 @click.pass_context
-def mv(ctx, cur_name, new_name, where):
-    """Rename or remove a component.
+def mv(ctx, component, destination, msg):
+    """Rename, remove or move a component.
 
-    :param cur_name: name of component to be removed or renamed.
-    :param new_name: new name of the component. If empty, the component will be removed.
+    Params:
+        component: name or relative path to the component that is to be renamed, removed or moved.
+        destination: New name for <component>, relative path of the component's new location, or ''
+            to remove the component.
     """
     context = ctx.obj
 
-    context.cur_name = cur_name
-    context.new_name = new_name
-    if new_name:
-        context.where =  where
-    # else: ignore these flags
+    context.component = component
+    context.destination = destination
+    if not msg:
+        msg = f'Commit prior to `micc2 mv {component} {destination}`'
+    context.msg = msg
 
     try:
         project = Project(context)
