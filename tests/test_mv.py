@@ -127,7 +127,7 @@ def test_move_1():
 
 
 if __name__ == "__main__":
-    the_test_you_want_to_debug = test_rename_remove_2
+    the_test_you_want_to_debug = test_rename_remove_3
 
     print(f"{__file__}::__main__ executing test '{the_test_you_want_to_debug}'")
     the_test_you_want_to_debug()
