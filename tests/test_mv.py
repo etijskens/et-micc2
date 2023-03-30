@@ -26,7 +26,7 @@ def test_rename_remove_1():
             component_name = f"submod_{flag[2:]}"
             results.append(helpers.micc(['-p', 'BAR', 'add', component_name, flag]))
             if 'cli' in flag:
-                assert (Path('.') / 'BAR' / 'bar' / f"cli_{component_name}.py").is_file()
+                assert (Path('.') / 'BAR' / 'bar/cli' / f"{component_name}.py").is_file()
             else:
                 assert (Path('.') / 'BAR' / 'bar' / component_name).is_dir()
 
@@ -36,8 +36,8 @@ def test_rename_remove_1():
             component_new_name = f'foo_{flag[2:]}'
             results.append(helpers.micc(['-p', 'BAR', 'mv', component_name, component_new_name]))
             if 'cli' in flag:
-                assert (Path('.') / 'BAR' / 'bar' / f"cli_{component_new_name}.py").is_file()
-                assert (Path('.') / 'BAR' / 'tests' / 'bar' / f"test_cli_{component_new_name}.py").is_file()
+                assert (Path('.') / 'BAR' / 'bar' / 'cli' / f"{component_new_name}.py").is_file()
+                assert (Path('.') / 'BAR' / 'tests' / 'bar' / 'cli' / f"test_{component_new_name}.py").is_file()
             else:
                 assert (Path('.') / 'BAR' / 'bar' / component_new_name).is_dir()
                 assert (Path('.') / 'BAR' / 'tests' / 'bar' / component_new_name).is_dir()
@@ -127,7 +127,7 @@ def test_move_1():
 
 
 if __name__ == "__main__":
-    the_test_you_want_to_debug = test_move_1
+    the_test_you_want_to_debug = test_rename_remove_1
 
     print(f"{__file__}::__main__ executing test '{the_test_you_want_to_debug}'")
     the_test_you_want_to_debug()

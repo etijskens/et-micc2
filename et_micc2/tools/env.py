@@ -152,7 +152,7 @@ def check_cmake(required=False):
         else:
             messages.warning(msg)
 
-def list_folders_in(dir_path: Path) -> typing.List[str]:
+def list_folders_in(_path: Path) -> typing.List[str]:
     """Get a list of all subfolders of dir_path."""
     lines = []
     for entry in dir_path.iterdir():

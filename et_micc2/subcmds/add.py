@@ -9,15 +9,15 @@ import et_micc2.tools.utils as utils
 
 
 def add(project):
-    """Add some source file to the project.
+    """Add a component to the project."""
 
-    This method dispatches to
+    key = project.components.has_name(project.context.add_name)
+    if key:
+        messages.error(
+            f"It is recommended that component names are unique. Component '{key}' exists already.",
+            exit_code=messages.ExitCodes.COMPONENT_NAME_NOT_UNIQUE.value
+        )
 
-    * :py:meth:`add_python_cli`,
-    * :py:meth:`add_python_submodule`,
-    * :py:meth:`add_f90_module`,
-    * :py:meth:`add_cpp_module`
-    """
     # set implied flags:
     if project.context.flag_clisub:  # cli with subcommands
         app_implied = f" [implied by --clisub   ({int(project.context.flag_clisub)})]"
@@ -35,8 +35,7 @@ def add(project):
         submodule = Submodule(project)
         db_entry = submodule.create()
 
-    project.deserialize_db()
-    project.serialize_db(db_entry)
+    project.serialize(db_entry)
 
 class Submodule:
     def __init__(self, project):

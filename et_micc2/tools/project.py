@@ -30,6 +30,7 @@ import semantic_version
 import et_micc2.tools.messages as messages
 from   et_micc2.tools.tomlfile import TomlFile
 import et_micc2.tools.utils as utils
+from et_micc2.tools.components import ComponentDatabase
 
 
 __FILE__ = Path(__file__).resolve()
@@ -158,6 +159,8 @@ class Project:
             if not getattr(self.context, 'invoked_subcommand', '') in ('create',):
                 messages.error(f'Not a project directory: `{self.context.project_path}`')
 
+        self.components = ComponentDatabase(self.context.project_path)
+
 
     @property
     def version(self):
@@ -197,57 +200,6 @@ class Project:
             self.context.clear_log = False
 
         self.context.logger = self.logger
-
-
-    def deserialize_db(self):
-        """Read file ``db.json`` into self.db."""
-
-        db_json = self.context.project_path / 'db.json'
-        if db_json.exists():
-            with db_json.open('r') as f:
-                self.db = json.load(f)
-        else:
-            self.db = {}
-
-
-    def serialize_db(self, db_entry=None, verbose=False):
-        """Write self.db to file ``db.json``.
-
-        Self.context is a SimpleNamespace object which is not default json serializable.
-        This function takes care of that by converting to ``str`` where possible, and
-        ignoring objects that do not need serialization, as e.g. self.context.logger.
-        """
-
-        if db_entry:
-            # produce a json serializable version of db_entry['context']:
-            my_options = {}
-            for key, val in db_entry['context'].__dict__.items():
-                if isinstance(val,(dict, list, tuple, str, int, float, bool)):
-                    # default serializable types
-                    my_options[key] = val
-                    if verbose:
-                        print(f"serialize_db: using ({key}:{val})")
-                elif isinstance(val, Path):
-                    my_options[key] = str(val)
-                    if verbose:
-                        print(f"serialize_db: using ({key}:str('{val}'))")
-                else:
-                    if verbose:
-                        print(f"serialize_db: ignoring ({key}:{val})")
-
-            db_entry['context'] = my_options
-
-            if not hasattr(self, 'db'):
-                # Read db.json into self.db if self.db does not yet exist.
-                self.deserialize_db()
-
-            # store the entry in self.db:
-            self.db[self.context.add_name] = db_entry
-
-        # finally, serialize self.db
-        with utils.in_directory(self.context.project_path):
-            with open('db.json','w') as f:
-                json.dump(self.db, f, indent=2)
 
 
     def replace_in_folder( self, folder_path: Path
@@ -379,6 +331,8 @@ class Project:
     def remove_folder(self, path):
         shutil.rmtree(path)
 
+    def serialize(self, new_components=[]):
+        self.components.serialize(new_components=new_components, logger=self.context.logger)
 
 def _filter(folders):
     """"In place modification of the list of folders to traverse.

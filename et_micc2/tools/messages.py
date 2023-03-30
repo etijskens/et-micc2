@@ -21,6 +21,7 @@ ExitCodes = Enum(
     , 'USER_INTERRUPTION'
     , 'SUBMODULE_NOT_FOUND'
     , 'RuntimeError'
+    , 'COMPONENT_NAME_NOT_UNIQUE'
     ]
 )
 

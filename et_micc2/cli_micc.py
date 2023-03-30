@@ -39,7 +39,7 @@ from et_micc2.subcmds.check_env import check_env as check_cmd
 from et_micc2.subcmds.create import create as create_cmd
 from et_micc2.subcmds.doc import doc as doc_cmd
 from et_micc2.subcmds.info import info as info_cmd
-from et_micc2.subcmds.mv import mv_component as mv_cmd
+from et_micc2.subcmds.mv import mv as mv_cmd
 
 if '3.8' < sys.version:
     from et_micc2.subcmds.check_env import check_env

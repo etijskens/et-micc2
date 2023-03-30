@@ -111,10 +111,10 @@ def test_insert_in_file():
 
 def test_in_directory():
 
-    helpers.clear_test_workspace()
+    test_workspace = helpers.test_workspace()
     p0 = Path.cwd()
 
-    pFoo = helpers.test_workspace / 'Foo'
+    pFoo = test_workspace / 'Foo'
     pFoo.mkdir()
     try:
         with utils.in_directory(pFoo):
@@ -124,7 +124,7 @@ def test_in_directory():
     except:
         print(f'except: cwd = {Path.cwd()}')
         assert Path.cwd() == p0
-    helpers.clear_test_workspace()
+
 
 
 # ==============================================================================

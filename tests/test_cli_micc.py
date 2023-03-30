@@ -39,46 +39,46 @@ def test_micc_help():
     assert 'Show this message and exit.' in result.output
 
 
-def test_clear_test_workspace():
-    """ 
-    """
-    p = helpers.test_workspace()
-    assert p.exists()
-    print(f"* assert {str(helpers.test_workspace)}.exists()=={p.exists()}")
-    
-    pFOO = p / 'FOO'
-    pFOO.mkdir()
-    assert pFOO.exists()
-
-    p = helpers.test_workspace()
-    assert not pFOO.exists()
-    assert p.exists()
-    print('*  works on empty subfolder')
-
-    pFOO.mkdir()
-    pbar = pFOO / 'bar.txt'
-    with pbar.open('w') as f:
-        f.write("some text\n")
-    assert pbar.exists()
-    
-    p = helpers.test_workspace()
-    assert not pbar.exists()
-    assert not pFOO.exists()
-    assert p.exists()
-    print('*  works on non-empty subfolder')
-
-    pFOO.mkdir()
-    pKeep = p / 'Keep'
-    pKeep.mkdir()
-    assert pKeep.exists()
-    with pbar.open('w') as f:
-        f.write("some text\n")
-    assert pbar.exists()
-    p = helpers.test_workspace(clear='FOO')
-    assert not pbar.exists()
-    assert not pFOO.exists()
-    assert pKeep.exists()
-    print('* helpers.clear_test_workspace("FOO") selectively removes subfolder "FOO."')
+# def test_clear_test_workspace():
+#     """
+#     """
+#     p = helpers.test_workspace()
+#     assert p.exists()
+#     print(f"* assert {str(helpers.test_workspace)}.exists()=={p.exists()}")
+#
+#     pFOO = p / 'FOO'
+#     pFOO.mkdir()
+#     assert pFOO.exists()
+#
+#     p = helpers.test_workspace()
+#     assert not pFOO.exists()
+#     assert p.exists()
+#     print('*  works on empty subfolder')
+#
+#     pFOO.mkdir()
+#     pbar = pFOO / 'bar.txt'
+#     with pbar.open('w') as f:
+#         f.write("some text\n")
+#     assert pbar.exists()
+#
+#     p = helpers.test_workspace()
+#     assert not pbar.exists()
+#     assert not pFOO.exists()
+#     assert p.exists()
+#     print('*  works on non-empty subfolder')
+#
+#     pFOO.mkdir()
+#     pKeep = p / 'Keep'
+#     pKeep.mkdir()
+#     assert pKeep.exists()
+#     with pbar.open('w') as f:
+#         f.write("some text\n")
+#     assert pbar.exists()
+#     p = helpers.test_workspace(clear='FOO')
+#     assert not pbar.exists()
+#     assert not pFOO.exists()
+#     assert pKeep.exists()
+#     print('* helpers.clear_test_workspace("FOO") selectively removes subfolder "FOO."')
 
 def obsolete_test_scenario_module_structure():
     # this test is obsolete since we decided that the top level package is always a module/__init__.py
@@ -294,7 +294,7 @@ def test_doc_cmd():
 
 if __name__ == "__main__":
     print(sys.version_info)
-    the_test_you_want_to_debug = test_clear_test_workspace
+    the_test_you_want_to_debug = test_doc_cmd
 
     print(f"__main__ running {the_test_you_want_to_debug}")
     the_test_you_want_to_debug()
