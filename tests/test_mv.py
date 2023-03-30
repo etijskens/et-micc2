@@ -101,14 +101,10 @@ def test_rename_remove_3():
 def test_move_1():
     """test move of sub-submodules between submodules"""
     with utils.in_directory(helpers.test_workspace()):
-        component_flags = ['--py', '--f90', '--cpp']
         results = []
         # Create package BAR
         results.append(helpers.micc(['-p', 'BAR', 'create', '--allow-nesting', '--remote=none']))
-        assert Path('BAR/bar/__init__.py').exists()
-
-        results.append(helpers.micc(['-p', 'BAR', 'add', 'app', '--clisub']))
-
+        assert Path('BAR/bar/__init__.py').is_file()
         # add Python submodule 'foo'
         results.append(helpers.micc(['-p', 'BAR', 'add', 'foo', '--py']))
         assert (Path('.') / 'BAR' / 'bar' / 'foo').is_dir()
@@ -127,7 +123,7 @@ def test_move_1():
 
 
 if __name__ == "__main__":
-    the_test_you_want_to_debug = test_rename_remove_3
+    the_test_you_want_to_debug = test_move_1
 
     print(f"{__file__}::__main__ executing test '{the_test_you_want_to_debug}'")
     the_test_you_want_to_debug()
