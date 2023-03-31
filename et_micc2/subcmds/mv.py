@@ -43,11 +43,11 @@ def mv(project):
     component_traits.is_cli = component_traits.description.startswith('CLI')
 
     if component_traits.is_cli:
+        # CLIs can't be moved
         if component_traits.to:
             mv_action = mv_rename
         else:
             mv_action = mv_remove
-        # CLIs can't be moved
     else:
         if component_traits.to:
             if component_traits.to in project.components:
