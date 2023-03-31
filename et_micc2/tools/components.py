@@ -113,4 +113,4 @@ class ComponentDatabase:
         self.db.__delitem__(key)
 
     def __contains__(self, key):
-        self.db.__contains__(key)
+        return self.db.__contains__(key)
