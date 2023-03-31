@@ -177,7 +177,7 @@ def mv_move(project, component_traits):
     paths = [component_traits.path, component_traits.to]
     with utils.in_directory(package_path):
         common_path = env.common_path(paths)
-    import_libs = [str(p.relative_to(common_path)).replace(os.sep, '.') for p in paths]
+        import_libs = [str(p.relative_to(common_path)).replace(os.sep, '.') for p in paths]
     replace = [
         (import_libs[0], import_libs[1]),
         (Path(component_traits.path).name, Path(component_traits.to).name),
