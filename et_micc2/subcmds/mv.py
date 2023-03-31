@@ -139,7 +139,7 @@ def mv_remove(project, component_traits):
 def mv_move(project, component_traits):
     """"""
     try:
-        project.components.has_name(component_traits.path)
+        project.components[component_traits.path]
     except KeyError:
         messages.error(f"Inexisting source: '{component_traits.path}'.")
 
