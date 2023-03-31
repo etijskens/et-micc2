@@ -179,7 +179,7 @@ def mv_move(project, component_traits):
         common_path = env.common_path(paths)
         pr = [Path(p).resolve().relative_to(common_path) for p in paths]
         pr[1] = pr[1] / component_traits.name
-        import_libs = [str(p).replace((os.sep, '.')) for p in pr]
+        import_libs = [str(p).replace(os.sep, '.') for p in pr]
     replace = [
         (import_libs[0], Path(import_libs[1])),
         (Path(component_traits.path).name, Path(component_traits.to).name),
