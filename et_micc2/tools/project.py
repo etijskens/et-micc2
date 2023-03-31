@@ -229,6 +229,8 @@ class Project:
                     f"  -> '{to.relative_to(self.context.project_path)}'"
                 )
                 folder_path.rename(to)
+            else:
+                to = folder_path
 
             # rename subfolder names:
             folder_list = [] # list of tuples with (oldname,newname)
