@@ -239,7 +239,8 @@ class Project:
                 root_path = Path(root)
                 for folder in folders:
                     new_folder = replace_many(folder, replace)
-                    folder_list.append((root_path / folder, root_path / new_folder))
+                    if new_folder != folder:
+                        folder_list.append((root_path / folder, root_path / new_folder))
 
             # rename subfolder names:
             project_path = self.context.project_path
