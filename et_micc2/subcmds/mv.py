@@ -181,7 +181,7 @@ def mv_move(project, component_traits):
         pr[1] = pr[1] / component_traits.name
         import_libs = [str(p).replace(os.sep, '.') for p in pr]
     replace = [
-        (import_libs[0], Path(import_libs[1])),
+        (import_libs[0], import_libs[1]),
         (Path(component_traits.path).name, Path(component_traits.to).name),
     ]
     project.replace_in_folder(package_path, replace)
