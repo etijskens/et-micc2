@@ -218,8 +218,8 @@ class Project:
         folder_nam2 = replace_many(folder_name, replace)
 
         msg = f"replace_in_folder: '{folder_path.relative_to(self.context.project_path)}:'"
-        for s0,s1 in replace:
-            msg += f"\n    '{s0}' -> '{s1}'"
+        for str_to_replace,replacement in replace:
+            msg += f"\n    '{str_to_replace}' -> '{replacement}'"
         with messages.log(self.logger.info, msg):
             # first rename the folder
             if folder_nam2 != folder_name:
@@ -236,7 +236,7 @@ class Project:
                 _filter(folders) # in place modification of the list of folders to traverse
                 root_path = Path(root)
                 for folder in folders:
-                    new_folder = folder.replace(replace_what, replace_with)
+                    new_folder = replace_many(folder, replace)
                     folder_list.append((root_path / folder, root_path / new_folder))
 
             # rename subfolder names:
@@ -252,15 +252,13 @@ class Project:
             for root, folders, files in os.walk(str(to)):
                 root_path = Path(root)
                 for file in files:
-                    if file.startswith('.orig.'):
+                    if ( file.startswith('.orig.')
+                        or file.endswith('.so')
+                        or file.endswith('.json')
+                        or file.endswith('.lock')
+                    ):
                         continue
-                    if file.endswith('.so'):
-                        continue
-                    if file.endswith('.json'):
-                        continue
-                    if file.endswith('.lock'):
-                        continue
-                    self.replace_in_file(root_path / file, replace_what, replace_with)
+                    self.replace_in_file(root_path / file, replace)
                 _filter(folders) # in place modification of the list of folders to traverse
 
 
@@ -296,14 +294,11 @@ class Project:
                 filename_modified = new_file != file
                 new_path = (filepath.parent / new_file).relative_to(project_path)
 
-            if contents_modified and filename_modified:
-                self.logger.info(f"Replacing '{replace}': modified file name and contents -> '{new_path}'.")
-            elif contents_modified:
-                self.logger.info(f"Replacing '{replace}': modified file contents -> '{new_path}'.")
-            elif filename_modified:
-                self.logger.info(f"Replacing '{replace}': modified file name -> '{new_path}'.")
-            else:
-                self.logger.info(f"Replacing '{replace}': unchanged file -> '{new_path}'.")
+            text = ("modified file name and contents" if (contents_modified and filename_modified) else
+                   ("modified file contents"          if (contents_modified) else
+                   ("modified file name"              if (filename_modified) else
+                   ("unchanged file"))))
+            self.logger.info(f"Replacing '{replace}': {text} -> '{new_path}'.")
 
             if filename_modified or contents_modified:
                 # By first renaming the original file, we avoid problems when the new file name
