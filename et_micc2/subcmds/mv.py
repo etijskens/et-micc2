@@ -170,8 +170,7 @@ def mv_move(project, component_traits):
     # Perform the move
     package_path      = project.context.project_path / project.context.package_name
     package_test_path = project.context.project_path / 'tests' / project.context.package_name
-
-    # shutil.move(package_path / component_traits.path, package_path / component_traits.to)
+    shutil.move(package_path / component_traits.path, package_path / component_traits.to)
 
     package_name = package_path.name
     paths = [component_traits.path, component_traits.to]
