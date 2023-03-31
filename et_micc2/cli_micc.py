@@ -719,10 +719,14 @@ def add(ctx
     help="If specified, execute `git commit -a -m <msg>` prior to the mv.",
     default=''
 )
+@click.option('--no-commit', is_flag=True
+    , help="Don't commit the current git status."
+    , default=False
+)
 @click.argument('component', type=str)
 @click.argument('to', default='')
 @click.pass_context
-def mv(ctx, component, to, msg):
+def mv(ctx, component, to, msg, no_commit):
     """Rename, remove or move a component.
 
     Params:
@@ -734,9 +738,10 @@ def mv(ctx, component, to, msg):
 
     context.component = component
     context.to = to
-    if not msg:
-        msg = f"Commit prior to `micc2 mv {component} {to}`"
-    context.msg = msg
+    if not no_commit:
+        if not msg:
+            msg = f"Commit prior to `micc2 mv {component} {to}`"
+    context.commit_msg = msg
 
     try:
         project = Project(context)

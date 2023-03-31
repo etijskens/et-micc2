@@ -5,6 +5,7 @@ import pkg_resources
 import semantic_version
 import shutil
 import subprocess
+from typing import Union, List
 
 import et_micc2.tools.messages as messages
 
@@ -159,3 +160,15 @@ def list_folders_in(_path: Path) -> typing.List[str]:
         if entry.is_dir():
             lines.append(str(entry))
     return lines
+
+def common_path(
+        paths: List[Union[Path,str]],
+    ) -> Path:
+    """Return the common directory (from root to leaf).
+
+    Params:
+        paths: list of paths from which the common path (left to right) is extracted.
+    """
+    paths_resolved = [str(Path(p).resolve()) for p in paths]
+    p = Path(os.path.commonpath(paths_resolved))
+    return p

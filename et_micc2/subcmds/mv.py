@@ -1,7 +1,9 @@
 import os
+import shutil
 from pathlib import Path
 # from subprocess import run
 from types import SimpleNamespace
+from typing import Union
 
 import et_micc2.tools.env as env
 import et_micc2.tools.messages as messages
@@ -9,8 +11,8 @@ import et_micc2.tools.utils as utils
 
 def mv(project):
     """Rename, move or remove a component (submodule, Fortran/C++ binary extension module, or app (CLI)."""
-    if project.context.msg:
-        cmds = [['git', 'commit', '-a', '-m', project.context.msg]]
+    if project.context.commit_msg:
+        cmds = [['git', 'commit', '-a', '-m', project.context.commit_msg]]
         utils.execute(cmds, project.logger.debug, stop_on_error=True)
 
     p = Path(project.context.component)
@@ -45,6 +47,7 @@ def mv(project):
             mv_action = mv_rename
         else:
             mv_action = mv_remove
+        # CLIs can't be moved
     else:
         if component_traits.to:
             if component_traits.to in project.components:
@@ -77,19 +80,19 @@ def mv_rename(project, component_traits):
     if component_traits.is_cli:
         project.replace_in_file(
             package_path / 'cli' / f"{component_traits.name}.py",
-            component_traits.name, component_traits.to
+            [(component_traits.name, component_traits.to)]
         )
         project.replace_in_file(
             package_tests_path / 'cli' / f"test_{component_traits.name}.py",
-            component_traits.name, component_traits.to
+            [(component_traits.name, component_traits.to)]
         )
 
     else:
         project.replace_in_folder(
-            package_path / component_traits.path, component_traits.name, component_traits.to
+            package_path / component_traits.path, [(component_traits.name, component_traits.to)]
         )
         project.replace_in_folder(
-            package_tests_path / component_traits.path, component_traits.name, component_traits.to
+            package_tests_path / component_traits.path, [(component_traits.name, component_traits.to)]
         )
 
     for key, val in component_traits.db_entry.items():
@@ -103,7 +106,7 @@ def mv_rename(project, component_traits):
         else:
             filepath = project.context.project_path / key
             new_string = val.replace(component_traits.name, component_traits.to)
-            project.replace_in_file(filepath, val, new_string, contents_only=True)
+            project.replace_in_file(filepath, [(val, new_string)], contents_only=True)
             component_traits.db_entry[key] = new_string
 
 
@@ -127,7 +130,7 @@ def mv_remove(project, component_traits):
             path = project.context.project_path / key
             parent_folder, filename, old_string = path.parent, path.name, val
             new_string = ''
-            project.replace_in_file(path, old_string, new_string, contents_only=True)
+            project.replace_in_file(path, [(old_string, new_string)], contents_only=True)
 
     return None 
     #   Since the component is removed, there is no db_entry to return
@@ -135,3 +138,63 @@ def mv_remove(project, component_traits):
 
 def mv_move(project, component_traits):
     """"""
+    try:
+        src_path = project.components.has_name(component_traits.path)
+    except KeyError:
+        messages.error(f"Inexisting source: '{component_traits.path}'.")
+
+    try:
+        project.components[component_traits.to] # may raise KeyError, which implies a rename and a move
+        # if no KeyError is raised, perform only a move
+        after_rename = False
+    except KeyError:
+        # this is a move with a rename. First perform the rename, then the move
+        to_path = component_traits.to
+        to_name = Path(component_traits.to).name
+        try:
+            to_parent = Path(to_path).parent
+            project.components[to_parent] # may raise KeyError
+        except KeyError:
+            messages.error(f"Destination {to_parent} does not exist.")
+
+        # prepare for renaming
+        project.context.to = to_name
+        commit_msg = project.context.commit_msg
+        project.context.commit_msg = '' # we don't want separate commits for the rename and the move
+        mv(project) # rename
+        # prepare for moving
+        component_traits.to       = Path(to_path).parent
+        component_traits.path = Path(project.context.component).parent / to_name
+        after_rename = True
+
+    # Perform the move
+    package_path      = project.context.project_path / project.context.package_name
+    package_test_path = project.context.project_path / 'tests' / project.context.package_name
+
+    shutil.move(package_path / component_traits.path, package_path / component_traits.to)
+
+    package_name = package_path.name
+    paths = [component_traits.component, component_traits.to]
+    common_path = env.common_path(paths)
+    import_libs = [p.relative_to(common_path).replace(os.sep, '.') for p in paths]
+    replace = [
+        (import_libs[0], import_libs[1]),
+        (Path(component_traits.component).name,Path(component_traits.to).name),
+    ]
+    project.replace_in_folder(package_path, replace)
+    project.replace_in_folder(package_test_path, replace)
+
+    db_entry = component_traits.db_entry
+    for key, val in db_entry.items():
+        if not key == 'context':
+            path = project.context.project_path / key
+            parent_folder, filename, old_string = path.parent, path.name, val
+            new_string = ''
+            project.replace_in_file(path, [(old_string, new_string)], contents_only=True)
+
+    if after_rename:
+        # restore the commit message in the component database
+        db_entry['context']['commit_msg'] = commit_msg
+
+    return db_entry
+

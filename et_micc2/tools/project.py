@@ -8,22 +8,23 @@ An OO interface to *micc* projects.
 
 """
 import copy
-from importlib import import_module
-import json
-from operator import xor
+# from importlib import import_module
+# import json
+# from operator import xor
 import os
 from pathlib import Path
-import re
-import requests
+# import re
+# import requests
 import shutil
-import site
-import subprocess
-import sys
-import sysconfig
-from types import SimpleNamespace
+# import site
+# import subprocess
+# import sys
+# import sysconfig
+# from types import SimpleNamespace
+from typing import List, Tuple
 
-import click
-import semantic_version
+# import click
+# import semantic_version
 
 # import et_micc2.tools.config as config
 # import et_micc2.tools.expand as expand
@@ -202,27 +203,24 @@ class Project:
         self.context.logger = self.logger
 
 
-    def replace_in_folder( self, folder_path: Path
-                           , replace_what
-                           , replace_with
-                         ):
+    def replace_in_folder( self,
+        folder_path: Path,
+        replace: List[Tuple[str, int]],
+    ):
         """replace every occurence of replace_what[i] with replace_with[i] in folder folder_path (also
         in file and folder names.
 
         Params:
             folder_path: path to component to be renamed or removed
-            replace_what: string to be replaced
-            replace_with: string to replace with
+            replace: list of tuples (str_to_replace, replacement_str)
         """
         folder_name = folder_path.name
-        folder_nam2 = folder_name.replace(replace_what, replace_with)
+        folder_nam2 = replace_many(folder_name, replace)
 
-
-        with messages.log(
-                self.logger.info,
-                f"replace_in_folder: '{folder_path.relative_to(self.context.project_path)}: '"
-                f" '{replace_what}' -> '{replace_with}'."
-            ):
+        msg = f"replace_in_folder: '{folder_path.relative_to(self.context.project_path)}:'"
+        for s0,s1 in replace:
+            msg += f"\n    '{s0}' -> '{s1}'"
+        with messages.log(self.logger.info, msg):
             # first rename the folder
             if folder_nam2 != folder_name:
                 to = folder_path.parent / folder_nam2
@@ -266,19 +264,18 @@ class Project:
                 _filter(folders) # in place modification of the list of folders to traverse
 
 
-    def replace_in_file( self
-                       , filepath: Path
-                       , replace_what: str
-                       , replace_with: str
-                       , contents_only=False
-                       ):
+    def replace_in_file( self,
+        filepath: Path,
+        replace: List[Tuple[str,int]],
+        contents_only:bool = False
+    ):
         """Replace <replace_what> with <replace_with> in file filepath. If `contents_only ==False`
         this action is also performed on the filename.
 
         Params:
             filepath: path to file
-            replace_what: name to be replaced
-            replace_with: the replacement for replace_what
+            replace: list of tuples (str_to_replace, replacement_str)
+            contents_only: if True the filename is not changed
         """
         project_path = self.context.project_path
         file = filepath.name
@@ -287,8 +284,7 @@ class Project:
             self.logger.info(f"Reading file comtents from '{filepath.relative_to(project_path)}'")
             with open(filepath,'r') as f:
                 old_contents = f.read()
-
-            new_contents = old_contents.replace(replace_what, replace_with)
+            new_contents = replace_many(old_contents, replace)
             contents_modified = new_contents != old_contents
 
             if contents_only:
@@ -296,18 +292,18 @@ class Project:
                 new_path = filepath.relative_to(project_path)
                 filename_modified = False
             else:
-                new_file = file.replace(replace_what,replace_with)
+                new_file = replace_many(file,replace)
                 filename_modified = new_file != file
                 new_path = (filepath.parent / new_file).relative_to(project_path)
 
             if contents_modified and filename_modified:
-                self.logger.info(f"Replacing '{replace_what}' with '{replace_with}': modified file name and contents -> '{new_path}'.")
+                self.logger.info(f"Replacing '{replace}': modified file name and contents -> '{new_path}'.")
             elif contents_modified:
-                self.logger.info(f"Replacing '{replace_what}' with '{replace_with}': modified file contents -> '{new_path}'.")
+                self.logger.info(f"Replacing '{replace}': modified file contents -> '{new_path}'.")
             elif filename_modified:
-                self.logger.info(f"Replacing '{replace_what}' with '{replace_with}': modified file name -> '{new_path}'.")
+                self.logger.info(f"Replacing '{replace}': modified file name -> '{new_path}'.")
             else:
-                self.logger.info(f"Replacing '{replace_what}' with '{replace_with}': unchanged file -> '{new_path}'.")
+                self.logger.info(f"Replacing '{replace}': unchanged file -> '{new_path}'.")
 
             if filename_modified or contents_modified:
                 # By first renaming the original file, we avoid problems when the new file name
@@ -341,3 +337,15 @@ def _filter(folders):
     """
     exclude_folders = ['.venv', '.git', '_build', '_cmake_build', '__pycache__']
     folders[:] = [f for f in folders if not f in exclude_folders]
+
+def replace_many(s:str, replace: List[Tuple[str,str]]) -> str:
+    """Replacing many strings in a str.
+
+    Params:
+        s : str to be modified
+        replace: list of tuples (str_to_replace, replacement_str)
+    """
+    result = s
+    for str_to_replace,replacement in replace:
+        result = result.replace(str_to_replace, replacement)
+    return result
