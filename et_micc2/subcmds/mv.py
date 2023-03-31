@@ -174,12 +174,12 @@ def mv_move(project, component_traits):
     shutil.move(package_path / component_traits.path, package_path / component_traits.to)
 
     package_name = package_path.name
-    paths = [component_traits.component, component_traits.to]
+    paths = [component_traits.path, component_traits.to]
     common_path = env.common_path(paths)
     import_libs = [p.relative_to(common_path).replace(os.sep, '.') for p in paths]
     replace = [
         (import_libs[0], import_libs[1]),
-        (Path(component_traits.component).name,Path(component_traits.to).name),
+        (Path(component_traits.path).name, Path(component_traits.to).name),
     ]
     project.replace_in_folder(package_path, replace)
     project.replace_in_folder(package_test_path, replace)
