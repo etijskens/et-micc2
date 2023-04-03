@@ -163,7 +163,7 @@ def mv_move(project, component_traits):
         project.context.commit_msg = '' # we don't want separate commits for the rename and the move
         mv(project) # rename
         # prepare for moving
-        component_traits.to       = Path(to_path).parent
+        component_traits.to = Path(to_path).parent
         component_traits.path = Path(project.context.component).parent / to_name
         after_rename = True
 

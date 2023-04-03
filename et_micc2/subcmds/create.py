@@ -180,9 +180,11 @@ def create(project):
                 if not returncode:
                     if project.context.github_repo:
                         # todo this context manager does not print correctly
-                        with messages.log( project.logger.info
-                                         ,f"Creating remote git repository at git://github.com/{github_username}/{project.context.project_path.name}"
-                                         ):
+                        with messages.log(
+                                project.logger.info,
+                                f"Creating {project.context.github_repo} remote git repository at "
+                                f"git://github.com/{github_username}/{project.context.project_path.name}"
+                        ):
                             with utils.in_directory(project.context.project_path):
                                 pat_file = project.context._cfg_dir / f'{project.context.template_parameters["github_username"]}.pat'
                                 if pat_file.exists():
