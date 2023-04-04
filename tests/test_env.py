@@ -5,15 +5,16 @@ from et_micc2.tools.utils import in_directory
 
 def test_common_path_1():
     """"""
-    paths = [
-        'et_micc2/scripts',
-        'et_micc2/subcmds/check_env.py',
-        'et_micc2/templates/top-level-package/{{tmpl.project_name}}/.gitignore'
-    ]
-    result = common_path(paths)
-    print(f"{result=}")
-    expected = Path('et_micc2/')
-    assert result == expected
+    with in_directory('/Users/etijskens/software/dev/workspace/et-micc2'):
+        paths = [
+            'et_micc2/scripts',
+            'et_micc2/subcmds/check_env.py',
+            'et_micc2/templates/top-level-package/{{tmpl.project_name}}/.gitignore'
+        ]
+        result = common_path(paths)
+        print(f"{result=}")
+        expected = Path('et_micc2/')
+        assert result == expected
 
 def test_common_path_2():
     """"""
