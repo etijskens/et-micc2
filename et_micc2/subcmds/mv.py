@@ -25,11 +25,11 @@ def mv(project):
         component_traits.db_entry = project.components[str(component_traits.path)]  # may raise KeyError
     except KeyError:
         msg = f"Component '{component_traits.name}' not found."
-        # similar = [component for component in env.list_folders_only(project) if (component_traits.to in component)]
-        # if similar:
-        #     msg +="\nDid you mean:"
-        #     for s in similar:
-        #         msg += f"\n  - {s} ?"
+        similar = [component for component in env.list_folders_only(project) if (component_traits.to in component)]
+        if similar:
+            msg +="\nDid you mean:"
+            for s in similar:
+                msg += f"\n  - {s} ?"
         messages.error(msg, exit_code=messages.ExitCodes.SUBMODULE_NOT_FOUND.value)
 
     component_traits.context = component_traits.db_entry['context']

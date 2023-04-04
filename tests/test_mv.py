@@ -129,9 +129,24 @@ def test_move_1():
         assert not (Path('.') / 'BAR' / 'bar' / 'foo2' / 'onion_soup').is_dir()
         assert     (Path('.') / 'BAR' / 'bar' / 'foo'  / 'sub' / 'onion_soup').is_dir()
 
+def test_similar():
+    """"""
+    with utils.in_directory(helpers.test_workspace()):
+        results = []
+        # Create package BAR
+        results.append(helpers.micc(['-p', 'BAR', 'create', '--allow-nesting', '--remote=none']))
+        assert Path('BAR/bar/__init__.py').is_file()
+        # add Python submodule 'foo'
+        results.append(helpers.micc(['-p', 'BAR', 'add', 'foo', '--py']))
+        assert (Path('.') / 'BAR' / 'bar' / 'foo').is_dir()
+        # add Python submodule 'foo/soup'
+        results.append(helpers.micc(['-p', 'BAR', 'add', 'foo/soup', '--py']))
+        assert (Path('.') / 'BAR' / 'bar' / 'foo'/ 'soup').is_dir()
+        # remove soup but pass the wrong path
+        results.append(helpers.micc(['-p', 'BAR', 'mv', 'soup']))
 
 if __name__ == "__main__":
-    the_test_you_want_to_debug = test_move_1
+    the_test_you_want_to_debug = test_similar
 
     print(f"{__file__}::__main__ executing test '{the_test_you_want_to_debug}'")
     the_test_you_want_to_debug()
