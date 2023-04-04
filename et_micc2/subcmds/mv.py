@@ -187,7 +187,10 @@ def mv_move(project, component_traits):
 
     db_entry = component_traits.db_entry
     for key, val in db_entry.items():
-        if not key == 'context':
+        if key == 'context':
+            context = component_traits.db_entry[key]
+            context.addname = str(component_traits.to)
+        else:
             path = project.context.project_path / key
             parent_folder, filename, old_string = path.parent, path.name, val
             new_string = ''
