@@ -29,7 +29,7 @@ def test_common_path_2():
         assert result == expected
 
 if __name__ == "__main__":
-    the_test_you_want_to_debug = test_common_path_2
+    the_test_you_want_to_debug = test_common_path_1
 
     print(f"{__file__}::__main__ executing test '{the_test_you_want_to_debug}'")
     the_test_you_want_to_debug()
