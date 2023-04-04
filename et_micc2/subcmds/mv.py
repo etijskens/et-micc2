@@ -189,7 +189,7 @@ def mv_move(project, component_traits):
     for key, val in db_entry.items():
         if key == 'context':
             context = component_traits.db_entry[key]
-            context.add_name = str(Path(component_traits.to) / component_traits.name)
+            context['add_name'] = str(Path(component_traits.to) / component_traits.name)
         else:
             path = project.context.project_path / key
             parent_folder, filename, old_string = path.parent, path.name, val
