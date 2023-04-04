@@ -190,6 +190,7 @@ def mv_move(project, component_traits):
         if key == 'context':
             context = component_traits.db_entry[key]
             context['add_name'] = str(Path(component_traits.to) / component_traits.name)
+            context['module_srcdir']
         else:
             path = project.context.project_path / key
             parent_folder, filename, old_string = path.parent, path.name, val
