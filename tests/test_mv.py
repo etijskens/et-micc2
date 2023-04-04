@@ -3,6 +3,8 @@
 
 import subprocess
 
+import pytest
+
 """Tests for `micc` package."""
 from pathlib import Path
 from types import SimpleNamespace
@@ -143,7 +145,9 @@ def test_similar():
         results.append(helpers.micc(['-p', 'BAR', 'add', 'foo/soup', '--py']))
         assert (Path('.') / 'BAR' / 'bar' / 'foo'/ 'soup').is_dir()
         # remove soup but pass the wrong path
-        results.append(helpers.micc(['-p', 'BAR', 'mv', 'soup']))
+        with pytest.raises(AssertionError):
+            results.append(helpers.micc(['-p', 'BAR', 'mv', 'soup']))
+
 
 if __name__ == "__main__":
     the_test_you_want_to_debug = test_similar

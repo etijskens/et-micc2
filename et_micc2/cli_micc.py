@@ -747,8 +747,8 @@ def mv(ctx, component, to, msg, no_commit):
         project = Project(context)
         with messages.logtime(context):
             mv_cmd(project)
-    except RuntimeError:
-        ctx.exit(ExitCodes.RuntimeError)
+    except RuntimeError as rte:
+        ctx.exit(rte.exit_code)
 
 
 ####################################################################################################
