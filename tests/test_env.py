@@ -13,7 +13,7 @@ def test_common_path_1():
         ]
         result = common_path(paths)
         print(f"{result=}")
-        expected = Path('et_micc2/')
+        expected = Path('et_micc2/').resolve()
         assert result == expected
 
 def test_common_path_2():
