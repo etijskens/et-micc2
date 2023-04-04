@@ -249,7 +249,6 @@ def in_directory(path):
         os.chdir(previous_dir)
 
 
-
 def execute(cmds,logfun=None,stop_on_error=True,env=None,cwd=None,verbose=True):
     """Executes a list of OS commands, and logs with logfun.
     

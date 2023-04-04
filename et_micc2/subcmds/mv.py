@@ -11,9 +11,10 @@ import et_micc2.tools.utils as utils
 
 def mv(project):
     """Rename, move or remove a component (submodule, Fortran/C++ binary extension module, or app (CLI)."""
-    if project.context.commit_msg:
-        cmds = [['git', 'commit', '-a', '-m', project.context.commit_msg]]
-        utils.execute(cmds, project.logger.debug, stop_on_error=True)
+    with utils.in_directory(project.context.project_path):
+        if project.context.commit_msg:
+            cmds = [['git', 'commit', '-a', '-m', project.context.commit_msg]]
+            utils.execute(cmds, project.logger.debug, stop_on_error=True)
 
     p = Path(project.context.component)
     component_traits = SimpleNamespace(
@@ -25,7 +26,7 @@ def mv(project):
         component_traits.db_entry = project.components[str(component_traits.path)]  # may raise KeyError
     except KeyError:
         msg = f"Component '{component_traits.name}' not found."
-        similar = [component for component in env.list_folders_only(project) if (component_traits.to in component)]
+        similar = project.components.similar_to(component_traits.name)
         if similar:
             msg +="\nDid you mean:"
             for s in similar:
