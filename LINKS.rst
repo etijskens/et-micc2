@@ -33,8 +33,11 @@ A system administrator has two problems: 1. Dumb users. 2. Smart users.
 
 "Theory and practice sometimes clash. And when that happens, theory loses. Every single time." - Linus Torvalds
 
+"Code never lies, comments sometimes do." - Ron Jeffries
+
 For Beginners
 -------------
+* `Harvard CS50’s Introduction to Programming with Python <https://www.youtube.com/watch?v=nLRL_NcnK-4>`_
 * `Learn Python: 7 of my favorite resources <https://opensource.com/article/22/11/learn-python>`_
 * `De Programmeursleerling - Pieter Spronck <http://www.spronck.net/pythonbook/dutchindex.xhtml>`_ (in Dutch)
 * `Slither into Python <https://www.slitherintopython.com>`_
@@ -126,6 +129,7 @@ rely on automatic code transformation from Python, so there is no need to write 
 * `PyCon 22 Talk - Henry Fredrick Schreiner III: Building a binary extension <https://www.youtube.com/watch?v=gROGDQakzas&list=PL2Uw4_HvXqvYeXy8ab7iRHjA-9HiYhRQl&index=24>`_
 * `Deep CMake for library authors <https://www.youtube.com/watch?v=m0DwB4OvDXk>`_ CppCon 2019, Interesting CMake stuff by craig scott,
   the author of `Professional CMake - a practical guide <https://crascit.com/professional-cmake/>`_
+* `nanobind, a fastder pybind11 <https://github.com/wjakob/nanobind>`_
 
 Approaches mimicking or wrapping OpenMP and MPI:
 
@@ -152,10 +156,15 @@ Concepts and ideas:
 
 * `Does it ever make sense to use more concurrent processes than processor cores? <https://softwareengineering.stackexchange.com/questions/415413/does-it-ever-make-sense-to-use-more-concurrent-processes-than-processor-cores?utm_source=Iterable&utm_medium=email&utm_campaign=the_overflow_newsletter>`_
   You can have as many threads as you want as long as they're doing nothing.
+* `Putting the “You” in CPU <https://cpu.land/?utm_source=tldrnewsletter>`_ Curious exactly what happens when you run a program on your computer? Read this article to learn how multiprocessing works, what system calls really are, how computers manage memory with hardware interrupts, and how Linux loads executables.
 
 Code modernization
 ------------------
 * `Improving performance with SIMD intrinsics in three use cases <https://stackoverflow.blog/2020/07/08/improving-performance-with-simd-intrinsics-in-three-use-cases/?utm_source=Iterable&utm_medium=email&utm_campaign=the_overflow_newsletter>`_
+* `LLVM Optimization Remarks - Ofek Shilon - CppCon 2022 <https://www.youtube.com/watch?v=qmEsx4MbKoc>`_
+* `The Most Important Optimizations to Apply in Your C++ Programs - Jan Bielak - CppCon 2022 <https://www.youtube.com/watch?v=qCjEN5XRzHc>`_`
+* `CppCon 2016: Jason Turner “Practical Performance Practices" <https://www.youtube.com/watch?v=uzF4u9KgUWI>`_
+* `CppCon 2018: Jonathan Boccara “105 STL Algorithms in Less Than an Hour” <https://www.youtube.com/watch?v=2olsGf6JIkU>`_
 
 Profiling
 ---------
@@ -186,6 +195,8 @@ Resource monitoring
 
 Python idioms and readability
 -----------------------------
+* `Weird Python "Features" That Might Catch You By Surprise <https://martinheinz.dev/blog/103>`_
+* `How to write Python code people actually want to use <https://www.youtube.com/watch?v=spi0N_PNznE>`_
 * `The Elements of Python Stylez <https://github.com/amontalenti/elements-of-python-style>`_
 * `Practical decorators <https://www.youtube.com/watch?v=MjHpMCIvwsY&t=1475s>`_ Reuven Lerner
 * `Useful Python decorators for Data Scientists <https://bytepawn.com/python-decorators-for-data-scientists.html>`_
@@ -247,6 +258,8 @@ Python idioms and readability
 
 Useful packages
 ---------------
+* `A curated list of awesome Python frameworks, libraries, software and resources <https://github.com/vinta/awesome-python>`_
+* `Python's Missing Batteries: Essential Libraries You're Missing Out On <https://martinheinz.dev/blog/96?utm_source=tldrnewsletter>`_
 * `safer: a safer file writer <https://medium.com/@TomSwirly/%EF%B8%8F-safer-a-safer-file-writer-%EF%B8%8F-5fe267dbe3f5>`_
 * `sproc: subprocesses for subhumanses <https://medium.com/@TomSwirly/%EF%B8%8F-sproc-subprocesseses-for-subhumanses-dbee42f22af5>`_
 * `The 22 Most-Used Python Packages in the World <https://medium.com/better-programming/the-22-most-used-python-packages-in-the-world-7020a904b2e>`_
@@ -264,6 +277,8 @@ Useful packages
 * `Awesome pattern matching (apm) for Python <https://github.com/scravy/awesome-pattern-matching>`_
 * `Scheduling All Kinds of Recurring Jobs with Python <https://towardsdatascience.com/scheduling-all-kinds-of-recurring-jobs-with-python-b8784c74d5dc>`_
 * `bidict <https://towardsdatascience.com/python-bi-dictionary-key-can-be-value-and-value-can-be-key-50715a2046af>`_
+* `Python asyncio <https://superfastpython.com/python-asyncio/>`_
+* `stringzilla <https://github.com/ashvardanian/Stringzilla?utm_source=tldrnewsletter>`_
 
 Exceptions
 ----------
@@ -353,6 +368,7 @@ Debugging
     * `Cool New Stuff in Gdb 9 and Gdb 10 - Greg Law - CppCon 2021 <https://www.youtube.com/watch?v=xSnetY3eoIk>`_
     * `Cool New Stuff in GDB 9, 10 and 11 - Greg Law - ACCU 2022 <https://www.youtube.com/watch?v=KLXnNWYa5YA>`_
     * ` <>`_
+* `Debugging a Mixed Python and C Language Stack <https://developer.nvidia.com/blog/debugging-mixed-python-and-c-language-stack>`_
 
 Logging
 -------
@@ -379,6 +395,9 @@ Scientific Python
 
 Artificial intelligence, machine learning and data science
 ----------------------------------------------------------
+* `Xorbits: scalable Python data science, familiar & fast <https://doc.xorbits.io/en/latest/>`_
+* `awesome polars <https://github.com/ddotta/awesome-polars>`_
+* `pandas 2.0 and the Arrow revolution (part I) <https://datapythonista.me/blog/pandas-20-and-the-arrow-revolution-part-i>`_
 * `Scikit-learn, wrapping your head around machine learning - PyCon 2019 <https://www.youtube.com/watch?v=kTdt0P0e3Qc>`_
 * `Applied Deep Learning for NLP Using PyTorch <https://youtu.be/VBM1u-UIoI0>`_
 * `Data Science Best Practices with pandas - PyCon 2019 <https://www.youtube.com/watch?v=ZjrUmNq41Eo>`_
@@ -402,6 +421,7 @@ Artificial intelligence, machine learning and data science
 * `Neural Networks: Zero to Hero <https://karpathy.ai/zero-to-hero.html?utm_source=tldrnewsletter>`_
 * `This guide is designated to anybody with basic programming knowledge or a computer science background interested in becoming a Research Scientist with 🎯 on Deep Learning and NLP <https://github.com/ahmedbahaaeldin/From-0-to-Research-Scientist-resources-guide?utm_source=tldrnewsletter>`_
 * `pyGWalker <https://github.com/Kanaries/pygwalker>`_
+* `Harvard CS50’s Artificial Intelligence with Python – Full University Course <https://www.youtube.com/watch?v=5NgNicANyqM>`_
 
 Pandas
 ------
@@ -455,6 +475,7 @@ Packaging
 * `What the heck is pyproject.toml? <https://snarky.ca/what-the-heck-is-pyproject-toml/>`_
 * `4 Things Tutorials Don't Tell You About PyPI <https://blog.paoloamoroso.com/2021/09/4-things-tutorials-dont-tell-you-about.html>`_
 * `How to improve Python packaging, or why fourteen tools are at least twelve too many <https://chriswarrick.com/blog/2023/01/15/how-to-improve-python-packaging/>`_
+* `Trusted Publishing; how to publish to PyPI with Github Actions <https://pgjones.dev/blog/trusted-plublishing-2023/>`_
 
 Graphics
 --------
@@ -522,7 +543,7 @@ git and other VCS
 
 Development environment, developement workflow
 ----------------------------------------------
-* `pyenv+poetry+pipx <https://jacobian.org/2019/nov/11/python-environment-2020/>`
+* `pyenv+poetry+pipx <https://jacobian.org/2019/nov/11/python-environment-2020/>`_
 * `Improving Python Dependency Management With pipx and Poetry <https://cedaei.com/posts/python-poetry-pipx/>`_
 * https://sourcery.ai/blog/python-best-practices/
 * https://pypi.org/project/create-python-package/ a micc 'light'
@@ -536,6 +557,7 @@ Development environment, developement workflow
 * `pipupgrade <https://github.com/achillesrasquinha/pipupgrade>`_
 * `How to Set Environment Variables in Linux and Mac: The Missing Manual <https://doppler.com/blog/how-to-set-environment-variables-in-linux-and-mac>`_
 * `GitHub Actions: the full course <https://www.youtube.com/playlist?list=PLArH6NjfKsUhvGHrpag7SuPumMzQRhUKY>`_
+* `a file browser for your terminal <https://github.com/juftin/browsr>`_
 
 CI/CD
 -----

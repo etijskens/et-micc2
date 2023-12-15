@@ -85,7 +85,7 @@ def build_binary_extension(context):
     """
     build_options = context.build_options
 
-    # Remove so file to avoid "RuntimeError: Symlink loop from ..."
+    # Remove .so file to avoid "RuntimeError: Symlink loop from ..."
     try:
         build_options.submodule_binary.unlink()  # missing_ok=True only available from 3.8 on, not in 3.7
     except FileNotFoundError:

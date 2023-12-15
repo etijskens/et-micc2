@@ -188,16 +188,6 @@ def create(project):
                             with utils.in_directory(project.context.project_path):
                                 pat_file = project.context._cfg_dir / f'{project.context.template_parameters["github_username"]}.pat'
                                 if pat_file.exists():
-                                    with open(pat_file) as f:
-                                        completed_process = \
-                                            subprocess.run(['gh', 'auth', 'login', '--with-token'], stdin=f, text=True)
-                                        utils.log_completed_process(completed_process, project.logger.debug)
-                                        cmd = ['gh', 'repo', 'create'
-                                            , '--source', str(project.context.project_path)
-                                            , f'--{project.context.github_repo}'  # --private or --public
-                                            , '--push'  # push the contents
-                                               ]
-                                        utils.execute(cmd, project.logger.debug, stop_on_error=True)
                                 else:
                                     project.logger.messages.error(
                                         f"Unable to access your GitHub account: \n"

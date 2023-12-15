@@ -145,7 +145,7 @@ tests put in by micc2_, and add a new one like below:
 
 The test :py:meth:`test_dot_aa` defines an array with 3 ``int`` numbers, and
 computes the dot product with itself. The expected result is easily calculated by
-hand. Save the file, and run the test, usi           ng Pytest_ as explained in
+hand. Save the file, and run the test, using Pytest_ as explained in
 :ref:`testing-your-code`. Pytest_ will show a line for every test source file an on
 each such line a ``.`` will appear for every successfull test, and a ``F`` for a failing
 test. Here is the result:
@@ -383,7 +383,7 @@ statements below:
     1e+16
     
 Because ``1e16`` is a 1 followed by 16 zeroes, adding ``1`` would alter the 17th
-digit,which is, because of the finite precision, not represented. An approximate
+digit, which is, because of the finite precision, not represented. An approximate
 result is returned, namely ``1e16``, which is of by a relative error of only 1e-16.
 
 .. code-block:: pycon
